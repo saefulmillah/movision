@@ -1,0 +1,112 @@
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 16px 15px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2xl);
+  box-shadow: var(--card-shadow);
+  animation: rise 0.32s ease both;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.label {
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.iconBox {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-left: auto;
+  border-radius: var(--r-md);
+}
+
+.value {
+  font-family: var(--font-mono);
+  font-size: var(--fs-kpi);
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1;
+}
+.value .sub {
+  font-size: var(--fs-lg);
+  color: var(--text-muted);
+}
+
+.hint {
+  font-size: var(--fs-xs);
+  color: var(--text-faint);
+}
+
+.kpi[data-disabled="true"] {
+  opacity: 0.55;
+}
+
+/* ---- Warna semantik per KPI ---- */
+.blue .iconBox {
+  background: rgba(91, 141, 255, 0.14);
+  color: var(--st-blue);
+}
+.green .iconBox {
+  background: rgba(52, 211, 153, 0.14);
+  color: var(--sem-green);
+}
+.amber .iconBox {
+  background: rgba(217, 160, 20, 0.14);
+  color: var(--sem-amber);
+}
+.red .iconBox {
+  background: rgba(244, 63, 94, 0.14);
+  color: var(--sem-red);
+}
+.cyan .iconBox {
+  background: rgba(34, 211, 238, 0.14);
+  color: var(--sem-cyan);
+}
+.purple .iconBox {
+  background: rgba(167, 139, 250, 0.14);
+  color: var(--sem-purple);
+}
+
+/* ---- Skeleton ---- */
+.skelLine {
+  height: 12px;
+  border-radius: 4px;
+  background: var(--track);
+  animation: pulseSkel 1.2s ease-in-out infinite;
+}
+.skelValue {
+  height: 26px;
+  width: 60%;
+  border-radius: 6px;
+  background: var(--track);
+  animation: pulseSkel 1.2s ease-in-out infinite;
+}
+@keyframes pulseSkel {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+/* Keyframes lokal (CSS Modules meng-hash referensi animasi; definisi lokal agar cocok). */
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+@keyframes pulse { 0% { transform: scale(1); opacity: 0.9; } 70% { transform: scale(1.9); opacity: 0; } 100% { opacity: 0; } }
+@keyframes glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(244,63,94,0.5); } 50% { box-shadow: 0 0 8px 2px rgba(244,63,94,0.55); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes slideInRight { from { opacity: 0; transform: translateX(34px); } to { opacity: 1; transform: none; } }
+

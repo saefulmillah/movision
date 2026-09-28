@@ -1,0 +1,22 @@
+.content {
+  z-index: 120;
+  padding: 6px 10px;
+  border-radius: var(--r-md);
+  background: var(--surface-1);
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+  color: var(--text);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  max-width: 240px;
+  animation: tipIn var(--t-fast);
+}
+.arrow {
+  fill: var(--surface-1);
+}
+@keyframes tipIn {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+}

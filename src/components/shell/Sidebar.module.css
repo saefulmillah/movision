@@ -1,0 +1,257 @@
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  flex: none;
+  width: var(--w-sidebar);
+  background: var(--surface-1);
+  border-right: 1px solid var(--line);
+  transition: width var(--t-panel);
+  overflow: hidden;
+}
+
+.sidebar.collapsed {
+  width: var(--w-sidebar-collapsed);
+}
+
+/* ---- Header: logo + tombol lipat ---- */
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  height: var(--h-topbar);
+  padding: 0 14px 0 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  color: var(--text);
+}
+
+.brandMark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--r-md);
+  background: var(--nav-active-bg);
+  color: var(--st-blue);
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.15;
+}
+.brandName {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+.brandSub {
+  font-size: var(--fs-micro);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.collapseBtn {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  margin-left: auto;
+  border-radius: var(--r-md);
+  color: var(--text-muted);
+}
+.collapseBtn:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.collapsed .header {
+  padding: 0;
+  justify-content: center;
+}
+/* Saat terlipat, sembunyikan brand penuh dan tampilkan tombol buka menu
+   terpusat di posisi tombol lipat semula (agar selalu ada tombol show). */
+.collapsed .brand {
+  display: none;
+}
+.collapsed .collapseBtn {
+  display: grid;
+  margin: 0 auto;
+}
+
+/* ---- Navigasi ---- */
+.nav {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.navItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 2px 10px;
+  padding: 11px 14px 11px 20px;
+  border-radius: var(--r-lg);
+  color: var(--text-muted);
+  font-size: var(--fs-md);
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background var(--t-fast), color var(--t-fast);
+}
+.navItem:hover {
+  background: rgba(47, 107, 255, 0.1);
+}
+.navItem.active {
+  background: var(--nav-active-bg);
+  color: var(--nav-active-text);
+}
+.navItem.active::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 19px;
+  border-radius: 2px;
+  background: var(--st-blue);
+}
+
+.navLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navBadge {
+  margin-left: auto;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--sem-red);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  animation: glow 1.8s infinite;
+}
+
+.collapsed .navItem {
+  justify-content: center;
+  padding: 11px 0;
+  margin: 2px 8px;
+}
+.collapsed .navLabel {
+  display: none;
+}
+.collapsed .navItem.active::before {
+  display: none;
+}
+.collapsed .navBadge {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  min-width: 8px;
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  font-size: 0;
+}
+
+/* ---- Profil pengguna ---- */
+.footer {
+  flex: none;
+  border-top: 1px solid var(--line);
+  padding: 12px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: var(--nav-active-bg);
+  color: var(--nav-active-text);
+  font-weight: 600;
+  font-size: var(--fs-sm);
+  text-transform: uppercase;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+.userName {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.userRole {
+  font-size: var(--fs-micro);
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.logoutBtn {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  margin-left: auto;
+  border-radius: var(--r-md);
+  color: var(--text-muted);
+}
+.logoutBtn:hover {
+  background: var(--surface-2);
+  color: var(--sem-red);
+}
+
+.collapsed .footer {
+  justify-content: center;
+  padding: 12px 0;
+}
+.collapsed .userInfo,
+.collapsed .logoutBtn {
+  display: none;
+}
+
+/* Keyframes lokal (CSS Modules meng-hash referensi animasi; definisi lokal agar cocok). */
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+@keyframes pulse { 0% { transform: scale(1); opacity: 0.9; } 70% { transform: scale(1.9); opacity: 0; } 100% { opacity: 0; } }
+@keyframes glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(244,63,94,0.5); } 50% { box-shadow: 0 0 8px 2px rgba(244,63,94,0.55); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes slideInRight { from { opacity: 0; transform: translateX(34px); } to { opacity: 1; transform: none; } }
+

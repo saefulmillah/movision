@@ -1,0 +1,14 @@
+/* ============================================================
+   Ikon Lucide via CSS mask — mewarisi warna dari currentColor.
+   Handoff §7: Lucide via CDN dipertahankan, dirender sebagai mask.
+   ============================================================ */
+
+.icon {
+  display: inline-block;
+  flex: none;
+  width: var(--icon-size, 17px);
+  height: var(--icon-size, 17px);
+  background-color: currentColor;
+  -webkit-mask: var(--icon-url) center / contain no-repeat;
+  mask: var(--icon-url) center / contain no-repeat;
+}

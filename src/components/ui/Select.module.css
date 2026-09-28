@@ -1,0 +1,85 @@
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color var(--t-fast), background var(--t-fast), box-shadow var(--t-fast);
+}
+.trigger:hover {
+  background: var(--surface-3);
+}
+.trigger:focus,
+.trigger:focus-visible,
+.trigger[data-state="open"] {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+.trigger[data-placeholder] {
+  color: var(--text-muted);
+}
+.lead {
+  color: var(--text-faint);
+  display: grid;
+  place-items: center;
+}
+.value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+.caret {
+  color: var(--text-faint);
+  margin-left: auto;
+}
+
+/* Konten dropdown (di-portal). Di atas Modal (overlay 100 / content 101)
+   agar Select yang dipakai di dalam Dialog tetap tampil & bisa diklik. */
+.content {
+  z-index: 200;
+  min-width: var(--radix-select-trigger-width);
+  max-height: 320px;
+  background: var(--surface-1);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+  overflow: hidden;
+}
+.viewport {
+  padding: 5px;
+}
+.item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--r-md);
+  font-size: var(--fs-base);
+  color: var(--text-dim);
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+}
+.item[data-highlighted] {
+  background: var(--nav-active-bg);
+  color: var(--text);
+}
+.item[data-state="checked"] {
+  color: var(--st-blue);
+  font-weight: 600;
+}
+.indicator {
+  margin-left: auto;
+  display: inline-flex;
+  color: var(--st-blue);
+}

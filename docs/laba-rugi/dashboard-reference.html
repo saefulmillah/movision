@@ -1,0 +1,344 @@
+<title>Laba Rugi Direktorat III</title>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#eef1f5;--surface:#fff;--surface-2:#f3f5f9;--ink:#182231;--muted:#65728a;
+  --line:#d3dae4;--line-strong:#b9c3d1;--brand:#1e4b8f;--brand-2:#16386b;--brand-ink:#fff;
+  --section-bg:#e7ecf3;--total-bg:#dbe5f5;--konsol-bg:#eaf1e9;
+  --pos:#1a7a4c;--neg:#c0392b;--chip:#eef1f6;--chip-on:#1e4b8f;
+  --shadow:0 1px 3px rgba(20,35,60,.08),0 8px 24px rgba(20,35,60,.06);
+  --rg-JKT:#d8e3f4;--rg-SUMBAGSEL:#f6ddc9;--rg-SUMBAGTENG:#dcecda;--rg-SUMBAGUT:#fbeaca;
+  --rg-JTTS:#e1e2e4;--rg-PBBL:#dde8f5;--rg-DIVISI:#e4e4e6;--rg-ink:#26313f;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;--bg:#0e131b;--surface:#161d28;--surface-2:#1b2430;--ink:#e7edf5;--muted:#93a1b5;
+  --line:#28323f;--line-strong:#3a4757;--brand:#2f5ea8;--brand-2:#20406f;
+  --section-bg:#1d2735;--total-bg:#213048;--konsol-bg:#1c2a24;--pos:#43c184;--neg:#f0705f;
+  --chip:#1f2937;--chip-on:#3a6bb5;--shadow:0 1px 3px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+  --rg-JKT:#22344c;--rg-SUMBAGSEL:#432f1f;--rg-SUMBAGTENG:#25382a;--rg-SUMBAGUT:#413720;
+  --rg-JTTS:#31333a;--rg-PBBL:#233650;--rg-DIVISI:#33343a;--rg-ink:#dce6f2;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;--bg:#0e131b;--surface:#161d28;--surface-2:#1b2430;--ink:#e7edf5;--muted:#93a1b5;
+  --line:#28323f;--line-strong:#3a4757;--brand:#2f5ea8;--brand-2:#20406f;
+  --section-bg:#1d2735;--total-bg:#213048;--konsol-bg:#1c2a24;--pos:#43c184;--neg:#f0705f;
+  --chip:#1f2937;--chip-on:#3a6bb5;--shadow:0 1px 3px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+  --rg-JKT:#22344c;--rg-SUMBAGSEL:#432f1f;--rg-SUMBAGTENG:#25382a;--rg-SUMBAGUT:#413720;
+  --rg-JTTS:#31333a;--rg-PBBL:#233650;--rg-DIVISI:#33343a;--rg-ink:#dce6f2;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0;-webkit-font-smoothing:antialiased}
+.wrap{padding:0 16px;padding-block:18px 40px;max-width:1580px;margin:0 auto}
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 20px;padding-bottom:12px;border-bottom:2px solid var(--brand)}
+.title h1{font-weight:800;letter-spacing:-.01em;font-size:clamp(19px,2.3vw,26px);margin:0;line-height:1.05}
+.title .sub{color:var(--muted);font-size:13px;margin-top:4px;font-weight:500}
+.title .sub b{color:var(--ink);font-weight:600}
+.brandmark{margin-left:auto;text-align:right;font-size:11px;color:var(--muted);line-height:1.5}
+.brandmark .b1{font-weight:800;letter-spacing:.05em;color:var(--brand);font-size:14px}
+/* tabs */
+.tabs{display:flex;gap:4px;margin:16px 0 0;flex-wrap:wrap}
+.tab{font:inherit;font-size:13.5px;font-weight:700;border:1px solid var(--line-strong);border-bottom:none;background:var(--surface-2);color:var(--muted);padding:10px 18px;border-radius:9px 9px 0 0;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--brand);color:#fff;border-color:var(--brand)}
+.toolbar{display:flex;flex-wrap:wrap;gap:14px 22px;align-items:flex-end;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:0 12px 12px 12px;box-shadow:var(--shadow)}
+.fgroup{display:flex;flex-direction:column;gap:7px}
+.fgroup>.lab{font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:600}
+select{font:inherit;font-size:14px;font-weight:600;color:var(--ink);background:var(--surface-2);border:1px solid var(--line-strong);border-radius:8px;padding:8px 30px 8px 12px;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%2365728a' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{font:inherit;font-size:12.5px;font-weight:600;border:1px solid var(--line-strong);background:var(--chip);color:var(--muted);padding:7px 12px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.12s;user-select:none}
+.pill:hover{border-color:var(--brand);color:var(--ink)}
+.pill[aria-pressed="true"]{background:var(--chip-on);border-color:var(--chip-on);color:#fff}
+.pill .dot{width:8px;height:8px;border-radius:2px;background:currentColor;opacity:.85}
+.pill.mini{padding:6px 10px}
+.spacer{flex:1 1 auto}
+.sizer{display:inline-flex;border:1px solid var(--line-strong);border-radius:8px;overflow:hidden}
+.sizer button{font:inherit;font-weight:700;border:0;background:var(--surface-2);color:var(--ink);width:34px;height:36px;cursor:pointer}
+.sizer button:hover{background:var(--chip-on);color:#fff}
+.sizer button+button{border-left:1px solid var(--line-strong)}
+.btn{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line-strong);background:var(--surface-2);color:var(--ink);padding:8px 13px;border-radius:8px;cursor:pointer}
+.btn.solid{background:var(--brand);color:#fff;border-color:var(--brand)}
+.hidden{display:none!important}
+/* summary */
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 15px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.tile::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--brand)}
+.tile.good::before{background:var(--pos)}.tile.bad::before{background:var(--neg)}
+.tile .k{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600}
+.tile .v{font-weight:800;font-size:clamp(17px,1.9vw,23px);letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.tile .r{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums;margin-top:3px}
+.tile .r b{font-weight:700}
+.delta.pos{color:var(--pos)}.delta.neg{color:var(--neg)}
+/* table */
+.tablecard{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden;margin-top:16px}
+.scroll{overflow-x:auto}
+table{border-collapse:separate;border-spacing:0;width:100%;font-variant-numeric:tabular-nums;--fs:13.5px;font-size:var(--fs)}
+th,td{padding:6px 11px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+thead th{position:sticky;top:env(safe-area-inset-top,0px);z-index:3}
+.h-title{background:var(--brand);color:#fff;font-weight:700;text-align:center;letter-spacing:.03em;font-size:calc(var(--fs) + 1px);padding:9px 12px}
+.h-reg{text-align:center;font-weight:700;color:var(--rg-ink);font-size:calc(var(--fs) - 1px);letter-spacing:.01em;border-left:2px solid var(--surface)}
+.h-sub{background:var(--surface-2);color:var(--muted);font-weight:600;font-size:calc(var(--fs) - 2px);text-transform:uppercase;letter-spacing:.04em}
+.c-uraian{text-align:left!important;position:sticky;left:0;z-index:2;background:var(--surface);font-weight:500;min-width:172px}
+thead .c-uraian{z-index:5;background:var(--brand-2);color:#fff;vertical-align:bottom;font-weight:800;letter-spacing:.03em}
+tr.section td{background:var(--section-bg);font-weight:700}
+tr.section .c-uraian{background:var(--section-bg);font-weight:800;text-transform:uppercase;letter-spacing:.02em}
+tr.total td{background:var(--total-bg);font-weight:700}
+tr.total .c-uraian{background:var(--total-bg);font-weight:800;text-transform:uppercase;letter-spacing:.02em}
+tr.sub .c-uraian{padding-left:24px;color:var(--muted);font-weight:500;position:relative}
+tr.sub .c-uraian::before{content:"–";position:absolute;left:12px;color:var(--line-strong)}
+tr.hpp td{background:var(--brand-2);color:#fff;font-weight:700;border-bottom:0}
+tr.hpp .c-uraian{background:var(--brand-2);color:#fff;font-weight:800;text-transform:uppercase}
+td.real{font-weight:600;border-right:1px solid var(--line)}
+td.rkap{color:var(--muted)}
+tr.section td.rkap,tr.total td.rkap{opacity:.72}
+tr.section td.real,tr.total td.real{color:inherit}
+.neg{color:var(--neg)!important}
+td.grp,th.grp{border-left:2px solid var(--line-strong)}
+th.grp.h-reg{border-left:2px solid var(--surface)}
+.foot{display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:space-between;align-items:center;margin-top:12px;font-size:11.5px;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:14px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:11px;height:11px;border-radius:3px;display:inline-block}
+@media (max-width:720px){.summary{grid-template-columns:repeat(2,1fr)}.brandmark{margin-left:0;text-align:left}}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <div class="title">
+      <h1 id="viewTitle">Laba Rugi — Per Regional</h1>
+      <div class="sub">Periode <b id="periodLabel">SD Agustus 2026</b> · Nilai dalam <b>Rp juta</b> · Sumber: LR_CF_PER_RUAS</div>
+    </div>
+    <div class="brandmark">
+      <div class="b1">HK · Danantara Indonesia</div>
+      <div>Materi Rapat Direktorat III</div>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs" role="tablist">
+    <button class="tab" role="tab" data-view="konsol">Konsolidasi</button>
+    <button class="tab" role="tab" data-view="regional" aria-selected="true">Per Regional</button>
+    <button class="tab" role="tab" data-view="ruas">Per Ruas</button>
+  </div>
+
+  <div class="toolbar">
+    <div class="fgroup">
+      <div class="lab">Periode</div>
+      <select id="selPeriod" aria-label="Pilih periode"></select>
+    </div>
+    <div class="fgroup" id="regFilterGroup" style="flex:1 1 300px;">
+      <div class="lab">Filter Regional</div>
+      <div class="pills" id="regPills"></div>
+    </div>
+    <div class="fgroup" id="viewOptsGroup">
+      <div class="lab">Opsi</div>
+      <div class="pills">
+        <button class="pill mini" id="tglKonsolCol" aria-pressed="false">+ Kolom Total</button>
+        <button class="pill mini" id="tglHideZero" aria-pressed="true">Sembunyikan ruas tanpa realisasi</button>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <div class="fgroup">
+      <div class="lab">Ukuran</div>
+      <div class="sizer" role="group" aria-label="Ukuran teks">
+        <button id="fsDown" title="Perkecil">A−</button><button id="fsUp" title="Perbesar">A+</button>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="lab">Rapat</div>
+      <button class="btn solid" id="btnFull">⛶ Layar Penuh</button>
+    </div>
+  </div>
+
+  <div class="summary" id="summary"></div>
+
+  <div class="tablecard">
+    <div class="scroll"><table id="pnl"><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
+  </div>
+
+  <div class="foot">
+    <div class="legend">
+      <span><i class="sw" style="background:var(--total-bg)"></i> Baris utama</span>
+      <span><i class="sw" style="background:var(--section-bg)"></i> Kelompok</span>
+      <span><span class="neg" style="font-weight:700">( )</span> Negatif</span>
+    </div>
+    <div id="footNote">HPP (%) = Beban Langsung ÷ Pendapatan Usaha</div>
+  </div>
+</div>
+
+<script>
+const DATASET = {"periods":[{"key":"2026-08","label":"SD Agustus 2026"},{"key":"2026-07","label":"SD Juli 2026"},{"key":"2026-06","label":"SD Juni 2026"}],"data":{"2026-08":{"entities":{"DIVISI":{"pend_usaha":[0.0,0.0],"tol":[0.0,0.0],"usaha_lainnya":[0.0,0.0],"elektronifikasi":[0.0,0.0],"beban_langsung":[0.0,0.0],"beban_i":[0.0,0.0],"beban_ii":[0.0,0.0],"beban_iii":[0.0,0.0],"laba_operasi":[0.0,0.0],"beban_usaha":[134109.7,116999.2],"bunga":[0.0,0.0],"pajak_tangguhan":[0.0,0.0],"eat":[-134109.7,-116999.2],"ebitda":[-134109.7,-116999.2]},"JORR S":{"pend_usaha":[572133.4,585514.4],"tol":[571839.4,585346.5],"usaha_lainnya":[294.0,167.9],"elektronifikasi":[0.0,0.0],"beban_langsung":[270035.2,274326.9],"beban_i":[107409.6,96949.8],"beban_ii":[35017.3,31808.9],"beban_iii":[127608.3,145568.2],"laba_operasi":[302098.2,311187.5],"beban_usaha":[null,null],"bunga":[295434.6,295549.4],"pajak_tangguhan":[0.0,0.0],"eat":[6430.2,15823.8],"ebitda":[406696.9,433746.1]},"ATP":{"pend_usaha":[309713.7,316952.0],"tol":[309638.2,316952.0],"usaha_lainnya":[75.5,0.0],"elektronifikasi":[0.0,0.0],"beban_langsung":[117605.1,112659.9],"beban_i":[48349.2,45187.1],"beban_ii":[20797.0,19088.1],"beban_iii":[48458.9,48384.7],"laba_operasi":[192108.6,204292.1],"beban_usaha":[null,null],"bunga":[186015.6,83932.0],"pajak_tangguhan":[0.0,0.0],"eat":[6092.9,120360.2],"ebitda":[235204.1,247313.3]},"JKT":{"pend_usaha":[881847.1,902466.4],"tol":[881477.6,902298.5],"usaha_lainnya":[369.5,167.9],"elektronifikasi":[0.0,0.0],"beban_langsung":[387640.4,386986.8],"beban_i":[155758.8,142136.9],"beban_ii":[55814.3,50897.1],"beban_iii":[176067.2,193952.8],"laba_operasi":[494206.8,515479.6],"beban_usaha":[0.0,0.0],"bunga":[481450.3,379481.3],"pajak_tangguhan":[0.0,0.0],"eat":[12523.2,136184.0],"ebitda":[641901.0,681059.4]},"TERPEKA":{"pend_usaha":[654761.9,700189.9],"tol":[643437.7,688289.7],"usaha_lainnya":[11081.9,11900.2],"elektronifikasi":[242.3,0.0],"beban_langsung":[393400.9,361058.7],"beban_i":[190612.6,157871.1],"beban_ii":[40914.9,37745.6],"beban_iii":[161873.4,165442.1],"laba_operasi":[261361.0,339131.2],"beban_usaha":[null,null],"bunga":[367605.9,299584.6],"pajak_tangguhan":[46469.4,46469.4],"eat":[-153749.5,-7850.2],"ebitda":[328340.0,409678.9]},"PALINDRA":{"pend_usaha":[59973.3,63643.7],"tol":[59973.3,63591.5],"usaha_lainnya":[0.0,14.0],"elektronifikasi":[0.0,38.2],"beban_langsung":[61666.4,59634.7],"beban_i":[34868.8,35376.4],"beban_ii":[5158.0,3499.9],"beban_iii":[21639.7,20758.4],"laba_operasi":[-1693.1,4009.0],"beban_usaha":[null,null],"bunga":[0.0,0.0],"pajak_tangguhan":[4980.5,4980.5],"eat":[-6673.7,-937.1],"ebitda":[10874.5,15695.4]},"INPRABU":{"pend_usaha":[88388.7,93714.1],"tol":[87625.5,92962.1],"usaha_lainnya":[673.8,728.8],"elektronifikasi":[89.5,23.2],"beban_langsung":[144221.7,120454.6],"beban_i":[59040.8,57760.5],"beban_ii":[18926.4,-3073.8],"beban_iii":[66254.6,65767.9],"laba_operasi":[-55833.0,-26740.5],"beban_usaha":[null,null],"bunga":[0.0,0.0],"pajak_tangguhan":[6130.1,6130.1],"eat":[-61961.1,-32936.8],"ebitda":[-20725.8,7880.1]},"BENGTABA":{"pend_usaha":[11141.1,10943.8],"tol":[11125.1,10933.4],"usaha_lainnya":[16.0,10.4],"elektronifikasi":[0.0,0.0],"beban_langsung":[50165.6,43852.2],"beban_i":[20665.9,15109.2],"beban_ii":[4595.1,4022.4],"beban_iii":[24904.6,24720.6],"laba_operasi":[-39024.6,-32908.4],"beban_usaha":[null,null],"bunga":[0.0,0.0],"pajak_tangguhan":[821.8,821.8],"eat":[-39838.3,-33723.7],"ebitda":[-24659.5,-18727.4]},"PALTUNG":{"pend_usaha":[6652.7,0.0],"tol":[6652.7,0.0],"usaha_lainnya":[0.0,0.0],"elektronifikasi":[0.0,0.0],"beban_langsung":[28786.6,0.0],"beban_i":[11697.2,0.0],"beban_ii":[8401.5,0.0],"beban_iii":[8687.9,0.0],"laba_operasi":[-22133.9,0.0],"beban_usaha":[null,null],"bunga":[0.0,0.0],"pajak_tangguhan":[0.0,0.0],"eat":[-22133.9,0.0],"ebitda":[-20751.9,0.0]},"SUMBAGSEL":{"pend_usaha":[820917.7,868491.5],"tol":[808814.2,855776.7],"usaha_lainnya":[11771.8,12653.4],"elektronifikasi":[331.7,61.4],"beban_langsung":[678241.3,585000.2],"beban_i":[316885.4,266117.2],"beban_ii":[77995.9,42194.0],"beban_iii":[283360.1,276689.0],"laba_operasi":[142676.4,283491.3],"beban_usaha":[0.0,0.0],"bunga":[367605.9,299584.6],"pajak_tangguhan":[58401.8,58401.8],"eat":[-284356.4,-75447.8],"ebitda":[273077.4,414527.1]},"PERMAI":{"pend_usaha":[369398.8,393382.0],"tol":[367483.8,392308.0],"usaha_lainnya":[1845.0,1074.0],"elektronifikasi":[70.0,0.0],"beban_langsung":[291109.7,300094.1],"beban_i":[124405.4,135791.0],"beban_ii":[47509.2,46423.6],"beban_iii":[119195.1,117879.4],"laba_operasi":[78289.1,93287.9],"beban_usaha":[null,null],"bunga":[11769.6,10859.2],"pajak_tangguhan":[29355.6,29355.6],"eat":[36979.4,52921.0],"ebitda":[128131.1,141814.5]},"PEKBANGPAR":{"pend_usaha":[101590.1,103586.1],"tol":[101462.2,103551.4],"usaha_lainnya":[0.0,34.6],"elektronifikasi":[127.9,0.0],"beban_langsung":[106757.4,100459.3],"beban_i":[43931.6,41179.3],"beban_ii":[19973.8,16733.8],"beban_iii":[42852.0,42546.3],"laba_operasi":[-5167.3,3126.7],"beban_usaha":[null,null],"bunga":[1506.9,1506.9],"pajak_tangguhan":[7724.6,7724.6],"eat":[-14398.7,-6112.1],"ebitda":[3553.1,11541.3]},"PACIN":{"pend_usaha":[31414.4,32518.1],"tol":[30982.4,32497.1],"usaha_lainnya":[388.0,21.0],"elektronifikasi":[44.0,0.0],"beban_langsung":[73063.9,121505.4],"beban_i":[25632.0,24428.7],"beban_ii":[14937.9,14937.9],"beban_iii":[32494.1,82138.8],"laba_operasi":[-41649.5,-88987.3],"beban_usaha":[null,null],"bunga":[0.0,68.1],"pajak_tangguhan":[0.0,0.0],"eat":[-41688.3,-89351.9],"ebitda":[-32147.1,-29840.2]},"LINGKAR PKU":{"pend_usaha":[680.9,0.0],"tol":[680.9,0.0],"usaha_lainnya":[0.0,0.0],"elektronifikasi":[0.0,0.0],"beban_langsung":[10412.4,0.0],"beban_i":[5985.6,0.0],"beban_ii":[1569.4,0.0],"beban_iii":[2857.5,0.0],"laba_operasi":[-9731.5,0.0],"beban_usaha":[null,null],"bunga":[0.0,0.0],"pajak_tangguhan":[0.0,0.0],"eat":[-9731.5,0.0],"ebitda":[-8422.2,0.0]},"SUMBAGTENG":{"pend_usaha":[503084.2,529486.1],"tol":[500609.3,528356.5],"usaha_lainnya":[2233.0,1129.7],"elektronifikasi":[241.9,0.0],"beban_langsung":[481343.4,522058.8],"beban_i":[199954.6,201399.0],"beban_ii":[83990.3,78095.3],"beban_iii":[197398.6,242564.5],"laba_operasi":[21740.8,7427.3],"beban_usaha":[0.0,0.0],"bunga":[13276.5,12434.1],"pajak_tangguhan":[37080.1,37080.1],"eat":[-28839.1,-42543.1],"ebitda":[91114.9,123515.6]},"SIBANCEH":{"pend_usaha":[29939.8,60239.1],"tol":[29878.7,60220.1],"usaha_lainnya":[61.1,19.0],"elektronifikasi":[0.0,0.0],"beban_langsung":[111104.1,109214.8],"beban_i":[50489.5,39802.8],"beban_ii":[12877.4,11129.1],"beban_iii":[47737.2,58282.8],"laba_operasi":[-81164.4,-48975.7],"beban_usaha":[null,null],"bunga":[0.0,0.0],"pajak_tangguhan":[3059.1,3059.1],"eat":[-84207.5,-52054.1],"ebitda":[-62182.5,-19447.4]},"BINBRAN":{"pend_usaha":[109609.1,131701.2],"tol":[109408.7,131538.8],"usaha_lainnya":[122.0,162.3],"elektronifikasi":[78.4,0.0],"beban_langsung":[91055.0,89387.4],"beban_i":[45583.2,44412.0],"beban_ii":[5694.3,5592.2],"beban_iii":[39777.6,39383.2],"laba_operasi":[18554.1,42313.8],"beban_usaha":[null,null],"bunga":[39199.2,35904.1],"pajak_tangguhan":[7534.1,7534.1],"eat":[-28171.2,-1983.0],"ebitda":[45934.2,69298.9]},"INKIS":{"pend_usaha":[120193.5,135334.9],"tol":[119324.4,134521.8],"usaha_lainnya":[777.2,813.2],"elektronifikasi":[91.9,0.0],"beban_langsung":[96895.4,92627.6],"beban_i":[43216.4,40498.8],"beban_ii":[19962.6,18415.7],"beban_iii":[33716.4,33713.1],"laba_operasi":[23298.1,42707.3],"beban_usaha":[null,null],"bunga":[0.0,0.0],"pajak_tangguhan":[8166.4,8166.4],"eat":[15139.6,34443.0],"ebitda":[34936.7,54342.5]},"SUMBAGUT":{"pend_usaha":[259742.3,327275.2],"tol":[258611.7,326280.7],"usaha_lainnya":[960.3,994.5],"elektronifikasi":[170.3,0.0],"beban_langsung":[299054.5,291229.8],"beban_i":[139289.2,124713.6],"beban_ii":[38534.3,35137.0],"beban_iii":[121231.1,131379.1],"laba_operasi":[-39312.2,36045.4],"beban_usaha":[0.0,0.0],"bunga":[39199.2,35904.1],"pajak_tangguhan":[18759.7,18759.7],"eat":[-97239.0,-19594.1],"ebitda":[18688.4,104194.0]},"JTTS":{"pend_usaha":[1583744.2,1725252.8],"tol":[1568035.2,1710413.8],"usaha_lainnya":[14965.1,14777.5],"elektronifikasi":[743.9,61.4],"beban_langsung":[1458639.3,1398288.8],"beban_i":[656129.1,592229.8],"beban_ii":[200520.4,155426.3],"beban_iii":[601989.8,650632.7],"laba_operasi":[125105.0,326964.0],"beban_usaha":[0.0,0.0],"bunga":[420081.6,347922.8],"pajak_tangguhan":[114241.6,114241.6],"eat":[-410434.6,-137584.9],"ebitda":[382880.7,642236.7]},"PBBL":{"pend_usaha":[246666.7,242624.8],"tol":[0.0,0.0],"usaha_lainnya":[246666.7,242624.8],"elektronifikasi":[0.0,0.0],"beban_langsung":[118535.2,112221.0],"beban_i":[55782.5,49836.2],"beban_ii":[19132.4,18764.5],"beban_iii":[43620.3,43620.3],"laba_operasi":[128131.4,130403.8],"beban_usaha":[null,null],"bunga":[0.0,1027.1],"pajak_tangguhan":[0.0,0.0],"eat":[121617.0,122970.3],"ebitda":[128131.4,130403.8]}},"konsol":{"AGUSTUS 2026":{"pend_usaha":[364292.1,361543.7],"tol":[330796.8,331685.6],"usaha_lainnya":[33180.5,29853.4],"elektronifikasi":[314.8,4.8],"beban_langsung":[267595.1,263580.5],"beban_i":[122052.6,128308.8],"beban_ii":[39193.5,24246.3],"beban_iii":[106349.0,111025.4],"laba_operasi":[96697.0,97963.2],"beban_usaha":[18385.6,16817.3],"bunga":[114701.5,116763.1],"pajak_tangguhan":[14280.2,14280.2],"eat":[-51677.1,-50710.9],"ebitda":[128540.1,141252.3]},"SD AGUSTUS 2026":{"pend_usaha":[2712258.1,2870344.0],"tol":[2449512.9,2612712.3],"usaha_lainnya":[262001.3,257570.2],"elektronifikasi":[743.9,61.4],"beban_langsung":[1964814.9,1897496.7],"beban_i":[867670.4,784202.9],"beban_ii":[275467.1,225087.9],"beban_iii":[821677.3,888205.9],"laba_operasi":[747443.2,972847.3],"beban_usaha":[134109.7,116999.2],"bunga":[901531.9,728431.2],"pajak_tangguhan":[114241.6,114241.6],"eat":[-410404.1,4570.2],"ebitda":[1018803.5,1336700.8]},"SEPTEMBER 2026":{"pend_usaha":[418365.9,411467.4],"tol":[385212.3,381592.2],"usaha_lainnya":[32938.6,29870.4],"elektronifikasi":[214.9,4.8],"beban_langsung":[275032.9,283452.2],"beban_i":[125610.4,151253.4],"beban_ii":[39193.5,21112.9],"beban_iii":[110229.0,111085.9],"laba_operasi":[143333.0,128015.2],"beban_usaha":[22828.4,22828.4],"bunga":[114699.5,117810.2],"pajak_tangguhan":[14280.2,14280.2],"eat":[-9477.1,-27824.4],"ebitda":[174613.2,165353.9]},"SD SEPTEMBER 2026":{"pend_usaha":[3130623.9,3281811.4],"tol":[2834725.2,2994304.5],"usaha_lainnya":[294939.9,287440.7],"elektronifikasi":[958.8,66.2],"beban_langsung":[2239847.7,2180948.9],"beban_i":[993280.8,935456.3],"beban_ii":[314660.6,246200.8],"beban_iii":[931906.2,999291.7],"laba_operasi":[890776.2,1100862.5],"beban_usaha":[156938.1,139827.6],"bunga":[1016231.4,846241.4],"pajak_tangguhan":[128521.8,128521.8],"eat":[-419881.2,-23254.2],"ebitda":[1193416.7,1502054.7]}}},"2026-07":{"entities":{"DIVISI":{"pend_usaha":[0.0,0.0],"tol":[0.0,0.0],"usaha_lainnya":[0.0,0.0],"elektronifikasi":[0.0,0.0],"beban_langsung":[0.0,0.0],"beban_i":[0.0,0.0],"beban_ii":[0.0,0.0],"beban_iii":[0.0,0.0],"laba_operasi":[0.0,0.0],"beban_usaha":[115724.1,100181.9],"bunga":[0.0,0.0],"pajak_tangguhan":[0.0,0.0],"eat":[-115724.1,-100181.9],"ebitda":[-115724.1,-100181.9]},"JORR S":{"pend_usaha":[496480.7,507988.6],"tol":[496223.4,507820.7],"usaha_lainnya":[257.2,167.9],"elektronifikasi":[0.0,0.0],"beban_langsung":[234446.2,238169.5],"beban_i":[92148.8,81775.4],"beban_ii":[30640.2,29021.9],"beban_iii":[111657.3,127372.1],"laba_operasi":[262034.5,269819.2],"beban_usaha":[null,null],"bunga":[258505.3,258609.1],"pajak_tangguhan":[0.0,0.0],"eat":[3325.0,11395.7],"ebitda":[353558.3,377057.9]},"ATP":{"pend_usaha":[268728.9,274973.5],"tol":[268693.8,274973.5],"usaha_lainnya":[35.0,0.0],"elektronifikasi":[0.0,0.0],"beban_langsung":[100176.3,97218.6],"beban_i":[39588.1,37549.7],"beban_ii":[18186.7,17332.3],"beban_iii":[42401.5,42336.6],"laba_operasi":[168552.5,177754.9],"beban_usaha":[null,null],"bunga":[160732.3,74895.3],"pajak_tangguhan":[0.0,0.0],"eat":[7820.2,102859.7],"ebitda":[206261.0,215398.5]},"JKT":{"pend_usaha":[765209.6,782962.1],"tol":[764917.3,782794.2],"usaha_lainnya":[292.3,167.9],"elektronifikasi":[0.0,0.0],"beban_langsung":[334622.6,335388.0],"beban_i":[131736.9,119325.1],"beban_ii":[48826.8,46354.2],"beban_iii":[154058.8,169708.7],"laba_operasi":[430587.0,447574.1],"beban_usaha":[0.0,0.0],"bunga":[419237.6,333504.4],"pajak_tangguhan":[0.0,0.0],"eat":[11145.2,114255.4],"ebitda":[559819.4,592456.5]},"TERPEKA":{"pend_usaha":[569249.1,613768.3],"tol":[559542.7,603121.6],"usaha_lainnya":[9706.3,10646.7],"elektronifikasi":[0.0,0.0],"beban_langsung":[343466.4,309606.0],"beban_i":[163216.8,131155.5],"beban_ii":[35800.5,33688.7],"beban_iii":[144449.1,144761.8],"laba_operasi":[225782.6,304162.2],"beban_usaha":[null,null],"bunga":[321676.5,231939.5],"pajak_tangguhan":[40660.8,40660.8],"eat":[-137446.2,30673.0],"ebitda":[287199.2,365891.5]},"PALINDRA":{"pend_usaha":[51881.2,55353.7],"tol":[51881.2,55306.3],"usaha_lainnya":[0.0,14.0],"elektronifikasi":[0.0,33.4],"beban_langsung":[53903.1,51283.8],"beban_i":[30455.1,29996.9],"beban_ii":[4513.2,3123.3],"beban_iii":[18934.7,18163.6],"laba_operasi":[-2021.8,4069.9],"beban_usaha":[null,null],"bunga":[0.0,0.0],"pajak_tangguhan":[4358.0,4358.0],"eat":[-6379.8,-258.7],"ebitda":[8974.9,14295.5]},"INPRABU":{"pend_usaha":[76145.0,82443.5],"tol":[75468.5,81784.0],"usaha_lainnya":[587.0,636.3],"elektronifikasi":[89.5,23.2],"beban_langsung":[125295.0,106186.3],"beban_i":[50761.7,51793.9],"beban_ii":[16560.6,-3154.5],"beban_iii":[57972.7,57546.9],"laba_operasi":[-49150.0,-23742.8],"beban_usaha":[null,null],"bunga":[0.0,0.0],"pajak_tangguhan":[5363.8,5363.8],"eat":[-54512.8,-29173.8],"ebitda":[-18431.2,6550.2]},"BENGTABA":{"pend_usaha":[9680.3,9597.4],"tol":[9666.3,9587.9],"usaha_lainnya":[14.0,9.5],"elektronifikasi":[0.0,0.0],"beban_langsung":[43235.2,38694.2],"beban_i":[17424.0,13053.2],"beban_ii":[4019.7,4010.5],"beban_iii":[21791.5,21630.5],"laba_operasi":[-33554.9,-29096.8],"beban_usaha":[null,null],"bunga":[0.0,0.0],"pajak_tangguhan":[719.0,719.0],"eat":[-34267.0,-29810.3],"ebitda":[-20985.5,-16688.3]},"PALTUNG":{"pend_usaha":[0.0,0.0],"tol":[0.0,0.0],"usaha_lainnya":[0.0,0.0],"elektronifikasi":[0.0,0.0],"beban_langsung":[14417.3,0.0],"beban_i":[6563.6,0.0],"beban_ii":[4200.7,0.0],"beban_iii":[3653.0,0.0],"laba_operasi":[-14417.3,0.0],"beban_usaha":[null,null],"bunga":[0.0,0.0],"pajak_tangguhan":[0.0,0.0],"eat":[-14417.3,0.0],"ebitda":[-14417.3,0.0]},"SUMBAGSEL":{"pend_usaha":[706955.6,761162.9],"tol":[696558.8,749799.9],"usaha_lainnya":[10307.3,11306.4],"elektronifikasi":[89.5,56.7],"beban_langsung":[580317.0,505770.4],"beban_i":[268421.2,225999.5],"beban_ii":[65094.8,37668.0],"beban_iii":[246801.0,242102.9],"laba_operasi":[126638.6,255392.6],"beban_usaha":[0.0,0.0],"bunga":[321676.5,231939.5],"pajak_tangguhan":[51101.6,51101.6],"eat":[-247023.1,-28569.8],"ebitda":[242340.2,370048.9]},"PERMAI":{"pend_usaha":[319903.8,344275.0],"tol":[318207.8,343283.0],"usaha_lainnya":[1635.0,992.0],"elektronifikasi":[61.0,0.0],"beban_langsung":[255068.9,244492.9],"beban_i":[109236.7,100717.0],"beban_ii":[41536.6,40631.6],"beban_iii":[104295.7,103144.3],"laba_operasi":[64834.8,99782.1],"beban_usaha":[null,null],"bunga":[10298.4,10171.0],"pajak_tangguhan":[25686.1,25686.1],"eat":[28686.8,63774.8],"ebitda":[108446.6,142242.6]},"PEKBANGPAR":{"pend_usaha":[86317.1,91443.6],"tol":[86206.7,91413.9],"usaha_lainnya":[0.0,29.7],"elektronifikasi":[110.4,0.0],"beban_langsung":[93256.9,87341.6],"beban_i":[38286.8,34799.6],"beban_ii":[17474.6,15314.3],"beban_iii":[37495.5,37227.8],"laba_operasi":[-6939.8,4102.0],"beban_usaha":[null,null],"bunga":[1318.5,1318.5],"pajak_tangguhan":[6759.0,6759.0],"eat":[-15017.3,-3982.9],"ebitda":[690.5,11464.6]},"PACIN":{"pend_usaha":[27277.3,28233.0],"tol":[26893.8,28212.0],"usaha_lainnya":[339.5,21.0],"elektronifikasi":[44.0,0.0],"beban_langsung":[63662.7,106424.8],"beban_i":[22159.8,21482.7],"beban_ii":[13070.6,13070.6],"beban_iii":[28432.3,71871.5],"laba_operasi":[-36385.5,-78191.8],"beban_usaha":[null,null],"bunga":[0.0,68.1],"pajak_tangguhan":[0.0,0.0],"eat":[-36419.4,-78556.4],"ebitda":[-28070.9,-26438.0]},"LINGKAR PKU":{"pend_usaha":[0.0,0.0],"tol":[0.0,0.0],"usaha_lainnya":[0.0,0.0],"elektronifikasi":[0.0,0.0],"beban_langsung":[4702.0,0.0],"beban_i":[4702.0,0.0],"beban_ii":[0.0,0.0],"beban_iii":[0.0,0.0],"laba_operasi":[-4702.0,0.0],"beban_usaha":[null,null],"bunga":[0.0,0.0],"pajak_tangguhan":[0.0,0.0],"eat":[-4702.0,0.0],"ebitda":[-4702.0,0.0]},"SUMBAGTENG":{"pend_usaha":[433498.1,463951.7],"tol":[431308.2,462909.0],"usaha_lainnya":[1974.5,1042.7],"elektronifikasi":[215.4,0.0],"beban_langsung":[416690.6,438259.4],"beban_i":[174385.3,156999.4],"beban_ii":[72081.8,69016.5],"beban_iii":[170223.5,212243.6],"laba_operasi":[16807.5,25692.2],"beban_usaha":[0.0,0.0],"bunga":[11616.9,11557.5],"pajak_tangguhan":[32445.1,32445.1],"eat":[-27451.9,-18764.6],"ebitda":[76364.2,127269.1]},"SIBANCEH":{"pend_usaha":[26040.2,52824.1],"tol":[25989.1,52805.1],"usaha_lainnya":[51.1,19.0],"elektronifikasi":[0.0,0.0],"beban_langsung":[95567.5,96201.8],"beban_i":[42529.7,34847.8],"beban_ii":[11267.8,10356.1],"beban_iii":[41770.0,50997.8],"laba_operasi":[-69527.3,-43377.7],"beban_usaha":[null,null],"bunga":[0.0,0.0],"pajak_tangguhan":[2676.7,2676.7],"eat":[-72190.0,-46073.7],"ebitda":[-52918.2,-17540.4]},"BINBRAN":{"pend_usaha":[96362.8,115291.2],"tol":[96162.4,115146.8],"usaha_lainnya":[122.0,144.3],"elektronifikasi":[78.4,0.0],"beban_langsung":[80116.2,77802.4],"beban_i":[40328.4,38428.0],"beban_ii":[4982.5,4914.2],"beban_iii":[34805.4,34460.2],"laba_operasi":[16246.5,37488.8],"beban_usaha":[null,null],"bunga":[34299.3,33840.9],"pajak_tangguhan":[6592.4,6592.4],"eat":[-24638.1,-3803.1],"ebitda":[40204.2,61100.9]},"INKIS":{"pend_usaha":[104066.4,118288.9],"tol":[103780.3,117571.8],"usaha_lainnya":[240.2,717.2],"elektronifikasi":[45.9,0.0],"beban_langsung":[86166.0,81751.9],"beban_i":[39196.9,36138.8],"beban_ii":[17467.3,16113.7],"beban_iii":[29501.8,29499.4],"laba_operasi":[17900.4,36537.0],"beban_usaha":[null,null],"bunga":[0.0,0.0],"pajak_tangguhan":[7145.6,7145.6],"eat":[10761.8,29293.5],"ebitda":[28084.2,46718.2]},"SUMBAGUT":{"pend_usaha":[226469.3,286404.2],"tol":[225931.7,285523.7],"usaha_lainnya":[413.3,880.5],"elektronifikasi":[124.3,0.0],"beban_langsung":[261849.7,255756.1],"beban_i":[122055.0,109414.6],"beban_ii":[33717.5,31384.0],"beban_iii":[106077.2,114957.4],"laba_operasi":[-35380.4,30648.1],"beban_usaha":[0.0,0.0],"bunga":[34299.3,33840.9],"pajak_tangguhan":[16414.7,16414.7],"eat":[-86066.3,-20583.3],"ebitda":[15370.2,90278.7]},"JTTS":{"pend_usaha":[1366923.1,1511518.8],"tol":[1353798.8,1498232.5],"usaha_lainnya":[12695.1,13229.6],"elektronifikasi":[429.2,56.7],"beban_langsung":[1258857.3,1199785.9],"beban_i":[564861.5,492413.4],"beban_ii":[170894.1,138068.5],"beban_iii":[523101.7,569303.9],"laba_operasi":[108065.8,311732.9],"beban_usaha":[0.0,0.0],"bunga":[367592.8,277338.0],"pajak_tangguhan":[99961.4,99961.4],"eat":[-360541.3,-67917.6],"ebitda":[334074.6,587596.8]},"PBBL":{"pend_usaha":[215833.3,214319.4],"tol":[0.0,0.0],"usaha_lainnya":[215833.3,214319.4],"elektronifikasi":[0.0,0.0],"beban_langsung":[103739.9,98742.3],"beban_i":[49019.4,44155.6],"beban_ii":[16552.7,16418.9],"beban_iii":[38167.8,38167.8],"laba_operasi":[112093.4,115577.1],"beban_usaha":[null,null],"bunga":[0.0,825.7],"pajak_tangguhan":[0.0,0.0],"eat":[106393.3,109125.2],"ebitda":[112093.4,115577.1]}},"konsol":{"JULI 2026":{"pend_usaha":[292723.5,318143.3],"tol":[259931.3,287835.8],"usaha_lainnya":[32580.3,30302.7],"elektronifikasi":[211.9,4.8],"beban_langsung":[253641.0,303795.4],"beban_i":[110911.0,111815.4],"beban_ii":[37409.1,24807.2],"beban_iii":[105320.9,167172.8],"laba_operasi":[39082.6,14347.9],"beban_usaha":[16807.6,15547.4],"bunga":[114701.5,56030.8],"pajak_tangguhan":[14280.2,14280.2],"eat":[-107712.1,-72536.5],"ebitda":[73023.8,115053.8]},"SD JULI 2026":{"pend_usaha":[2347966.0,2508800.3],"tol":[2118716.1,2281026.8],"usaha_lainnya":[228820.7,227716.8],"elektronifikasi":[429.2,56.7],"beban_langsung":[1697219.8,1633916.2],"beban_i":[745617.9,655894.1],"beban_ii":[236273.7,200841.6],"beban_iii":[715328.2,777180.4],"laba_operasi":[650746.2,874884.1],"beban_usaha":[115724.1,100181.9],"bunga":[786830.4,611668.1],"pajak_tangguhan":[99961.4,99961.4],"eat":[-358726.9,55281.1],"ebitda":[890263.3,1195448.5]},"AGUSTUS 2026":{"pend_usaha":[364292.1,360715.8],"tol":[330796.8,330744.8],"usaha_lainnya":[33180.5,29966.2],"elektronifikasi":[314.8,4.8],"beban_langsung":[267595.1,282540.3],"beban_i":[122052.6,145669.7],"beban_ii":[39193.5,25844.9],"beban_iii":[106349.0,111025.6],"laba_operasi":[96697.0,78175.6],"beban_usaha":[18385.6,18385.6],"bunga":[114701.5,70187.2],"pajak_tangguhan":[14280.2,14280.2],"eat":[-51677.1,-25630.3],"ebitda":[128540.1,119896.4]},"SD AGUSTUS 2026":{"pend_usaha":[2712258.1,2869516.1],"tol":[2449512.9,2611771.6],"usaha_lainnya":[262001.3,257683.1],"elektronifikasi":[743.9,61.4],"beban_langsung":[1964814.9,1916456.4],"beban_i":[867670.4,801563.8],"beban_ii":[275467.1,226686.5],"beban_iii":[821677.3,888206.0],"laba_operasi":[747443.2,953059.7],"beban_usaha":[134109.7,118567.5],"bunga":[901531.9,681855.3],"pajak_tangguhan":[114241.6,114241.6],"eat":[-410404.1,29650.7],"ebitda":[1018803.5,1315344.9]}}},"2026-06":{"entities":{"DIVISI":{"pend_usaha":[0.0,0.0],"tol":[0.0,0.0],"usaha_lainnya":[0.0,0.0],"elektronifikasi":[0.0,0.0],"beban_langsung":[0.0,0.0],"beban_i":[0.0,0.0],"beban_ii":[0.0,0.0],"beban_iii":[0.0,0.0],"laba_operasi":[0.0,0.0],"beban_usaha":[98916.5,84634.5],"bunga":[0.0,0.0],"pajak_tangguhan":[0.0,0.0],"eat":[-98916.5,-84634.5],"ebitda":[-98916.5,-84634.5]},"JORR S":{"pend_usaha":[433340.1,444070.9],"tol":[433119.6,444048.4],"usaha_lainnya":[220.5,22.5],"elektronifikasi":[0.0,0.0],"beban_langsung":[199320.7,188628.1],"beban_i":[77351.5,66686.9],"beban_ii":[26263.0,26234.9],"beban_iii":[95706.2,95706.2],"laba_operasi":[234019.4,255442.9],"beban_usaha":[null,null],"bunga":[221576.0,221648.9],"pajak_tangguhan":[0.0,0.0],"eat":[12268.5,33944.1],"ebitda":[312468.5,333891.9]},"ATP":{"pend_usaha":[234559.6,240442.2],"tol":[234524.5,240442.2],"usaha_lainnya":[35.0,0.0],"elektronifikasi":[0.0,0.0],"beban_langsung":[85479.1,80858.9],"beban_i":[33558.6,28938.4],"beban_ii":[15576.4,15576.4],"beban_iii":[36344.2,36344.2],"laba_operasi":[149080.5,159583.3],"beban_usaha":[null,null],"bunga":[135449.0,65233.4],"pajak_tangguhan":[0.0,0.0],"eat":[13631.5,94350.0],"ebitda":[181402.1,191904.9]},"JKT":{"pend_usaha":[667899.7,684513.1],"tol":[667644.2,684490.6],"usaha_lainnya":[255.5,22.5],"elektronifikasi":[0.0,0.0],"beban_langsung":[284799.8,269487.0],"beban_i":[110910.1,95625.3],"beban_ii":[41839.3,41811.3],"beban_iii":[132050.4,132050.4],"laba_operasi":[383099.9,415026.2],"beban_usaha":[0.0,0.0],"bunga":[357025.0,286882.3],"pajak_tangguhan":[0.0,0.0],"eat":[25899.9,128294.1],"ebitda":[493870.5,525796.8]},"TERPEKA":{"pend_usaha":[500896.6,535591.3],"tol":[492526.1,526460.9],"usaha_lainnya":[8370.5,9130.4],"elektronifikasi":[0.0,0.0],"beban_langsung":[296542.1,259200.8],"beban_i":[142042.4,105755.5],"beban_ii":[30686.2,29631.8],"beban_iii":[123813.5,123813.5],"laba_operasi":[204354.5,276390.4],"beban_usaha":[null,null],"bunga":[275747.2,229241.2],"pajak_tangguhan":[34852.1,34852.1],"eat":[-106992.8,11596.3],"ebitda":[256997.3,329033.2]},"PALINDRA":{"pend_usaha":[45383.9,48623.1],"tol":[45383.9,48580.4],"usaha_lainnya":[0.0,14.0],"elektronifikasi":[0.0,28.7],"beban_langsung":[46289.3,44026.6],"beban_i":[26191.1,25050.0],"beban_ii":[3868.5,2746.8],"beban_iii":[16229.8,16229.8],"laba_operasi":[-905.4,4596.5],"beban_usaha":[null,null],"bunga":[0.0,0.0],"pajak_tangguhan":[3735.4,3735.4],"eat":[-4640.8,885.4],"ebitda":[8520.4,14022.3]},"INPRABU":{"pend_usaha":[66173.2,72182.1],"tol":[65672.9,71620.3],"usaha_lainnya":[500.3,538.6],"elektronifikasi":[0.0,23.2],"beban_langsung":[108841.6,88230.6],"beban_i":[44955.7,41774.8],"beban_ii":[14195.0,-3235.2],"beban_iii":[49690.9,49690.9],"laba_operasi":[-42668.4,-16048.4],"beban_usaha":[null,null],"bunga":[0.0,0.0],"pajak_tangguhan":[4597.6,4597.6],"eat":[-47266.0,-20714.7],"ebitda":[-16338.0,10282.0]},"BENGTABA":{"pend_usaha":[8535.4,8393.7],"tol":[8523.4,8385.2],"usaha_lainnya":[12.0,8.6],"elektronifikasi":[0.0,0.0],"beban_langsung":[36814.3,33456.6],"beban_i":[14691.5,11341.8],"beban_ii":[3444.4,3436.4],"beban_iii":[18678.4,18678.4],"laba_operasi":[-28278.9,-25062.9],"beban_usaha":[null,null],"bunga":[0.0,0.0],"pajak_tangguhan":[616.3,616.3],"eat":[-28889.2,-25673.5],"ebitda":[-17505.1,-14289.1]},"PALTUNG":{"pend_usaha":[0.0,0.0],"tol":[0.0,0.0],"usaha_lainnya":[0.0,0.0],"elektronifikasi":[0.0,0.0],"beban_langsung":[1318.1,0.0],"beban_i":[1318.1,0.0],"beban_ii":[0.0,0.0],"beban_iii":[0.0,0.0],"laba_operasi":[-1318.1,0.0],"beban_usaha":[null,null],"bunga":[0.0,0.0],"pajak_tangguhan":[0.0,0.0],"eat":[-1318.1,0.0],"ebitda":[-1318.1,0.0]},"SUMBAGSEL":{"pend_usaha":[620989.1,664790.2],"tol":[612106.4,655046.7],"usaha_lainnya":[8882.8,9691.6],"elektronifikasi":[0.0,51.9],"beban_langsung":[489805.5,424914.6],"beban_i":[229198.9,183922.1],"beban_ii":[52194.0,32579.9],"beban_iii":[208412.6,208412.7],"laba_operasi":[131183.6,239875.6],"beban_usaha":[0.0,0.0],"bunga":[275747.2,229241.2],"pajak_tangguhan":[43801.4,43801.4],"eat":[-189106.9,-33906.5],"ebitda":[230356.4,339048.4]},"PERMAI":{"pend_usaha":[280255.5,300975.0],"tol":[278816.5,300059.0],"usaha_lainnya":[1439.0,916.0],"elektronifikasi":[0.0,0.0],"beban_langsung":[218668.9,212093.2],"beban_i":[93708.7,87857.0],"beban_ii":[35563.9,34839.9],"beban_iii":[89396.3,89396.2],"laba_operasi":[61586.6,88881.8],"beban_usaha":[null,null],"bunga":[8827.2,8700.0],"pajak_tangguhan":[22016.7,22016.7],"eat":[30598.8,58025.0],"ebitda":[98968.1,126263.4]},"PEKBANGPAR":{"pend_usaha":[76425.6,79608.0],"tol":[76330.8,79583.3],"usaha_lainnya":[0.0,24.8],"elektronifikasi":[94.8,0.0],"beban_langsung":[80015.5,74877.7],"beban_i":[32901.2,28844.0],"beban_ii":[14975.4,13894.7],"beban_iii":[32139.0,32139.0],"laba_operasi":[-3589.9,4730.3],"beban_usaha":[null,null],"bunga":[1130.2,1130.2],"pajak_tangguhan":[5793.4,5793.4],"eat":[-10513.5,-2200.2],"ebitda":[2950.3,11270.6]},"PACIN":{"pend_usaha":[24007.6,24127.3],"tol":[23672.6,24106.3],"usaha_lainnya":[291.0,21.0],"elektronifikasi":[44.0,0.0],"beban_langsung":[54423.4,53870.6],"beban_i":[18849.4,18296.7],"beban_ii":[11203.4,11203.4],"beban_iii":[24370.5,24370.5],"laba_operasi":[-30415.8,-29743.4],"beban_usaha":[null,null],"bunga":[0.0,68.1],"pajak_tangguhan":[0.0,0.0],"eat":[-30444.9,-30050.7],"ebitda":[-23289.0,-22616.6]},"LINGKAR PKU":{"pend_usaha":[0.0,0.0],"tol":[0.0,0.0],"usaha_lainnya":[0.0,0.0],"elektronifikasi":[0.0,0.0],"beban_langsung":[3535.6,0.0],"beban_i":[3535.6,0.0],"beban_ii":[0.0,0.0],"beban_iii":[0.0,0.0],"laba_operasi":[-3535.6,0.0],"beban_usaha":[null,null],"bunga":[0.0,0.0],"pajak_tangguhan":[0.0,0.0],"eat":[-3535.6,0.0],"ebitda":[-3535.6,0.0]},"SUMBAGTENG":{"pend_usaha":[380688.7,404710.3],"tol":[378819.9,403748.5],"usaha_lainnya":[1730.0,961.8],"elektronifikasi":[138.8,0.0],"beban_langsung":[356643.4,340841.5],"beban_i":[148994.9,134997.7],"beban_ii":[61742.7,59938.0],"beban_iii":[145905.9,145905.7],"laba_operasi":[24045.3,63868.8],"beban_usaha":[0.0,0.0],"bunga":[9957.4,9898.2],"pajak_tangguhan":[27810.1,27810.1],"eat":[-13895.2,25774.2],"ebitda":[75093.9,114917.4]},"SIBANCEH":{"pend_usaha":[22973.0,45979.0],"tol":[22931.9,45960.0],"usaha_lainnya":[41.1,19.0],"elektronifikasi":[0.0,0.0],"beban_langsung":[79370.9,74945.6],"beban_i":[33909.9,29559.3],"beban_ii":[9658.1,9583.6],"beban_iii":[35802.9,35802.7],"laba_operasi":[-56397.9,-28966.6],"beban_usaha":[null,null],"bunga":[0.0,0.0],"pajak_tangguhan":[2294.3,2294.3],"eat":[-58680.2,-31280.2],"ebitda":[-42161.5,-14730.0]},"BINBRAN":{"pend_usaha":[85745.8,101064.2],"tol":[85545.3,100937.8],"usaha_lainnya":[122.0,126.3],"elektronifikasi":[78.4,0.0],"beban_langsung":[68824.4,65535.5],"beban_i":[34720.5,31466.2],"beban_ii":[4270.7,4236.2],"beban_iii":[29833.2,29833.2],"laba_operasi":[16921.4,35528.7],"beban_usaha":[null,null],"bunga":[29399.4,28941.2],"pajak_tangguhan":[5650.6,5650.6],"eat":[-18122.6,573.8],"ebitda":[37456.5,56063.8]},"INKIS":{"pend_usaha":[91946.2,103628.6],"tol":[91737.0,103007.3],"usaha_lainnya":[209.2,621.3],"elektronifikasi":[0.0,0.0],"beban_langsung":[74480.2,69818.6],"beban_i":[34220.9,30718.7],"beban_ii":[14972.0,13812.1],"beban_iii":[25287.3,25287.7],"laba_operasi":[17466.0,33810.1],"beban_usaha":[null,null],"bunga":[0.0,0.0],"pajak_tangguhan":[6124.8,6124.8],"eat":[11347.2,27587.4],"ebitda":[26195.0,42539.2]},"SUMBAGUT":{"pend_usaha":[200664.9,250671.8],"tol":[200214.2,249905.1],"usaha_lainnya":[372.3,766.6],"elektronifikasi":[78.4,0.0],"beban_langsung":[222675.4,210299.7],"beban_i":[102851.4,91744.2],"beban_ii":[28900.7,27631.9],"beban_iii":[90923.3,90923.6],"laba_operasi":[-22010.5,40372.1],"beban_usaha":[0.0,0.0],"bunga":[29399.4,28941.2],"pajak_tangguhan":[14069.7,14069.7],"eat":[-65455.6,-3119.0],"ebitda":[21490.0,83873.0]},"JTTS":{"pend_usaha":[1202342.7,1320172.2],"tol":[1191140.5,1308700.4],"usaha_lainnya":[10985.1,11420.0],"elektronifikasi":[217.2,51.9],"beban_langsung":[1069124.3,976055.7],"beban_i":[481045.1,410664.0],"beban_ii":[142837.4,120149.8],"beban_iii":[445241.7,445242.0],"laba_operasi":[133218.5,344116.5],"beban_usaha":[0.0,0.0],"bunga":[315104.0,268080.6],"pajak_tangguhan":[85681.2,85681.2],"eat":[-268457.7,-11251.3],"ebitda":[326940.3,537838.8]},"PBBL":{"pend_usaha":[185000.0,185971.6],"tol":[0.0,0.0],"usaha_lainnya":[185000.0,185971.6],"elektronifikasi":[0.0,0.0],"beban_langsung":[89656.5,84581.6],"beban_i":[42753.2,37793.0],"beban_ii":[14188.0,14073.4],"beban_iii":[32715.2,32715.2],"laba_operasi":[95343.5,101390.0],"beban_usaha":[null,null],"bunga":[0.0,674.4],"pajak_tangguhan":[0.0,0.0],"eat":[90457.7,95405.7],"ebitda":[95343.5,101390.0]}},"konsol":{"JUNI 2026":{"pend_usaha":[406158.5,435723.7],"tol":[373348.1,401030.1],"usaha_lainnya":[32737.6,34688.8],"elektronifikasi":[72.8,4.8],"beban_langsung":[249488.1,219130.1],"beban_i":[114625.9,101359.4],"beban_ii":[33194.3,16102.8],"beban_iii":[101667.9,101667.9],"laba_operasi":[156670.4,216593.6],"beban_usaha":[25757.1,14745.1],"bunga":[114720.5,166370.2],"pajak_tangguhan":[14280.2,14280.2],"eat":[896.4,19463.6],"ebitda":[181662.0,252597.3]},"SD JUNI 2026":{"pend_usaha":[2055242.4,2190657.0],"tol":[1858784.6,1993191.0],"usaha_lainnya":[196240.6,197414.1],"elektronifikasi":[217.2,51.9],"beban_langsung":[1443580.5,1330124.4],"beban_i":[634708.4,544082.3],"beban_ii":[198864.8,176034.4],"beban_iii":[610007.4,610007.6],"laba_operasi":[611661.9,860532.6],"beban_usaha":[98916.5,84634.5],"bunga":[672128.9,555637.3],"pajak_tangguhan":[85681.2,85681.2],"eat":[-251016.6,127814.0],"ebitda":[817237.8,1080391.1]},"JULI 2026":{"pend_usaha":[292723.5,305861.4],"tol":[259931.3,275859.8],"usaha_lainnya":[32580.3,29996.8],"elektronifikasi":[211.9,4.8],"beban_langsung":[253641.0,239171.8],"beban_i":[110911.0,111033.8],"beban_ii":[37409.1,26469.8],"beban_iii":[105320.9,101668.3],"laba_operasi":[39082.6,66689.5],"beban_usaha":[16807.6,16807.6],"bunga":[114701.5,85174.7],"pajak_tangguhan":[14280.2,14280.2],"eat":[-107712.1,-50515.4],"ebitda":[73023.8,100630.8]},"SD JULI 2026":{"pend_usaha":[2347966.0,2496518.3],"tol":[2118715.9,2269050.8],"usaha_lainnya":[228820.9,227410.9],"elektronifikasi":[429.2,56.7],"beban_langsung":[1697221.5,1569296.2],"beban_i":[745619.4,655116.0],"beban_ii":[236273.9,202504.2],"beban_iii":[715328.2,711675.9],"laba_operasi":[650744.5,927222.2],"beban_usaha":[115724.1,101442.0],"bunga":[786830.4,640812.0],"pajak_tangguhan":[99961.4,99961.4],"eat":[-358728.7,77298.5],"ebitda":[890261.6,1181021.9]}}}}};
+
+/* ---------- konfigurasi tampilan ---------- */
+const ROWS=[
+ {id:"pend_usaha",label:"Pend. Usaha",type:"section"},
+ {id:"tol",label:"Tol",type:"sub"},
+ {id:"usaha_lainnya",label:"Usaha Lainnya",type:"sub"},
+ {id:"elektronifikasi",label:"Elektronifikasi",type:"sub"},
+ {id:"beban_langsung",label:"Beban Langsung",type:"section"},
+ {id:"beban_i",label:"Beban I",type:"sub"},
+ {id:"beban_ii",label:"Beban II",type:"sub"},
+ {id:"beban_iii",label:"Beban III",type:"sub"},
+ {id:"laba_operasi",label:"Laba Operasi",type:"total"},
+ {id:"beban_usaha",label:"Beban Usaha",type:"section"},
+ {id:"bunga",label:"Bunga",type:"sub"},
+ {id:"pajak_tangguhan",label:"Pajak Tangguhan",type:"sub"},
+ {id:"eat",label:"EAT",type:"total"},
+ {id:"ebitda",label:"EBITDA",type:"total"},
+ {id:"hpp",label:"HPP (%)",type:"hpp"},
+];
+const REGIONS=[
+ {id:"JKT",label:"JKT"},{id:"SUMBAGSEL",label:"REG SUMBAGSEL"},{id:"SUMBAGTENG",label:"REG SUMBAGTENG"},
+ {id:"SUMBAGUT",label:"REG SUMBAGUT"},{id:"JTTS",label:"JTTS"},{id:"PBBL",label:"PBBL"},
+];
+// urutan & kelompok ruas (slide 5)
+const RUAS=[
+ {id:"DIVISI",grp:"DIVISI",always:true},
+ {id:"JORR S",grp:"JKT"},{id:"ATP",grp:"JKT"},
+ {id:"TERPEKA",grp:"SUMBAGSEL"},{id:"PALINDRA",grp:"SUMBAGSEL"},{id:"INPRABU",grp:"SUMBAGSEL"},{id:"BENGTABA",grp:"SUMBAGSEL"},{id:"PALTUNG",grp:"SUMBAGSEL"},
+ {id:"PERMAI",grp:"SUMBAGTENG"},{id:"PEKBANGPAR",grp:"SUMBAGTENG"},{id:"PACIN",grp:"SUMBAGTENG"},{id:"LINGKAR PKU",grp:"SUMBAGTENG"},
+ {id:"SIBANCEH",grp:"SUMBAGUT"},{id:"BINBRAN",grp:"SUMBAGUT"},{id:"INKIS",grp:"SUMBAGUT"},
+ {id:"JTTS",grp:"JTTS",always:true},{id:"PBBL",grp:"PBBL",always:true},
+];
+
+const $=s=>document.querySelector(s);
+const STORE="pnl-dir3-v1";
+let state={view:"regional",period:DATASET.periods[0].key,regions:REGIONS.map(r=>r.id),konsolCol:false,hideZero:true,fs:13.5};
+try{state=Object.assign(state,JSON.parse(localStorage.getItem(STORE)||"{}"))}catch(e){}
+if(!DATASET.periods.some(p=>p.key===state.period))state.period=DATASET.periods[0].key;
+state.regions=state.regions.filter(r=>REGIONS.some(x=>x.id===r));
+if(!state.regions.length)state.regions=REGIONS.map(r=>r.id);
+const save=()=>{try{localStorage.setItem(STORE,JSON.stringify(state))}catch(e){}};
+
+const P=()=>DATASET.periods.find(p=>p.key===state.period);
+const periodData=()=>DATASET.data[state.period];
+const sdKonsolKey=()=>P().label.toUpperCase();               // "SD AGUSTUS 2026"
+const sdKonsol=()=>periodData().konsol[sdKonsolKey()]||null;
+
+/* ---------- format ---------- */
+function fmtNum(v){
+  if(v==null) return {t:"-",neg:false};
+  const r=Math.round(v);
+  if(r===0) return {t:"-",neg:false};
+  const neg=r<0, s=Math.abs(r).toLocaleString("en-US");
+  return {t:neg?"("+s+")":s,neg};
+}
+function fmtPct(v){ if(v==null) return {t:"-",neg:false}; return {t:Math.round(v)+"%",neg:v>100}; }
+function hppOf(d){
+  const bl=d.beban_langsung,pu=d.pend_usaha;
+  const f=(b,p)=>(p==null||p===0||b==null)?null:b/p*100;
+  return [f(bl&&bl[0],pu&&pu[0]),f(bl&&bl[1],pu&&pu[1])];
+}
+function cellVal(d,rowId){ if(rowId==="hpp")return hppOf(d); return d[rowId]||[null,null]; }
+function isZeroEntity(d){ // tanpa realisasi = sisi REAL pend & beban langsung nol/kosong
+  const zr=x=>!x||x[1]==null||Math.round(x[1])===0;
+  return zr(d.pend_usaha)&&zr(d.beban_langsung); }
+
+/* ---------- build columns per view ---------- */
+function columns(){
+  const d=periodData();
+  if(state.view==="konsol"){
+    return Object.keys(d.konsol).map(k=>({label:k.replace(/ 20\d\d$/,""),sublabel:/^SD/.test(k)?["RKAP","REAL"]:["RKAP","REAL"],tint:/^SD/i.test(k)?"JTTS":"DIVISI",data:d.konsol[k]}));
+  }
+  if(state.view==="regional"){
+    let cols=REGIONS.filter(r=>state.regions.includes(r.id)).map(r=>({label:r.label,tint:r.id,data:d.entities[r.id]||{}}));
+    if(state.konsolCol&&sdKonsol()) cols.push({label:"KONSOLIDASI",tint:"PBBL",konsol:true,data:sdKonsol()});
+    return cols;
+  }
+  // ruas
+  let list=RUAS.filter(x=>x.always||state.regions.includes(x.grp));
+  let cols=list.map(x=>({label:x.id,tint:x.grp,data:d.entities[x.id]||{}}));
+  if(state.hideZero) cols=cols.filter(c=>c.konsol|| (RUAS.find(x=>x.id===c.label)?.always) || !isZeroEntity(c.data));
+  return cols;
+}
+
+/* ---------- render ---------- */
+function renderHead(cols){
+  const per=P().label;
+  let r1=`<tr><th class="c-uraian" rowspan="3">Uraian</th>`+
+    `<th class="h-title" colspan="${cols.length*2}">${state.view==="konsol"?"Agustus, SD Agustus, September, SD September 2026":per}</th></tr>`;
+  let r2=`<tr>`+cols.map(c=>`<th class="h-reg grp" colspan="2" style="background:var(--rg-${c.tint})">${c.label}</th>`).join("")+`</tr>`;
+  let r3=`<tr>`+cols.map(()=>`<th class="h-sub grp">RKAP</th><th class="h-sub">REAL</th>`).join("")+`</tr>`;
+  $("#thead").innerHTML=r1+r2+r3;
+}
+function renderBody(cols){
+  const isPctRow=id=>id==="hpp";
+  let html="";
+  for(const row of ROWS){
+    const cls=row.type==="hpp"?"hpp":row.type;
+    html+=`<tr class="${cls}"><td class="c-uraian">${row.label}</td>`;
+    for(const c of cols){
+      const v=cellVal(c.data,row.id);
+      const a=isPctRow(row.id)?fmtPct(v[0]):fmtNum(v[0]);
+      const b=isPctRow(row.id)?fmtPct(v[1]):fmtNum(v[1]);
+      html+=`<td class="rkap grp ${a.neg?'neg':''}">${a.t}</td><td class="real ${b.neg?'neg':''}">${b.t}</td>`;
+    }
+    html+=`</tr>`;
+  }
+  $("#tbody").innerHTML=html;
+}
+function renderSummary(){
+  const box=$("#summary");
+  if(state.view==="konsol"||!sdKonsol()){box.classList.add("hidden");return;}
+  box.classList.remove("hidden");
+  const d=sdKonsol();
+  const items=[["pend_usaha","Pendapatan Usaha"],["laba_operasi","Laba Operasi"],["eat","EAT"],["ebitda","EBITDA"]];
+  box.innerHTML=items.map(([id,k])=>{
+    const [rk,re]=d[id]||[null,null];
+    const delta=(rk!=null&&re!=null)?re-rk:null, good=delta!=null&&delta>=0;
+    const rev=fmtNum(re),rkv=fmtNum(rk),dv=fmtNum(delta);
+    const cls=delta==null?"":(good?"good":"bad"),dcls=good?"pos":"neg",ar=delta==null?"":(good?"▲":"▼");
+    return `<div class="tile ${cls}"><div class="k">${k}</div><div class="v ${rev.neg?'neg':''}">${rev.t}</div>
+      <div class="r">RKAP <b>${rkv.t}</b> · <span class="delta ${dcls}">${ar} ${dv.t}</span></div></div>`;
+  }).join("");
+}
+function renderAll(){
+  const cols=columns();
+  renderHead(cols);renderBody(cols);renderSummary();
+  $("#viewTitle").textContent = state.view==="konsol"?"Laba Rugi — Konsolidasi":state.view==="regional"?"Laba Rugi — Per Regional":"Laba Rugi — Per Ruas";
+  $("#periodLabel").textContent=P().label;
+  document.querySelector("table").style.setProperty("--fs",state.fs+"px");
+  // toolbar visibility per view
+  $("#regFilterGroup").classList.toggle("hidden",state.view==="konsol");
+  $("#tglKonsolCol").classList.toggle("hidden",state.view!=="regional");
+  $("#tglHideZero").classList.toggle("hidden",state.view!=="ruas");
+  $("#viewOptsGroup").classList.toggle("hidden",state.view==="konsol");
+  document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.view===state.view));
+  $("#footNote").textContent = state.view==="konsol"
+    ? "Kolom Total resmi = JKT + JTTS + PBBL + DIVISI (pusat). RKK = Rencana Kerja Kuartal."
+    : state.view==="ruas" ? "Ruas dikelompokkan per regional (warna). JTTS = SUMBAGSEL+SUMBAGTENG+SUMBAGUT. HPP = Beban Langsung ÷ Pend. Usaha."
+    : "HPP (%) = Beban Langsung ÷ Pendapatan Usaha · JTTS sudah mencakup 3 regional Sumatra.";
+}
+
+/* ---------- controls ---------- */
+function build(){
+  const sel=$("#selPeriod");
+  sel.innerHTML=DATASET.periods.map(p=>`<option value="${p.key}">${p.label}</option>`).join("");
+  sel.value=state.period;
+  sel.onchange=()=>{state.period=sel.value;save();renderAll()};
+  const pbox=$("#regPills");
+  pbox.innerHTML=`<button class="pill" data-reg="__all">Semua</button>`+
+    REGIONS.map(r=>`<button class="pill" data-reg="${r.id}"><span class="dot" style="background:var(--rg-${r.id})"></span>${r.label}</button>`).join("");
+  pbox.querySelectorAll("[data-reg]").forEach(b=>b.onclick=()=>{
+    const id=b.dataset.reg;
+    if(id==="__all") state.regions=state.regions.length===REGIONS.length?[]:REGIONS.map(r=>r.id);
+    else{const i=state.regions.indexOf(id);i>=0?state.regions.splice(i,1):state.regions.push(id);
+      state.regions=REGIONS.map(r=>r.id).filter(x=>state.regions.includes(x));}
+    syncPills();save();renderAll();
+  });
+  document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{state.view=t.dataset.view;save();renderAll()});
+  $("#tglKonsolCol").onclick=e=>{state.konsolCol=!state.konsolCol;e.currentTarget.setAttribute("aria-pressed",state.konsolCol);save();renderAll()};
+  $("#tglHideZero").onclick=e=>{state.hideZero=!state.hideZero;e.currentTarget.setAttribute("aria-pressed",state.hideZero);save();renderAll()};
+  $("#fsUp").onclick=()=>{state.fs=Math.min(20,state.fs+1);save();renderAll()};
+  $("#fsDown").onclick=()=>{state.fs=Math.max(10,state.fs-1);save();renderAll()};
+  $("#btnFull").onclick=()=>{document.fullscreenElement?document.exitFullscreen?.():document.documentElement.requestFullscreen?.().catch(()=>{})};
+  $("#tglKonsolCol").setAttribute("aria-pressed",state.konsolCol);
+  $("#tglHideZero").setAttribute("aria-pressed",state.hideZero);
+  syncPills();
+}
+function syncPills(){
+  $("#regPills").querySelectorAll("[data-reg]").forEach(b=>{
+    const id=b.dataset.reg;
+    const on=id==="__all"?state.regions.length===REGIONS.length:state.regions.includes(id);
+    b.setAttribute("aria-pressed",on);
+  });
+}
+build();renderAll();
+</script>

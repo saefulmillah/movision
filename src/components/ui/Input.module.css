@@ -1,0 +1,35 @@
+.wrap {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  transition: border-color var(--t-fast), box-shadow var(--t-fast);
+}
+.wrap:focus-within {
+  box-shadow: var(--focus-ring);
+}
+.wrap[data-invalid="true"] {
+  border-color: var(--sem-red);
+}
+.lead,
+.trail {
+  color: var(--text-faint);
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+.input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  outline: none;
+  font-size: var(--fs-base);
+  color: var(--text);
+}
+.input::placeholder {
+  color: var(--text-faint);
+}

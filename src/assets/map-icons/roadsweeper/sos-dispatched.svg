@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Road Sweeper SOS Dispatched">
+  <title>Road Sweeper - SOS Dispatched</title>
+  <!-- Icon path supplied by Lucide v0.469.0, ISC License. -->
+  <defs>
+    <filter id="marker-shadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="2" stdDeviation="1.8" flood-color="#0F172A" flood-opacity="0.24" />
+    </filter>
+  </defs>
+  
+  
+    <circle cx="32" cy="32" r="24" fill="none" stroke="#F97316" stroke-width="2" opacity="0.48">
+      <animate attributeName="r" values="24;31;24" dur="1.8s" repeatCount="indefinite" />
+      <animate attributeName="opacity" values="0.48;0;0.48" dur="1.8s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="32" cy="32" r="25" fill="none" stroke="#F97316" stroke-width="1.5" opacity="0.3">
+      <animate attributeName="r" values="25;34;25" dur="1.8s" begin="0.35s" repeatCount="indefinite" />
+      <animate attributeName="opacity" values="0.3;0;0.3" dur="1.8s" begin="0.35s" repeatCount="indefinite" />
+    </circle>
+  
+  <circle cx="32" cy="32" r="23" fill="#F97316" opacity="0.14" />
+  <circle cx="32" cy="32" r="20.5" fill="#FFFFFF" filter="url(#marker-shadow)" />
+  <circle cx="32" cy="32" r="20.5" stroke="#F97316" stroke-width="3" />
+  <circle cx="32" cy="32" r="16.5" fill="#FFEDD5" opacity="0.5" />
+  <g color="#F97316">
+    <svg x="13" y="19" width="31" height="31" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" />
+  <path d="M15 18H9" />
+  <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14" />
+  <circle cx="17" cy="18" r="2" />
+  <circle cx="7" cy="18" r="2" />
+  </svg>
+    <circle cx="43" cy="21" r="9" fill="#FFFFFF" stroke="#F97316" stroke-width="2" />
+  <svg x="36.5" y="14.5" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m9.06 11.9 8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08" />
+  <path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z" />
+  </svg>
+  </g>
+</svg>

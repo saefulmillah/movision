@@ -1,0 +1,350 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+  height: 100%;
+  min-height: 0;
+}
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  flex: none;
+}
+.headSpacer {
+  flex: 1 1 auto;
+}
+.search {
+  width: 280px;
+}
+
+.body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  gap: var(--sp-5);
+}
+.tableCard {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2xl);
+  overflow: hidden;
+}
+.tableScroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* ============ Tabel ============ */
+.tableBody {
+  padding: 0;
+  overflow-y: auto;
+}
+.table {
+  display: flex;
+  flex-direction: column;
+}
+.thead,
+.trow {
+  display: grid;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 16px;
+}
+.thead {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-faint);
+  border-bottom: 1px solid var(--line);
+}
+.trow {
+  border-bottom: 1px solid var(--line-soft);
+  cursor: pointer;
+  transition: background var(--t-fast);
+  font-size: var(--fs-base);
+}
+.trow:hover,
+.trow[data-selected="true"] {
+  background: var(--nav-active-bg);
+}
+
+.userCell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: var(--nav-active-bg);
+  color: var(--nav-active-text);
+  font-weight: 600;
+  font-size: var(--fs-sm);
+  text-transform: uppercase;
+  flex: none;
+}
+.userMeta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.userName {
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.userSub {
+  font-size: var(--fs-micro);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.chip {
+  padding: 2px 8px;
+  border-radius: var(--r-sm);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  background: var(--nav-active-bg);
+  color: var(--nav-active-text);
+  white-space: nowrap;
+}
+.chipMono {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  background: var(--surface-3);
+  color: var(--text-dim);
+}
+.chipGreen {
+  background: rgba(52, 211, 153, 0.16);
+  color: var(--st-green);
+}
+.chipBlue {
+  background: rgba(91, 141, 255, 0.16);
+  color: var(--st-blue);
+}
+.chipAmber {
+  background: rgba(217, 160, 20, 0.16);
+  color: var(--st-amber);
+}
+.chipGray {
+  background: rgba(120, 140, 170, 0.18);
+  color: var(--st-gray);
+}
+.muted {
+  color: var(--text-muted);
+}
+
+/* ============ Panel detail pengguna ============ */
+.detailPanel {
+  flex: none;
+  width: var(--w-panel-user);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2xl);
+  overflow: hidden;
+  animation: slideInRight 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.detailHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+}
+.detailBody {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.sectionLabel {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-faint);
+}
+.kv {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: var(--fs-sm);
+  padding: 3px 0;
+}
+.kvKey {
+  color: var(--text-muted);
+}
+.kvVal {
+  color: var(--text);
+  font-weight: 500;
+  text-align: right;
+  word-break: break-word;
+}
+.detailFooter {
+  display: flex;
+  gap: 10px;
+  padding: 14px 16px;
+  border-top: 1px solid var(--line);
+}
+.detailFooter > * {
+  flex: 1;
+}
+
+/* ============ Kartu Role ============ */
+.roleGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--sp-5);
+  overflow-y: auto;
+  padding-bottom: 4px;
+}
+.roleCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2xl);
+}
+.roleHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.roleIcon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--r-lg);
+  background: var(--nav-active-bg);
+  color: var(--st-blue);
+  flex: none;
+}
+.roleLabel {
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  color: var(--text);
+}
+.roleCode {
+  font-size: var(--fs-micro);
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+.roleDesc {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.roleInfoNote {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: var(--r-lg);
+  background: var(--surface-3);
+  border: 1px solid var(--line);
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ============ Form ============ */
+.field {
+  margin-bottom: 14px;
+}
+.fieldLabel {
+  display: block;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.fieldError {
+  font-size: var(--fs-xs);
+  color: var(--sem-red);
+  margin-top: 5px;
+}
+.checkRow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: var(--fs-sm);
+  color: var(--text-dim);
+}
+.multi {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.multiChip {
+  padding: 6px 11px;
+  border-radius: var(--r-sm);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--t-fast);
+}
+.multiChip[data-on="true"] {
+  background: var(--nav-active-bg);
+  border-color: var(--st-blue);
+  color: var(--nav-active-text);
+}
+
+.indent {
+  padding-left: 26px;
+}
+.confirmText {
+  font-size: var(--fs-body);
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+.confirmText b {
+  color: var(--text);
+}
+.warn {
+  color: var(--sem-red);
+}
+
+/* Keyframes lokal (CSS Modules meng-hash referensi animasi; definisi lokal agar cocok). */
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+@keyframes pulse { 0% { transform: scale(1); opacity: 0.9; } 70% { transform: scale(1.9); opacity: 0; } 100% { opacity: 0; } }
+@keyframes glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(244,63,94,0.5); } 50% { box-shadow: 0 0 8px 2px rgba(244,63,94,0.55); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes slideInRight { from { opacity: 0; transform: translateX(34px); } to { opacity: 1; transform: none; } }
+

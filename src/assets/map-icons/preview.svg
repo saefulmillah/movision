@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="820" height="590" viewBox="0 0 820 590" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="marker-shadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="2" stdDeviation="1.8" flood-color="#0F172A" flood-opacity="0.24" />
+    </filter>
+  </defs>
+  <rect width="820" height="590" rx="24" fill="#F4F7FA" />
+  <path d="M0 112H820M0 232H820M0 352H820M0 472H820" stroke="#DCE4EA" stroke-width="1" />
+  <text x="34" y="32" class="title">MOVISION / OPERATIONAL MAP ICONS</text>
+  <text x="34" y="50" class="subtitle">Status ring: normal green · offline gray · SOS created red · dispatched orange pulse</text>
+  <style>
+    .title { fill: #0F172A; font: 700 13px Arial, sans-serif; letter-spacing: 1.2px; }
+    .subtitle { fill: #64748B; font: 11px Arial, sans-serif; }
+    .label { fill: #334155; font: 600 11px Arial, sans-serif; }
+  </style>
+  <g transform="translate(34 58) scale(1.15)">
+      
+  
+  <circle cx="32" cy="32" r="23" fill="#16A34A" opacity="0.14" />
+  <circle cx="32" cy="32" r="20.5" fill="#FFFFFF" filter="url(#marker-shadow)" />
+  <circle cx="32" cy="32" r="20.5" stroke="#16A34A" stroke-width="3" />
+  <circle cx="32" cy="32" r="16.5" fill="#DCFCE7" opacity="0.5" />
+  <g color="#16A34A">
+    <svg x="16" y="16" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M16.75 12h3.632a1 1 0 0 1 .894 1.447l-2.034 4.069a1 1 0 0 1-1.708.134l-2.124-2.97" />
+  <path d="M17.106 9.053a1 1 0 0 1 .447 1.341l-3.106 6.211a1 1 0 0 1-1.342.447L3.61 12.3a2.92 2.92 0 0 1-1.3-3.91L3.69 5.6a2.92 2.92 0 0 1 3.92-1.3z" />
+  <path d="M2 19h3.76a2 2 0 0 0 1.8-1.1L9 15" />
+  <path d="M2 21v-4" />
+  <path d="M7 9h.01" />
+  </svg>
+    
+  </g>
+    </g>
+    <text x="71" y="136" text-anchor="middle" class="label">CCTV</text>
+  <g transform="translate(184 58) scale(1.15)">
+      
+  
+  <circle cx="32" cy="32" r="23" fill="#16A34A" opacity="0.14" />
+  <circle cx="32" cy="32" r="20.5" fill="#FFFFFF" filter="url(#marker-shadow)" />
+  <circle cx="32" cy="32" r="20.5" stroke="#16A34A" stroke-width="3" />
+  <circle cx="32" cy="32" r="16.5" fill="#DCFCE7" opacity="0.5" />
+  <g color="#16A34A">
+    <svg x="16" y="16" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect width="20" height="14" x="2" y="3" rx="2" />
+  <line x1="8" x2="16" y1="21" y2="21" />
+  <line x1="12" x2="12" y1="17" y2="21" />
+  </svg>
+    
+  </g>
+    </g>
+    <text x="221" y="136" text-anchor="middle" class="label">VMS</text>
+  <g transform="translate(334 58) scale(1.15)">
+      
+  
+  <circle cx="32" cy="32" r="23" fill="#16A34A" opacity="0.14" />
+  <circle cx="32" cy="32" r="20.5" fill="#FFFFFF" filter="url(#marker-shadow)" />
+  <circle cx="32" cy="32" r="20.5" stroke="#16A34A" stroke-width="3" />
+  <circle cx="32" cy="32" r="16.5" fill="#DCFCE7" opacity="0.5" />
+  <g color="#16A34A">
+    <svg x="16" y="16" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" />
+  <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" />
+  <path d="M7 21h10" />
+  <path d="M12 3v18" />
+  <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2" />
+  </svg>
+    
+  </g>
+    </g>
+    <text x="371" y="136" text-anchor="middle" class="label">WIM</text>
+  <g transform="translate(484 58) scale(1.15)">
+      
+  
+  <circle cx="32" cy="32" r="23" fill="#16A34A" opacity="0.14" />
+  <circle cx="32" cy="32" r="20.5" fill="#FFFFFF" filter="url(#marker-shadow)" />
+  <circle cx="32" cy="32" r="20.5" stroke="#16A34A" stroke-width="3" />
+  <circle cx="32" cy="32" r="16.5" fill="#DCFCE7" opacity="0.5" />
+  <g color="#16A34A">
+    <svg x="16" y="16" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9" />
+  <path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5" />
+  <circle cx="12" cy="12" r="2" />
+  <path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5" />
+  <path d="M19.1 4.9C23 8.8 23 15.1 19.1 19" />
+  </svg>
+    
+  </g>
+    </g>
+    <text x="521" y="136" text-anchor="middle" class="label">Radio</text>
+  <g transform="translate(634 58) scale(1.15)">
+      
+  
+  <circle cx="32" cy="32" r="23" fill="#16A34A" opacity="0.14" />
+  <circle cx="32" cy="32" r="20.5" fill="#FFFFFF" filter="url(#marker-shadow)" />
+  <circle cx="32" cy="32" r="20.5" stroke="#16A34A" stroke-width="3" />
+  <circle cx="32" cy="32" r="16.5" fill="#DCFCE7" opacity="0.5" />
+  <g color="#16A34A">
+    <svg x="16" y="16" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="4.5" r="2.5" />
+  <path d="m10.2 6.3-3.9 3.9" />
+  <circle cx="4.5" cy="12" r="2.5" />
+  <path d="M7 12h10" />
+  <circle cx="19.5" cy="12" r="2.5" />
+  <path d="m13.8 17.7 3.9-3.9" />
+  <circle cx="12" cy="19.5" r="2.5" />
+  </svg>
+    
+  </g>
+    </g>
+    <text x="671" y="136" text-anchor="middle" class="label">Gerbang Tol</text>
+  <g transform="translate(34 178) scale(1.15)">
+      
+  
+  <circle cx="32" cy="32" r="23" fill="#16A34A" opacity="0.14" />
+  <circle cx="32" cy="32" r="20.5" fill="#FFFFFF" filter="url(#marker-shadow)" />
+  <circle cx="32" cy="32" r="20.5" stroke="#16A34A" stroke-width="3" />
+  <circle cx="32" cy="32" r="16.5" fill="#DCFCE7" opacity="0.5" />
+  <g color="#16A34A">
+    <svg x="16" y="16" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 2v2" />
+  <path d="m4.93 4.93 1.41 1.41" />
+  <path d="M20 12h2" />
+  <path d="m19.07 4.93-1.41 1.41" />
+  <path d="M15.947 12.65a4 4 0 0 0-5.925-4.128" />
+  <path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z" />
+  </svg>
+    
+  </g>
+    </g>
+    <text x="71" y="256" text-anchor="middle" class="label">Cuaca</text>
+  <g transform="translate(184 178) scale(1.15)">
+      
+  
+  <circle cx="32" cy="32" r="23" fill="#16A34A" opacity="0.14" />
+  <circle cx="32" cy="32" r="20.5" fill="#FFFFFF" filter="url(#marker-shadow)" />
+  <circle cx="32" cy="32" r="20.5" stroke="#16A34A" stroke-width="3" />
+  <circle cx="32" cy="32" r="16.5" fill="#DCFCE7" opacity="0.5" />
+  <g color="#16A34A">
+    <svg x="16" y="16" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M7 18v-6a5 5 0 1 1 10 0v6" />
+  <path d="M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2z" />
+  <path d="M21 12h1" />
+  <path d="M18.5 4.5 18 5" />
+  <path d="M2 12h1" />
+  <path d="M12 2v1" />
+  <path d="m4.929 4.929.707.707" />
+  <path d="M12 12v6" />
+  </svg>
+    
+  </g>
+    </g>
+    <text x="221" y="256" text-anchor="middle" class="label">SOS</text>
+  <g transform="translate(334 178) scale(1.15)">
+      
+  
+  <circle cx="32" cy="32" r="23" fill="#16A34A" opacity="0.14" />
+  <circle cx="32" cy="32" r="20.5" fill="#FFFFFF" filter="url(#marker-shadow)" />
+  <circle cx="32" cy="32" r="20.5" stroke="#16A34A" stroke-width="3" />
+  <circle cx="32" cy="32" r="16.5" fill="#DCFCE7" opacity="0.5" />
+  <g color="#16A34A">
+    <svg x="13" y="19" width="31" height="31" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m21 8-2 2-1.5-3.7A2 2 0 0 0 15.646 5H8.4a2 2 0 0 0-1.903 1.257L5 10 3 8" />
+  <path d="M7 14h.01" />
+  <path d="M17 14h.01" />
+  <rect width="18" height="8" x="3" y="10" rx="2" />
+  <path d="M5 18v2" />
+  <path d="M19 18v2" />
+  </svg>
+    <circle cx="43" cy="21" r="9" fill="#FFFFFF" stroke="#16A34A" stroke-width="2" />
+  <svg x="36.5" y="14.5" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M7 18v-6a5 5 0 1 1 10 0v6" />
+  <path d="M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2z" />
+  <path d="M21 12h1" />
+  <path d="M18.5 4.5 18 5" />
+  <path d="M2 12h1" />
+  <path d="M12 2v1" />
+  <path d="m4.929 4.929.707.707" />
+  <path d="M12 12v6" />
+  </svg>
+  </g>
+    </g>
+    <text x="371" y="256" text-anchor="middle" class="label">Patroli</text>
+  <g transform="translate(484 178) scale(1.15)">
+      
+  
+  <circle cx="32" cy="32" r="23" fill="#16A34A" opacity="0.14" />
+  <circle cx="32" cy="32" r="20.5" fill="#FFFFFF" filter="url(#marker-shadow)" />
+  <circle cx="32" cy="32" r="20.5" stroke="#16A34A" stroke-width="3" />
+  <circle cx="32" cy="32" r="16.5" fill="#DCFCE7" opacity="0.5" />
+  <g color="#16A34A">
+    <svg x="13" y="19" width="31" height="31" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" />
+  <path d="M15 18H9" />
+  <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14" />
+  <circle cx="17" cy="18" r="2" />
+  <circle cx="7" cy="18" r="2" />
+  </svg>
+    <circle cx="43" cy="21" r="9" fill="#FFFFFF" stroke="#16A34A" stroke-width="2" />
+  <svg x="36.5" y="14.5" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10" />
+  <path d="m4.93 4.93 4.24 4.24" />
+  <path d="m14.83 9.17 4.24-4.24" />
+  <path d="m14.83 14.83 4.24 4.24" />
+  <path d="m9.17 14.83-4.24 4.24" />
+  <circle cx="12" cy="12" r="4" />
+  </svg>
+  </g>
+    </g>
+    <text x="521" y="256" text-anchor="middle" class="label">Rescue</text>
+  <g transform="translate(634 178) scale(1.15)">
+      
+  
+  <circle cx="32" cy="32" r="23" fill="#16A34A" opacity="0.14" />
+  <circle cx="32" cy="32" r="20.5" fill="#FFFFFF" filter="url(#marker-shadow)" />
+  <circle cx="32" cy="32" r="20.5" stroke="#16A34A" stroke-width="3" />
+  <circle cx="32" cy="32" r="16.5" fill="#DCFCE7" opacity="0.5" />
+  <g color="#16A34A">
+    <svg x="16" y="16" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10 10H6" />
+  <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" />
+  <path
+    d="M19 18h2a1 1 0 0 0 1-1v-3.28a1 1 0 0 0-.684-.948l-1.923-.641a1 1 0 0 1-.578-.502l-1.539-3.076A1 1 0 0 0 16.382 8H14" />
+  <path d="M8 8v4" />
+  <path d="M9 18h6" />
+  <circle cx="17" cy="18" r="2" />
+  <circle cx="7" cy="18" r="2" />
+  </svg>
+    
+  </g>
+    </g>
+    <text x="671" y="256" text-anchor="middle" class="label">Ambulance</text>
+  <g transform="translate(34 298) scale(1.15)">
+      
+  
+  <circle cx="32" cy="32" r="23" fill="#16A34A" opacity="0.14" />
+  <circle cx="32" cy="32" r="20.5" fill="#FFFFFF" filter="url(#marker-shadow)" />
+  <circle cx="32" cy="32" r="20.5" stroke="#16A34A" stroke-width="3" />
+  <circle cx="32" cy="32" r="16.5" fill="#DCFCE7" opacity="0.5" />
+  <g color="#16A34A">
+    <svg x="13" y="19" width="31" height="31" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m21 8-2 2-1.5-3.7A2 2 0 0 0 15.646 5H8.4a2 2 0 0 0-1.903 1.257L5 10 3 8" />
+  <path d="M7 14h.01" />
+  <path d="M17 14h.01" />
+  <rect width="18" height="8" x="3" y="10" rx="2" />
+  <path d="M5 18v2" />
+  <path d="M19 18v2" />
+  </svg>
+    <circle cx="43" cy="21" r="9" fill="#FFFFFF" stroke="#16A34A" stroke-width="2" />
+  <svg x="36.5" y="14.5" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+  <path d="m9 12 2 2 4-4" />
+  </svg>
+  </g>
+    </g>
+    <text x="71" y="376" text-anchor="middle" class="label">PJR</text>
+  <g transform="translate(184 298) scale(1.15)">
+      
+  
+  <circle cx="32" cy="32" r="23" fill="#16A34A" opacity="0.14" />
+  <circle cx="32" cy="32" r="20.5" fill="#FFFFFF" filter="url(#marker-shadow)" />
+  <circle cx="32" cy="32" r="20.5" stroke="#16A34A" stroke-width="3" />
+  <circle cx="32" cy="32" r="16.5" fill="#DCFCE7" opacity="0.5" />
+  <g color="#16A34A">
+    <svg x="13" y="19" width="31" height="31" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" />
+  <path d="M15 18H9" />
+  <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14" />
+  <circle cx="17" cy="18" r="2" />
+  <circle cx="7" cy="18" r="2" />
+  </svg>
+    <circle cx="43" cy="21" r="9" fill="#FFFFFF" stroke="#16A34A" stroke-width="2" />
+  <svg x="36.5" y="14.5" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+  </svg>
+  </g>
+    </g>
+    <text x="221" y="376" text-anchor="middle" class="label">Derek / Towing</text>
+  <g transform="translate(334 298) scale(1.15)">
+      
+  
+  <circle cx="32" cy="32" r="23" fill="#16A34A" opacity="0.14" />
+  <circle cx="32" cy="32" r="20.5" fill="#FFFFFF" filter="url(#marker-shadow)" />
+  <circle cx="32" cy="32" r="20.5" stroke="#16A34A" stroke-width="3" />
+  <circle cx="32" cy="32" r="16.5" fill="#DCFCE7" opacity="0.5" />
+  <g color="#16A34A">
+    <svg x="13" y="19" width="31" height="31" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" />
+  <path d="M15 18H9" />
+  <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14" />
+  <circle cx="17" cy="18" r="2" />
+  <circle cx="7" cy="18" r="2" />
+  </svg>
+    <circle cx="43" cy="21" r="9" fill="#FFFFFF" stroke="#16A34A" stroke-width="2" />
+  <svg x="36.5" y="14.5" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z" />
+  </svg>
+  </g>
+    </g>
+    <text x="371" y="376" text-anchor="middle" class="label">Water Tank</text>
+  <g transform="translate(484 298) scale(1.15)">
+      
+  
+  <circle cx="32" cy="32" r="23" fill="#16A34A" opacity="0.14" />
+  <circle cx="32" cy="32" r="20.5" fill="#FFFFFF" filter="url(#marker-shadow)" />
+  <circle cx="32" cy="32" r="20.5" stroke="#16A34A" stroke-width="3" />
+  <circle cx="32" cy="32" r="16.5" fill="#DCFCE7" opacity="0.5" />
+  <g color="#16A34A">
+    <svg x="13" y="19" width="31" height="31" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 12H5a2 2 0 0 0-2 2v5" />
+  <circle cx="13" cy="19" r="2" />
+  <circle cx="5" cy="19" r="2" />
+  <path d="M8 19h3m5-17v17h6M6 12V7c0-1.1.9-2 2-2h3l5 5" />
+  </svg>
+    <circle cx="43" cy="21" r="9" fill="#FFFFFF" stroke="#16A34A" stroke-width="2" />
+  <svg x="36.5" y="14.5" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m5 12 7-7 7 7" />
+  <path d="M12 19V5" />
+  </svg>
+  </g>
+    </g>
+    <text x="521" y="376" text-anchor="middle" class="label">Skylift</text>
+  <g transform="translate(634 298) scale(1.15)">
+      
+  
+  <circle cx="32" cy="32" r="23" fill="#16A34A" opacity="0.14" />
+  <circle cx="32" cy="32" r="20.5" fill="#FFFFFF" filter="url(#marker-shadow)" />
+  <circle cx="32" cy="32" r="20.5" stroke="#16A34A" stroke-width="3" />
+  <circle cx="32" cy="32" r="16.5" fill="#DCFCE7" opacity="0.5" />
+  <g color="#16A34A">
+    <svg x="13" y="19" width="31" height="31" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" />
+  <path d="M15 18H9" />
+  <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14" />
+  <circle cx="17" cy="18" r="2" />
+  <circle cx="7" cy="18" r="2" />
+  </svg>
+    <circle cx="43" cy="21" r="9" fill="#FFFFFF" stroke="#16A34A" stroke-width="2" />
+  <svg x="36.5" y="14.5" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m9.06 11.9 8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08" />
+  <path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z" />
+  </svg>
+  </g>
+    </g>
+    <text x="671" y="376" text-anchor="middle" class="label">Road Sweeper</text>
+  <g transform="translate(34 418) scale(1.15)">
+      
+  
+  <circle cx="32" cy="32" r="23" fill="#16A34A" opacity="0.14" />
+  <circle cx="32" cy="32" r="20.5" fill="#FFFFFF" filter="url(#marker-shadow)" />
+  <circle cx="32" cy="32" r="20.5" stroke="#16A34A" stroke-width="3" />
+  <circle cx="32" cy="32" r="16.5" fill="#DCFCE7" opacity="0.5" />
+  <g color="#16A34A">
+    <svg x="16" y="16" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 6 2 7" />
+  <path d="M10 6h4" />
+  <path d="m22 7-2-1" />
+  <rect width="16" height="16" x="4" y="3" rx="2" />
+  <path d="M4 11h16" />
+  <path d="M8 15h.01" />
+  <path d="M16 15h.01" />
+  <path d="M6 19v2" />
+  <path d="M18 21v-2" />
+  </svg>
+    
+  </g>
+    </g>
+    <text x="71" y="496" text-anchor="middle" class="label">Shuttle</text>
+  <g transform="translate(184 418) scale(1.15)">
+      
+  
+  <circle cx="32" cy="32" r="23" fill="#16A34A" opacity="0.14" />
+  <circle cx="32" cy="32" r="20.5" fill="#FFFFFF" filter="url(#marker-shadow)" />
+  <circle cx="32" cy="32" r="20.5" stroke="#16A34A" stroke-width="3" />
+  <circle cx="32" cy="32" r="16.5" fill="#DCFCE7" opacity="0.5" />
+  <g color="#16A34A">
+    <svg x="13" y="19" width="31" height="31" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m21 8-2 2-1.5-3.7A2 2 0 0 0 15.646 5H8.4a2 2 0 0 0-1.903 1.257L5 10 3 8" />
+  <path d="M7 14h.01" />
+  <path d="M17 14h.01" />
+  <rect width="18" height="8" x="3" y="10" rx="2" />
+  <path d="M5 18v2" />
+  <path d="M19 18v2" />
+  </svg>
+    <circle cx="43" cy="21" r="9" fill="#FFFFFF" stroke="#16A34A" stroke-width="2" />
+  <svg x="36.5" y="14.5" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
+  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+  <path d="M12 11h4" />
+  <path d="M12 16h4" />
+  <path d="M8 11h.01" />
+  <path d="M8 16h.01" />
+  </svg>
+  </g>
+    </g>
+    <text x="221" y="496" text-anchor="middle" class="label">Inspector</text>
+  <g transform="translate(334 418) scale(1.15)">
+      
+  
+  <circle cx="32" cy="32" r="23" fill="#16A34A" opacity="0.14" />
+  <circle cx="32" cy="32" r="20.5" fill="#FFFFFF" filter="url(#marker-shadow)" />
+  <circle cx="32" cy="32" r="20.5" stroke="#16A34A" stroke-width="3" />
+  <circle cx="32" cy="32" r="16.5" fill="#DCFCE7" opacity="0.5" />
+  <g color="#16A34A">
+    <svg x="13" y="19" width="31" height="31" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m21 8-2 2-1.5-3.7A2 2 0 0 0 15.646 5H8.4a2 2 0 0 0-1.903 1.257L5 10 3 8" />
+  <path d="M7 14h.01" />
+  <path d="M17 14h.01" />
+  <rect width="18" height="8" x="3" y="10" rx="2" />
+  <path d="M5 18v2" />
+  <path d="M19 18v2" />
+  </svg>
+    <circle cx="43" cy="21" r="9" fill="#FFFFFF" stroke="#16A34A" stroke-width="2" />
+  <svg x="36.5" y="14.5" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+  <path d="m9 12 2 2 4-4" />
+  </svg>
+  </g>
+    </g>
+    <text x="371" y="496" text-anchor="middle" class="label">Kamtib</text>
+  <g transform="translate(484 418) scale(1.15)">
+      
+  
+  <circle cx="32" cy="32" r="23" fill="#16A34A" opacity="0.14" />
+  <circle cx="32" cy="32" r="20.5" fill="#FFFFFF" filter="url(#marker-shadow)" />
+  <circle cx="32" cy="32" r="20.5" stroke="#16A34A" stroke-width="3" />
+  <circle cx="32" cy="32" r="16.5" fill="#DCFCE7" opacity="0.5" />
+  <g color="#16A34A">
+    <svg x="16" y="16" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m21 8-2 2-1.5-3.7A2 2 0 0 0 15.646 5H8.4a2 2 0 0 0-1.903 1.257L5 10 3 8" />
+  <path d="M7 14h.01" />
+  <path d="M17 14h.01" />
+  <rect width="18" height="8" x="3" y="10" rx="2" />
+  <path d="M5 18v2" />
+  <path d="M19 18v2" />
+  </svg>
+    
+  </g>
+    </g>
+    <text x="521" y="496" text-anchor="middle" class="label">General</text>
+</svg>

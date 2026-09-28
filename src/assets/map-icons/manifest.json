@@ -1,0 +1,216 @@
+{
+  "statuses": [
+    {
+      "key": "normal",
+      "label": "Normal",
+      "color": "#16A34A"
+    },
+    {
+      "key": "offline",
+      "label": "Error / Offline",
+      "color": "#9CA3AF"
+    },
+    {
+      "key": "sos-created",
+      "label": "SOS Created",
+      "color": "#DC2626"
+    },
+    {
+      "key": "sos-dispatched",
+      "label": "SOS Dispatched",
+      "color": "#F97316"
+    }
+  ],
+  "icons": [
+    {
+      "key": "cctv",
+      "label": "CCTV",
+      "files": [
+        "cctv/normal.svg",
+        "cctv/offline.svg",
+        "cctv/sos-created.svg",
+        "cctv/sos-dispatched.svg"
+      ]
+    },
+    {
+      "key": "vms",
+      "label": "VMS",
+      "files": [
+        "vms/normal.svg",
+        "vms/offline.svg",
+        "vms/sos-created.svg",
+        "vms/sos-dispatched.svg"
+      ]
+    },
+    {
+      "key": "wim",
+      "label": "WIM",
+      "files": [
+        "wim/normal.svg",
+        "wim/offline.svg",
+        "wim/sos-created.svg",
+        "wim/sos-dispatched.svg"
+      ]
+    },
+    {
+      "key": "radio",
+      "label": "Radio",
+      "files": [
+        "radio/normal.svg",
+        "radio/offline.svg",
+        "radio/sos-created.svg",
+        "radio/sos-dispatched.svg"
+      ]
+    },
+    {
+      "key": "gerbang-tol",
+      "label": "Gerbang Tol",
+      "files": [
+        "gerbang-tol/normal.svg",
+        "gerbang-tol/offline.svg",
+        "gerbang-tol/sos-created.svg",
+        "gerbang-tol/sos-dispatched.svg"
+      ]
+    },
+    {
+      "key": "cuaca",
+      "label": "Cuaca",
+      "files": [
+        "cuaca/normal.svg",
+        "cuaca/offline.svg",
+        "cuaca/sos-created.svg",
+        "cuaca/sos-dispatched.svg"
+      ]
+    },
+    {
+      "key": "sos",
+      "label": "SOS",
+      "files": [
+        "sos/normal.svg",
+        "sos/offline.svg",
+        "sos/sos-created.svg",
+        "sos/sos-dispatched.svg"
+      ]
+    },
+    {
+      "key": "patroli",
+      "label": "Patroli",
+      "files": [
+        "patroli/normal.svg",
+        "patroli/offline.svg",
+        "patroli/sos-created.svg",
+        "patroli/sos-dispatched.svg"
+      ]
+    },
+    {
+      "key": "rescue",
+      "label": "Rescue",
+      "files": [
+        "rescue/normal.svg",
+        "rescue/offline.svg",
+        "rescue/sos-created.svg",
+        "rescue/sos-dispatched.svg"
+      ]
+    },
+    {
+      "key": "ambulance",
+      "label": "Ambulance",
+      "files": [
+        "ambulance/normal.svg",
+        "ambulance/offline.svg",
+        "ambulance/sos-created.svg",
+        "ambulance/sos-dispatched.svg"
+      ]
+    },
+    {
+      "key": "pjr",
+      "label": "PJR",
+      "files": [
+        "pjr/normal.svg",
+        "pjr/offline.svg",
+        "pjr/sos-created.svg",
+        "pjr/sos-dispatched.svg"
+      ]
+    },
+    {
+      "key": "derek",
+      "label": "Derek / Towing",
+      "files": [
+        "derek/normal.svg",
+        "derek/offline.svg",
+        "derek/sos-created.svg",
+        "derek/sos-dispatched.svg"
+      ]
+    },
+    {
+      "key": "water-tank",
+      "label": "Water Tank",
+      "files": [
+        "water-tank/normal.svg",
+        "water-tank/offline.svg",
+        "water-tank/sos-created.svg",
+        "water-tank/sos-dispatched.svg"
+      ]
+    },
+    {
+      "key": "skylift",
+      "label": "Skylift",
+      "files": [
+        "skylift/normal.svg",
+        "skylift/offline.svg",
+        "skylift/sos-created.svg",
+        "skylift/sos-dispatched.svg"
+      ]
+    },
+    {
+      "key": "roadsweeper",
+      "label": "Road Sweeper",
+      "files": [
+        "roadsweeper/normal.svg",
+        "roadsweeper/offline.svg",
+        "roadsweeper/sos-created.svg",
+        "roadsweeper/sos-dispatched.svg"
+      ]
+    },
+    {
+      "key": "shuttle",
+      "label": "Shuttle",
+      "files": [
+        "shuttle/normal.svg",
+        "shuttle/offline.svg",
+        "shuttle/sos-created.svg",
+        "shuttle/sos-dispatched.svg"
+      ]
+    },
+    {
+      "key": "inspector",
+      "label": "Inspector",
+      "files": [
+        "inspector/normal.svg",
+        "inspector/offline.svg",
+        "inspector/sos-created.svg",
+        "inspector/sos-dispatched.svg"
+      ]
+    },
+    {
+      "key": "kamtib",
+      "label": "Kamtib",
+      "files": [
+        "kamtib/normal.svg",
+        "kamtib/offline.svg",
+        "kamtib/sos-created.svg",
+        "kamtib/sos-dispatched.svg"
+      ]
+    },
+    {
+      "key": "general",
+      "label": "General",
+      "files": [
+        "general/normal.svg",
+        "general/offline.svg",
+        "general/sos-created.svg",
+        "general/sos-dispatched.svg"
+      ]
+    }
+  ]
+}

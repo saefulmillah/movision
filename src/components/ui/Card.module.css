@@ -1,0 +1,72 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2xl);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  animation: rise 0.3s ease both;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+  flex: none;
+}
+
+.title {
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.count {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--r-sm);
+  background: var(--surface-3);
+  color: var(--text-muted);
+}
+
+.headerAction {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--st-blue);
+}
+.headerAction:hover {
+  filter: brightness(1.1);
+}
+.headerAction[data-disabled="true"] {
+  color: var(--text-faint);
+  pointer-events: none;
+}
+
+.body {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 16px;
+  overflow: auto;
+}
+.body[data-flush="true"] {
+  padding: 0;
+}
+
+/* Keyframes lokal (CSS Modules meng-hash referensi animasi; definisi lokal agar cocok). */
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+@keyframes pulse { 0% { transform: scale(1); opacity: 0.9; } 70% { transform: scale(1.9); opacity: 0; } 100% { opacity: 0; } }
+@keyframes glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(244,63,94,0.5); } 50% { box-shadow: 0 0 8px 2px rgba(244,63,94,0.55); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes slideInRight { from { opacity: 0; transform: translateX(34px); } to { opacity: 1; transform: none; } }
+

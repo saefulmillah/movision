@@ -1,0 +1,342 @@
+.page {
+  display: grid;
+  grid-template-columns: var(--w-panel-left) 1fr;
+  height: 100%;
+  min-height: 0;
+  background: var(--app-bg);
+}
+.page[data-full="true"] {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  grid-template-columns: 1fr;
+}
+
+/* ============ Panel daftar kamera (kiri) ============ */
+.listPanel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--surface-1);
+  border-right: 1px solid var(--line);
+}
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 12px 6px;
+  padding: 9px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+}
+.searchBox input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  outline: none;
+  font-size: var(--fs-base);
+  color: var(--text);
+}
+.camList {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 6px 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.camItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--r-lg);
+  cursor: pointer;
+  transition: background var(--t-fast);
+}
+.camItem:hover {
+  background: rgba(47, 107, 255, 0.08);
+}
+.camItem[data-selected="true"] {
+  background: var(--nav-active-bg);
+}
+.camDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  flex: none;
+  background: var(--sem-green);
+}
+.camDot[data-off="true"] {
+  background: var(--st-gray);
+}
+.camInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.camName {
+  font-size: var(--fs-base);
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.camKm {
+  font-size: var(--fs-micro);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Drawer daftar kamera saat layar penuh */
+.fullListPanel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--w-panel-left);
+  z-index: 25;
+  background: var(--surface-1);
+  border-right: 1px solid var(--line);
+  box-shadow: 8px 0 24px rgba(0, 0, 0, 0.28);
+  transform: translateX(-100%);
+  transition: transform var(--t-panel);
+}
+.fullListPanel[data-open="true"] {
+  transform: translateX(0);
+}
+.fullListPanel .listPanel {
+  height: 100%;
+  border-right: none;
+}
+
+/* ============ Kolom utama ============ */
+.main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+  flex: none;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--line);
+}
+.tbBranch {
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  color: var(--text);
+}
+.tbCount {
+  display: flex;
+  gap: 12px;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+.tbCount b {
+  color: var(--sem-green);
+  font-family: var(--font-mono);
+}
+.tbCount .off {
+  color: var(--st-gray);
+}
+.tbSpacer {
+  flex: 1 1 auto;
+}
+
+/* Pager mode layar penuh (di floating toolbar) */
+.pager {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.pagerBtn {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--t-fast);
+}
+.pagerBtn:hover:not(:disabled) {
+  background: var(--surface-3);
+}
+.pagerBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.pagerLabel {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--text-dim);
+  min-width: 34px;
+  text-align: center;
+}
+
+/* ============ Grid kamera ============ */
+.gridWrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 14px 18px;
+}
+.grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(var(--cols, 3), 1fr);
+}
+.page[data-full="true"] .gridWrap {
+  overflow: hidden;
+  padding: 14px;
+}
+.page[data-full="true"] .grid {
+  height: 100%;
+  grid-template-rows: repeat(var(--cols, 3), 1fr);
+}
+
+/* ============ Tile ============ */
+.tile {
+  position: relative;
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--tile-1), var(--tile-2));
+  border: 1px solid var(--line);
+  aspect-ratio: 16 / 9;
+  animation: fadeIn 0.3s ease both;
+}
+.tile[data-selected="true"] {
+  outline: 2px solid var(--st-blue);
+  outline-offset: -2px;
+}
+.page[data-full="true"] .tile {
+  aspect-ratio: auto;
+  height: 100%;
+  min-height: 0;
+}
+.tile video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.tilePlaceholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--on-scrim-dim);
+}
+
+/* Overlay atas & bawah */
+.ovTop,
+.ovBottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  z-index: 2;
+  pointer-events: none;
+}
+.ovTop {
+  top: 0;
+  background: linear-gradient(180deg, rgba(6, 12, 24, 0.72), transparent);
+}
+.ovBottom {
+  bottom: 0;
+  background: linear-gradient(0deg, rgba(6, 12, 24, 0.72), transparent);
+}
+.ovName {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--on-scrim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ovKm {
+  font-size: var(--fs-micro);
+  font-family: var(--font-mono);
+  color: var(--on-scrim-dim);
+}
+.ovStatus {
+  margin-left: auto;
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  color: var(--on-scrim-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--sem-green);
+  flex: none;
+}
+.statusDot[data-off="true"] {
+  background: var(--st-gray);
+}
+
+/* LIVE badge */
+.live {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+.liveDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--sem-red);
+  animation: blink 1.6s infinite;
+}
+
+/* Offline state */
+.offline {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--on-scrim-dim);
+}
+.offlineLabel {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* Keyframes lokal (CSS Modules meng-hash referensi animasi; definisi lokal agar cocok). */
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+@keyframes pulse { 0% { transform: scale(1); opacity: 0.9; } 70% { transform: scale(1.9); opacity: 0; } 100% { opacity: 0; } }
+@keyframes glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(244,63,94,0.5); } 50% { box-shadow: 0 0 8px 2px rgba(244,63,94,0.55); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes slideInRight { from { opacity: 0; transform: translateX(34px); } to { opacity: 1; transform: none; } }
+

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="WIM SOS Dispatched">
+  <title>WIM - SOS Dispatched</title>
+  <!-- Icon path supplied by Lucide v0.469.0, ISC License. -->
+  <defs>
+    <filter id="marker-shadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="2" stdDeviation="1.8" flood-color="#0F172A" flood-opacity="0.24" />
+    </filter>
+  </defs>
+  
+  
+    <circle cx="32" cy="32" r="24" fill="none" stroke="#F97316" stroke-width="2" opacity="0.48">
+      <animate attributeName="r" values="24;31;24" dur="1.8s" repeatCount="indefinite" />
+      <animate attributeName="opacity" values="0.48;0;0.48" dur="1.8s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="32" cy="32" r="25" fill="none" stroke="#F97316" stroke-width="1.5" opacity="0.3">
+      <animate attributeName="r" values="25;34;25" dur="1.8s" begin="0.35s" repeatCount="indefinite" />
+      <animate attributeName="opacity" values="0.3;0;0.3" dur="1.8s" begin="0.35s" repeatCount="indefinite" />
+    </circle>
+  
+  <circle cx="32" cy="32" r="23" fill="#F97316" opacity="0.14" />
+  <circle cx="32" cy="32" r="20.5" fill="#FFFFFF" filter="url(#marker-shadow)" />
+  <circle cx="32" cy="32" r="20.5" stroke="#F97316" stroke-width="3" />
+  <circle cx="32" cy="32" r="16.5" fill="#FFEDD5" opacity="0.5" />
+  <g color="#F97316">
+    <svg x="16" y="16" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" />
+  <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" />
+  <path d="M7 21h10" />
+  <path d="M12 3v18" />
+  <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2" />
+  </svg>
+    
+  </g>
+</svg>

@@ -1,0 +1,194 @@
+<title>Top Risk Divisi</title>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#eef1f5;--surface:#fff;--surface-2:#f4f6f9;--ink:#182231;--muted:#647287;
+  --line:#d5dbe4;--line-strong:#b9c3d1;--brand:#16386b;--brand-ink:#fff;--shadow:0 1px 3px rgba(20,35,60,.08),0 10px 30px rgba(20,35,60,.06);
+  --L:#1e8e3e;--LM:#7cb342;--M:#f7d13a;--MH:#ef8a1a;--H:#e23b34;
+  --ink-on-warm:#2a2118;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;--bg:#0e131b;--surface:#161d28;--surface-2:#1b2430;--ink:#e7edf5;--muted:#94a2b6;
+  --line:#28323f;--line-strong:#3a4757;--brand:#24487f;--shadow:0 1px 3px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0e131b;--surface:#161d28;--surface-2:#1b2430;--ink:#e7edf5;--muted:#94a2b6;--line:#28323f;--line-strong:#3a4757;--brand:#24487f;--shadow:0 1px 3px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1400px;margin:0 auto;padding:0 16px;padding-block:20px 40px}
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 20px;border-bottom:2px solid var(--brand);padding-bottom:12px}
+.top h1{margin:0;font-size:clamp(19px,2.2vw,25px);font-weight:800;letter-spacing:-.01em}
+.top .sub{color:var(--muted);font-size:13px;font-weight:600;margin-top:3px}
+.brand{margin-left:auto;text-align:right;font-size:11px;color:var(--muted)}
+.brand b{color:var(--brand);font-weight:800;font-size:14px;letter-spacing:.04em}
+.grid2{display:grid;grid-template-columns:minmax(440px,0.9fr) 1.1fr;gap:22px;margin-top:18px;align-items:start}
+@media (max-width:980px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px}
+.card h2{margin:0 0 10px;font-size:14px;font-weight:800;letter-spacing:.02em;text-transform:uppercase;color:var(--brand)}
+svg{width:100%;height:auto;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:12px;color:var(--muted);font-weight:600}
+.legend .it{display:inline-flex;align-items:center;gap:7px}
+.dot{width:16px;height:16px;border-radius:50%;display:inline-block;border:2px solid #111}
+.dot.inh{background:#111}.dot.exp{background:#8a8a8a;border-color:#8a8a8a}.dot.res{background:#fff}
+.zsw{width:14px;height:14px;border-radius:3px;display:inline-block}
+.scroll{overflow-x:auto}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:12.5px}
+th,td{padding:8px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+thead th{background:var(--brand);color:#fff;font-weight:700;text-align:center;font-size:11.5px;letter-spacing:.02em;position:sticky;top:0}
+thead tr.sub th{background:var(--surface-2);color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.05em}
+td.rank{text-align:center;font-weight:800;color:var(--brand);font-size:15px}
+td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+.chip{display:inline-block;min-width:52px;text-align:center;font-weight:800;font-size:11px;padding:3px 8px;border-radius:6px;color:#2a2118}
+.chip.L{background:var(--L);color:#fff}.chip.LM{background:var(--LM)}.chip.M{background:var(--M)}.chip.MH{background:var(--MH);color:#fff}.chip.H{background:var(--H);color:#fff}
+.evt{font-weight:700}.dmp{color:var(--muted);font-size:11.5px;margin-top:2px}
+.note{font-size:11px;color:var(--muted);margin-top:10px}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>Manajemen Risiko — Top Risk Divisi</h1>
+      <div class="sub">Bulan Agustus 2026 · Divisi Operasi &amp; Pemeliharaan Jalan Tol</div>
+    </div>
+    <div class="brand"><b>HK · Danantara Indonesia</b><div>Rapat Direktorat · Peta Risiko</div></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2>Peta Risiko (5 × 5)</h2>
+      <svg id="heat" viewBox="0 0 560 560" role="img" aria-label="Heat map risiko 5x5"></svg>
+      <div class="legend">
+        <span class="it"><span class="dot inh"></span>Inherent Risk</span>
+        <span class="it"><span class="dot exp"></span>Expected Risk</span>
+        <span class="it"><span class="dot res"></span>Residual Risk</span>
+      </div>
+      <div class="legend">
+        <span class="it"><span class="zsw" style="background:var(--L)"></span>Low</span>
+        <span class="it"><span class="zsw" style="background:var(--LM)"></span>Low-Moderate</span>
+        <span class="it"><span class="zsw" style="background:var(--M)"></span>Moderate</span>
+        <span class="it"><span class="zsw" style="background:var(--MH)"></span>Moderate-High</span>
+        <span class="it"><span class="zsw" style="background:var(--H)"></span>High</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Daftar Top Risk</h2>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th rowspan="2">#</th><th rowspan="2">Peristiwa &amp; Dampak</th>
+              <th colspan="2">Inherent</th><th colspan="2">Expected</th><th colspan="2">Residual</th>
+            </tr>
+            <tr class="sub"><th>Exposure</th><th>Nilai</th><th>Exposure</th><th>Nilai</th><th>Exposure</th><th>Nilai</th></tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="note">Nilai dalam Rp juta (asumsi). Exposure = nomor sel matriks + level. Peta &amp; level dihitung dari Kemungkinan × Dampak.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== KONFIGURASI MATRIKS (appetite) — nomor sel -> impact,likelihood,level ===== */
+const CELL = {
+ 1:{i:1,l:1,z:'L'}, 2:{i:1,l:2,z:'L'}, 3:{i:1,l:3,z:'LM'}, 4:{i:1,l:4,z:'LM'}, 7:{i:1,l:5,z:'LM'},
+ 5:{i:2,l:1,z:'L'}, 6:{i:2,l:2,z:'LM'}, 8:{i:2,l:3,z:'LM'}, 9:{i:2,l:4,z:'LM'}, 12:{i:2,l:5,z:'M'},
+ 10:{i:3,l:1,z:'LM'},11:{i:3,l:2,z:'LM'},13:{i:3,l:3,z:'M'}, 14:{i:3,l:4,z:'M'}, 17:{i:3,l:5,z:'MH'},
+ 15:{i:4,l:1,z:'M'}, 16:{i:4,l:2,z:'MH'},18:{i:4,l:3,z:'MH'},19:{i:4,l:4,z:'MH'},22:{i:4,l:5,z:'H'},
+ 20:{i:5,l:1,z:'H'}, 21:{i:5,l:2,z:'H'}, 23:{i:5,l:3,z:'H'}, 24:{i:5,l:4,z:'H'}, 25:{i:5,l:5,z:'H'},
+};
+const ZCOL={L:getVar('--L'),LM:getVar('--LM'),M:getVar('--M'),MH:getVar('--MH'),H:getVar('--H')};
+function getVar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()||'#ccc';}
+const IMPACT=['','Sangat\nRendah','Rendah','Moderat','Tinggi','Sangat\nTinggi'];
+const LIKELI=['','Sangat Jarang','Jarang','Bisa Terjadi','Sangat Mungkin','Hampir Pasti'];
+
+/* ===== DATA RISIKO (dari Top_Risk_Divisi.xlsx) ===== */
+const RISKS=[
+ {r:1,evt:"Risiko Keterlambatan Penyesuaian Tarif",dmp:"Penurunan pendapatan tol",
+  inh:{c:14,z:'M',v:14603}, exp:{c:3,z:'LM',v:2410}, res:{c:24,z:'H',v:40118}},
+ {r:2,evt:"Keterlambatan pemberlakuan tarif tol pada ruas baru",dmp:"Penurunan pendapatan tol",
+  inh:{c:24,z:'H',v:38942}, exp:{c:23,z:'H',v:35947}, res:{c:23,z:'H',v:32951}},
+ {r:3,evt:"Risiko kerusakan konstruksi jalan tol",dmp:"Peningkatan biaya pemeliharaan",
+  inh:{c:23,z:'H',v:35473}, exp:{c:23,z:'H',v:29561}, res:{c:21,z:'H',v:8868}},
+ {r:4,evt:"Risiko Peningkatan Tingkat Kecelakaan",dmp:"Reputasi perusahaan sebagai BUJT menurun",
+  inh:{c:19,z:'MH',v:1200}, exp:{c:18,z:'MH',v:1028}, res:{c:18,z:'MH',v:1028}},
+ {r:5,evt:"Risiko komplain dari pengguna jalan tol",dmp:"Reputasi perusahaan sebagai BUJT menurun",
+  inh:{c:18,z:'MH',v:1028}, exp:{c:16,z:'MH',v:686}, res:{c:16,z:'MH',v:514}},
+ {r:6,evt:"Risiko deduction ruas tol dengan sistem PBBL",dmp:"Penurunan pendapatan PBBL",
+  inh:{c:12,z:'M',v:8645}, exp:{c:12,z:'M',v:8645}, res:{c:12,z:'M',v:12626}},
+];
+
+/* ===== RENDER HEAT MAP ===== */
+const M=48, CELLW=92, CELLH=92; // margin & cell size -> grid 460x460 within 560 viewBox
+function cellXY(i,l){ return { x: M + (i-1)*CELLW, y: M + (5-l)*CELLH }; }
+function fmt(v){return v==null?'':Math.round(v).toLocaleString('en-US');}
+
+function drawHeat(){
+  const ns="http://www.w3.org/2000/svg"; const svg=document.getElementById('heat'); svg.innerHTML='';
+  // cells
+  for(const no in CELL){const {i,l,z}=CELL[no];const {x,y}=cellXY(i,l);
+    const rect=document.createElementNS(ns,'rect');
+    rect.setAttribute('x',x);rect.setAttribute('y',y);rect.setAttribute('width',CELLW-2);rect.setAttribute('height',CELLH-2);
+    rect.setAttribute('rx',5);rect.setAttribute('fill',ZCOL[z]);svg.appendChild(rect);
+    const t=document.createElementNS(ns,'text');t.setAttribute('x',x+7);t.setAttribute('y',y+CELLH-10);
+    t.setAttribute('font-size','13');t.setAttribute('font-weight','700');t.setAttribute('fill','rgba(0,0,0,.6)');t.textContent=no;svg.appendChild(t);
+  }
+  // axis labels
+  for(let i=1;i<=5;i++){const {x}=cellXY(i,1);
+    const t=document.createElementNS(ns,'text');t.setAttribute('x',x+CELLW/2-1);t.setAttribute('y',M+5*CELLH+18);
+    t.setAttribute('text-anchor','middle');t.setAttribute('font-size','12');t.setAttribute('font-weight','700');t.setAttribute('fill','var(--muted)');t.textContent=i;svg.appendChild(t);
+  }
+  for(let l=1;l<=5;l++){const {y}=cellXY(1,l);
+    const t=document.createElementNS(ns,'text');t.setAttribute('x',M-10);t.setAttribute('y',y+CELLH/2+4);
+    t.setAttribute('text-anchor','end');t.setAttribute('font-size','12');t.setAttribute('font-weight','700');t.setAttribute('fill','var(--muted)');t.textContent=l;svg.appendChild(t);
+  }
+  // axis titles
+  const xt=document.createElementNS(ns,'text');xt.setAttribute('x',M+2.5*CELLW);xt.setAttribute('y',M+5*CELLH+40);xt.setAttribute('text-anchor','middle');xt.setAttribute('font-size','12');xt.setAttribute('font-weight','800');xt.setAttribute('fill','var(--ink)');xt.textContent='Tingkat Dampak →';svg.appendChild(xt);
+  const yt=document.createElementNS(ns,'text');yt.setAttribute('x',14);yt.setAttribute('y',M+2.5*CELLH);yt.setAttribute('text-anchor','middle');yt.setAttribute('font-size','12');yt.setAttribute('font-weight','800');yt.setAttribute('fill','var(--ink)');yt.setAttribute('transform',`rotate(-90 14 ${M+2.5*CELLH})`);yt.textContent='Tingkat Kemungkinan →';svg.appendChild(yt);
+
+  // group markers by cell
+  const byCell={};
+  const push=(no,rank,stage)=>{(byCell[no]=byCell[no]||[]).push({rank,stage});};
+  RISKS.forEach(k=>{push(k.inh.c,k.r,'inh');push(k.exp.c,k.r,'exp');push(k.res.c,k.r,'res');});
+  const order={inh:0,exp:1,res:2};
+  for(const no in byCell){
+    const {i,l}=CELL[no]; const {x,y}=cellXY(i,l);
+    const ms=byCell[no].sort((a,b)=>order[a.stage]-order[b.stage]||a.rank-b.rank);
+    const R=11, gap=3; const perRow=Math.min(ms.length, Math.floor((CELLW-10)/(2*R+gap))||1);
+    ms.forEach((m,idx)=>{
+      const row=Math.floor(idx/perRow), col=idx%perRow;
+      const cntRow=Math.min(perRow, ms.length-row*perRow);
+      const totalW=cntRow*(2*R)+ (cntRow-1)*gap;
+      const cx=x+CELLW/2 - totalW/2 + R + col*(2*R+gap);
+      const rows=Math.ceil(ms.length/perRow);
+      const cy=y+CELLH/2 - (rows-1)*(R+2)/2 + row*(2*R+2);
+      const c=document.createElementNS(ns,'circle');
+      c.setAttribute('cx',cx);c.setAttribute('cy',cy);c.setAttribute('r',R);
+      if(m.stage==='inh'){c.setAttribute('fill','#111');}
+      else if(m.stage==='exp'){c.setAttribute('fill','#8a8a8a');}
+      else{c.setAttribute('fill','#fff');c.setAttribute('stroke','#111');c.setAttribute('stroke-width','1.5');}
+      svg.appendChild(c);
+      const t=document.createElementNS(ns,'text');t.setAttribute('x',cx);t.setAttribute('y',cy+3.5);
+      t.setAttribute('text-anchor','middle');t.setAttribute('font-size','11');t.setAttribute('font-weight','800');
+      t.setAttribute('fill', m.stage==='res'?'#111':'#fff');t.textContent=m.rank;svg.appendChild(t);
+    });
+  }
+}
+
+/* ===== RENDER TABEL ===== */
+function drawTable(){
+  const tb=document.getElementById('tbody');
+  tb.innerHTML=RISKS.map(k=>{
+    const chip=(o)=>`<span class="chip ${o.z}">${o.c} · ${o.z}</span>`;
+    return `<tr>
+      <td class="rank">${k.r}</td>
+      <td><div class="evt">${k.evt}</div><div class="dmp">${k.dmp}</div></td>
+      <td>${chip(k.inh)}</td><td class="num">${fmt(k.inh.v)}</td>
+      <td>${chip(k.exp)}</td><td class="num">${fmt(k.exp.v)}</td>
+      <td>${chip(k.res)}</td><td class="num">${fmt(k.res.v)}</td>
+    </tr>`;
+  }).join('');
+}
+drawHeat();drawTable();
+</script>

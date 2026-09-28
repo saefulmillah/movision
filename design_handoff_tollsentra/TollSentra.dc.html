@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="prototype">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;height:100%}
+  body{background:var(--app-bg);color:var(--text);font-family:'IBM Plex Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  :root,[data-theme="dark"]{--app-bg:#133A73;--surface-1:#1E4C87;--surface-2:rgba(39,84,143,.78);--surface-3:rgba(30,72,130,.62);--track:rgba(210,225,250,.16);--text:#eaf1fb;--text-dim:#c8d6ee;--text-muted:#93a8c9;--text-faint:#6f88ae;--line-soft:rgba(150,185,230,.1);--line:rgba(150,185,230,.16);--line-strong:rgba(150,185,230,.26);--map-bg:#102f5c;--grid:rgba(130,170,230,.09);--tile-1:rgba(9,26,54,.66);--tile-2:rgba(24,52,96,.66);--sos-bg:linear-gradient(90deg,rgba(244,63,94,.22),rgba(244,63,94,.06));--sos-border:rgba(244,63,94,.3);--sos-text:#ffd7dd;--sos-sub:#f7a9b4;--st-green:var(--sem-green);--st-amber:var(--sem-amber);--st-red:var(--sem-rose);--st-blue:#7ea6ff;--st-gray:#a4b5d2;--card-shadow:0 1px 2px rgba(0,0,0,.18);--nav-active-bg:rgba(90,141,255,.16);--nav-active-text:#eaf1fb;--sem-green:#34d399;--sem-amber:#fbbf24;--sem-red:#f43f5e;--sem-cyan:#22d3ee;--sem-purple:#a78bfa;--sem-rose:#fb7185;--sem-sky:#38bdf8;--sem-slate:#8496b0;--marker-ring:rgba(10,17,32,.85);--marker-glow:13px;--overlay-bg:rgba(10,15,26,.85);--on-scrim:#eaf1fb;--on-scrim-dim:rgba(228,238,252,.72)}
+  [data-theme="light"]{--app-bg:#EDF0F5;--surface-1:#F8FAFC;--surface-2:#FCFDFE;--surface-3:#F1F4F9;--track:#E3E8EF;--text:#2E3D4F;--text-dim:#586878;--text-muted:#76859A;--text-faint:#9AA8B9;--line-soft:rgba(45,65,95,.045);--line:#E4E9EF;--line-strong:#D8DFE7;--map-bg:#E6EBF2;--grid:rgba(90,120,165,.05);--tile-1:#1E242E;--tile-2:#262E3A;--sos-bg:#FCF5F6;--sos-border:#EDD9DC;--sos-text:#B45360;--sos-sub:#AE7C84;--st-green:#2E9C77;--st-amber:#A8801F;--st-red:#C4525F;--st-blue:#3C63B4;--st-gray:#6B7A8D;--card-shadow:0 1px 3px rgba(40,60,90,.05);--nav-active-bg:#E8EEF9;--nav-active-text:#2E5794;--sem-green:#2E9C77;--sem-amber:#B8891C;--sem-red:#C4525F;--sem-cyan:#2189A0;--sem-purple:#7A64C4;--sem-rose:#C05C6C;--sem-sky:#3690BE;--sem-slate:#79879A;--marker-ring:#F8FAFC;--marker-glow:0px;--overlay-bg:rgba(252,253,254,.92);--on-scrim:#f2f6fb;--on-scrim-dim:rgba(240,246,252,.8)}
+  a{color:var(--st-blue);text-decoration:none}
+  a:hover{color:#8fb0ff}
+  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar-thumb{background:#22304a;border-radius:6px}
+  ::-webkit-scrollbar-track{background:transparent}
+  input,button{font-family:inherit}
+  @keyframes ts-pulse{0%{transform:scale(.9);opacity:.7}70%{transform:scale(2.4);opacity:0}100%{opacity:0}}
+  @keyframes ts-blink{0%,100%{opacity:1}50%{opacity:.25}}
+  @keyframes ts-glow{0%,100%{box-shadow:0 0 0 0 rgba(244,63,94,.45)}50%{box-shadow:0 0 0 6px rgba(244,63,94,0)}}
+</style>
+</helmet>
+<div data-theme="{{ themeAttr }}" style="width: 100%; height: 100vh; overflow: hidden; position: relative; font-size: 14px; background:var(--app-bg); color:var(--text)">
+
+<sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+<div style="width:100%;height:100vh;display:flex;background:var(--app-bg)">
+  <div style="flex:1.15;position:relative;overflow:hidden;background:radial-gradient(1200px 600px at 30% 20%,rgba(47,107,255,.22),transparent 60%),linear-gradient(160deg,var(--surface-1),var(--app-bg) 70%);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:100% 100%,40px 40px,40px 40px;padding:56px 60px;display:flex;flex-direction:column;justify-content:space-between">
+    <div style="display:flex;align-items:center;gap:13px">
+      <div style="width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,#2f6bff,#1b4dd6);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(47,107,255,.4)"><span style="width:23px;height:23px;background:#fff;-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/radio-tower.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/radio-tower.svg) center/contain no-repeat"></span></div>
+      <div><div style="font-size:19px;font-weight:700;letter-spacing:.3px">TollSentra</div><div style="font-size:11.5px;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase">Pusat Kendali Operasi Tol</div></div>
+    </div>
+    <div style="max-width:460px">
+      <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border:1px solid rgba(47,107,255,.35);border-radius:30px;font-size:11.5px;color:var(--st-blue);font-family:'IBM Plex Mono';margin-bottom:22px"><span style="width:7px;height:7px;border-radius:50%;background:var(--sem-green);animation:ts-blink 1.6s infinite"></span>SISTEM AKTIF · 6 RUAS TERPANTAU</div>
+      <h1 style="font-size:38px;line-height:1.15;font-weight:700;margin:0 0 16px">Satu layar untuk<br>seluruh operasi tol.</h1>
+      <p style="font-size:15px;line-height:1.6;color:var(--text-dim);margin:0">Pantau CCTV per ruas, sebaran aset di peta, kejadian SOS, dan status WIM secara real-time dari satu pusat kendali terpadu.</p>
+      <div style="display:flex;gap:26px;margin-top:34px">
+        <div><div style="font-family:'IBM Plex Mono';font-size:24px;font-weight:600;color:var(--text)">428</div><div style="font-size:11.5px;color:var(--text-muted);margin-top:2px">Kamera CCTV</div></div>
+        <div style="width:1px;background:rgba(148,163,184,.15)"></div>
+        <div><div style="font-family:'IBM Plex Mono';font-size:24px;font-weight:600;color:var(--text)">48</div><div style="font-size:11.5px;color:var(--text-muted);margin-top:2px">Gerbang Tol</div></div>
+        <div style="width:1px;background:rgba(148,163,184,.15)"></div>
+        <div><div style="font-family:'IBM Plex Mono';font-size:24px;font-weight:600;color:var(--text)">15</div><div style="font-size:11.5px;color:var(--text-muted);margin-top:2px">Site WIM</div></div>
+      </div>
+    </div>
+    <div style="font-size:11.5px;color:var(--text-faint);font-family:'IBM Plex Mono'">v2.4.0 · © 2026 TollSentra Control</div>
+  </div>
+  <div style="flex:.85;display:flex;align-items:center;justify-content:center;padding:40px;background:var(--surface-1);border-left:1px solid var(--line)">
+    <div style="width:100%;max-width:372px">
+      <div style="font-size:22px;font-weight:600;margin-bottom:6px">Masuk ke Pusat Kendali</div>
+      <div style="font-size:13.5px;color:var(--text-muted);margin-bottom:30px">Gunakan kredensial operator Anda untuk melanjutkan.</div>
+      <label style="display:block;font-size:12.5px;color:var(--text-dim);margin-bottom:7px;font-weight:500">Nama Pengguna</label>
+      <div style="position:relative;margin-bottom:18px"><span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);width:17px;height:17px;background:var(--text-faint);-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/user.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/user.svg) center/contain no-repeat"></span><input value="operator.jorr" style="width:100%;padding:13px 14px 13px 40px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:10px;color:var(--text);font-size:14px;outline:none"></div>
+      <label style="display:block;font-size:12.5px;color:var(--text-dim);margin-bottom:7px;font-weight:500">Kata Sandi</label>
+      <div style="position:relative;margin-bottom:16px"><span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);width:17px;height:17px;background:var(--text-faint);-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/lock.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/lock.svg) center/contain no-repeat"></span><input type="password" value="123456789" style="width:100%;padding:13px 14px 13px 40px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:10px;color:var(--text);font-size:14px;outline:none"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;font-size:12.5px"><label style="display:flex;align-items:center;gap:8px;color:var(--text-dim);cursor:pointer"><span style="width:16px;height:16px;border-radius:5px;background:#2f6bff;display:flex;align-items:center;justify-content:center"><span style="width:11px;height:11px;background:#fff;-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/check.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/check.svg) center/contain no-repeat"></span></span>Ingat saya</label><a href="#">Lupa kata sandi?</a></div>
+      <button onClick="{{ doLogin }}" style="width:100%;padding:14px;background:{{ accent }};border:none;border-radius:10px;color:#fff;font-size:14.5px;font-weight:600;cursor:pointer;box-shadow:0 6px 18px rgba(47,107,255,.35)" style-hover="filter:brightness(1.08)">Masuk</button>
+      <div style="display:flex;align-items:center;gap:12px;margin:22px 0;color:var(--text-faint);font-size:12px"><div style="flex:1;height:1px;background:var(--line-strong)"></div>atau<div style="flex:1;height:1px;background:var(--line-strong)"></div></div>
+      <button onClick="{{ doLogin }}" style="width:100%;padding:13px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:10px;color:var(--text-dim);font-size:13.5px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px" style-hover="border-color:rgba(47,107,255,.5)"><span style="width:17px;height:17px;background:var(--st-blue);-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/key-round.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/key-round.svg) center/contain no-repeat"></span>Masuk dengan SSO (OIDC)</button>
+      <div style="text-align:center;font-size:11.5px;color:var(--text-faint);margin-top:26px">Akses dibatasi. Aktivitas login dicatat sistem.</div>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isApp }}" hint-placeholder-val="{{ false }}">
+<div style="width:100%;height:100vh;display:flex;background:var(--app-bg)">
+
+  <aside style="width:{{ sideW }};flex:none;background:var(--surface-1);border-right:1px solid var(--line);display:flex;flex-direction:column;transition:width .18s ease">
+    <div style="display:flex;align-items:center;gap:11px;padding:18px 18px 16px;justify-content:{{ sideJustify }}">
+      <div style="width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#2f6bff,#1b4dd6);display:flex;align-items:center;justify-content:center;flex:none"><span style="width:20px;height:20px;background:#fff;-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/radio-tower.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/radio-tower.svg) center/contain no-repeat"></span></div>
+      <sc-if value="{{ sideOpen }}" hint-placeholder-val="{{ true }}"><div><div style="font-size:15.5px;font-weight:700;letter-spacing:.2px">TollSentra</div><div style="font-size:10px;color:var(--text-faint);letter-spacing:1px;text-transform:uppercase">Control Center</div></div></sc-if>
+    </div>
+    <div onClick="{{ toggleSide }}" style="display:flex;align-items:center;gap:10px;justify-content:{{ sideJustify }};margin:0 10px 6px;padding:9px 12px;border-radius:8px;cursor:pointer;background:var(--line-soft)" style-hover="background:rgba(47,107,255,.12)">
+      <span style="width:18px;height:18px;flex:none;background:var(--text-muted);-webkit-mask:url({{ toggleIcon }}) center/contain no-repeat;mask:url({{ toggleIcon }}) center/contain no-repeat"></span>
+      <sc-if value="{{ sideOpen }}" hint-placeholder-val="{{ true }}"><span style="font-size:12px;color:var(--text-muted);font-weight:500">{{ toggleLabel }}</span></sc-if>
+    </div>
+    <sc-if value="{{ sideOpen }}" hint-placeholder-val="{{ true }}"><div style="padding:6px 0 4px;font-size:10.5px;color:var(--text-faint);letter-spacing:1.4px;text-transform:uppercase;margin:8px 20px 4px">Menu</div></sc-if>
+    <nav style="flex:1;overflow-y:auto">
+      <sc-for list="{{ nav }}" as="item" hint-placeholder-count="6">
+        <div onClick="{{ item.onClick }}" title="{{ item.label }}" style="position:relative;display:flex;align-items:center;gap:12px;padding:{{ navPad }};margin:2px 10px;border-radius:9px;cursor:pointer;background:{{ item.bg }};justify-content:{{ sideJustify }};transition:background .15s" style-hover="background:rgba(47,107,255,.1)">
+          <sc-if value="{{ item.active }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:3px;top:50%;transform:translateY(-50%);width:3px;height:19px;border-radius:2px;background:{{ accent }}"></span></sc-if>
+          <span style="position:relative;width:19px;height:19px;flex:none;background:{{ item.tint }};-webkit-mask:url({{ item.iconUrl }}) center/contain no-repeat;mask:url({{ item.iconUrl }}) center/contain no-repeat"><sc-if value="{{ item.dotCollapsed }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:-3px;right:-4px;width:8px;height:8px;border-radius:50%;background:var(--sem-red);box-shadow:0 0 0 2px var(--surface-1)"></span></sc-if></span>
+          <sc-if value="{{ sideOpen }}" hint-placeholder-val="{{ true }}"><span style="font-size:13.5px;font-weight:500;color:{{ item.tint }}">{{ item.label }}</span></sc-if>
+          <sc-if value="{{ item.badge }}" hint-placeholder-val="{{ false }}"><span style="margin-left:auto;font:600 10.5px/1 'IBM Plex Mono';background:var(--sem-red);color:#fff;padding:3px 7px;border-radius:20px;animation:ts-glow 1.8s infinite">{{ item.badge }}</span></sc-if>
+        </div>
+      </sc-for>
+    </nav>
+    <div style="border-top:1px solid var(--line);padding:14px 16px;display:flex;align-items:center;gap:11px;justify-content:{{ sideJustify }}">
+      <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#334670,#1b2740);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;color:var(--text-dim);flex:none">RP</div>
+      <sc-if value="{{ sideOpen }}" hint-placeholder-val="{{ true }}"><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Rangga Prasetyo</div><div style="font-size:11px;color:var(--text-faint)">Operator Ruang Kendali</div></div></sc-if>
+      <sc-if value="{{ sideOpen }}" hint-placeholder-val="{{ true }}"><span onClick="{{ logout }}" style="width:18px;height:18px;flex:none;cursor:pointer;background:var(--text-faint);-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/log-out.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/log-out.svg) center/contain no-repeat" style-hover="background:var(--sem-red)"></span></sc-if>
+    </div>
+  </aside>
+
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+    <header style="height:60px;flex:none;border-bottom:1px solid var(--line);background:var(--surface-1);display:flex;align-items:center;padding:0 22px;gap:18px">
+      <div style="font-size:16px;font-weight:600">{{ screenTitle }}</div>
+      
+      <div style="flex:1"></div>
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 11px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:8px;cursor:pointer;margin-left:6px" style-hover="border-color:rgba(47,107,255,.5)">
+        <span style="width:15px;height:15px;background:var(--st-blue);-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/git-fork.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/git-fork.svg) center/contain no-repeat"></span>
+        <span style="font-size:12.5px;color:var(--text-dim);font-weight:500">Ruas: {{ branchLabel }}</span>
+        <span style="width:14px;height:14px;background:var(--text-faint);-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/chevron-down.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/chevron-down.svg) center/contain no-repeat"></span>
+      </div><div style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--sem-green);font-family:'IBM Plex Mono'"><span style="width:8px;height:8px;border-radius:50%;background:var(--sem-green);animation:ts-blink 1.6s infinite"></span>SSE TERHUBUNG</div>
+      <div style="width:1px;height:22px;background:var(--line-strong)"></div>
+      <div style="font-family:'IBM Plex Mono';font-size:15px;font-weight:500;color:var(--text);letter-spacing:.5px">{{ now }}</div>
+      <div onClick="{{ toggleTheme }}" title="Ganti tema terang/gelap" style="width:34px;height:34px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="border-color:rgba(47,107,255,.5)"><span style="width:17px;height:17px;background:var(--text-muted);-webkit-mask:url({{ themeIcon }}) center/contain no-repeat;mask:url({{ themeIcon }}) center/contain no-repeat"></span></div>
+      <div style="position:relative;width:34px;height:34px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="width:17px;height:17px;background:var(--text-muted);-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/bell.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/bell.svg) center/contain no-repeat"></span><span style="position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;padding:0 4px;border-radius:9px;background:var(--sem-red);color:#fff;font:600 10px/16px 'IBM Plex Mono';text-align:center">{{ sosCount }}</span></div>
+    </header>
+
+    <sc-if value="{{ sosActive }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:none;background:var(--sos-bg);border-bottom:1px solid var(--sos-border);display:flex;align-items:center;gap:14px;padding:11px 22px">
+      <div style="position:relative;width:24px;height:24px;flex:none"><span style="position:absolute;inset:0;border-radius:50%;background:rgba(244,63,94,.5);animation:ts-pulse 1.8s infinite"></span><span style="position:relative;width:24px;height:24px;display:block;background:var(--sem-red);-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/siren.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/siren.svg) center/contain no-repeat"></span></div>
+      <div style="font-weight:600;font-size:13.5px;color:var(--sos-text)">SOS AKTIF · {{ sosCount }} insiden butuh penanganan</div>
+      <div style="font-size:12.5px;color:var(--sos-sub);font-family:'IBM Plex Mono'">Terbaru: {{ sosLatest }}</div>
+      <div style="flex:1"></div>
+      <button onClick="{{ goSos }}" style="padding:8px 16px;background:var(--sem-red);border:none;border-radius:8px;color:#fff;font-size:12.5px;font-weight:600;cursor:pointer" style-hover="filter:brightness(1.08)">Buka Worklist SOS</button>
+    </div>
+    </sc-if>
+
+    <main style="flex:1;overflow-y:auto;overflow-x:hidden">
+
+      <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:{{ pad }}">
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:16px">
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="6">
+            <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;box-shadow:var(--card-shadow);padding:16px 16px 15px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><span style="font-size:11.5px;color:var(--text-muted);font-weight:500">{{ k.label }}</span><span style="width:30px;height:30px;border-radius:8px;background:{{ k.tintBg }};display:flex;align-items:center;justify-content:center"><span style="width:16px;height:16px;background:{{ k.tone }};-webkit-mask:url({{ k.iconUrl }}) center/contain no-repeat;mask:url({{ k.iconUrl }}) center/contain no-repeat"></span></span></div>
+              <div style="font-family:'IBM Plex Mono';font-size:27px;font-weight:600;line-height:1;color:var(--text)">{{ k.value }}</div>
+              <div style="font-size:11.5px;color:var(--text-faint);margin-top:6px">{{ k.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:1.75fr 1fr;gap:16px;align-items:start">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;box-shadow:var(--card-shadow);overflow:hidden">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)"><div style="font-size:14px;font-weight:600">Sebaran Aset — Ringkas</div><span onClick="{{ goPeta }}" style="font-size:12px;color:var(--st-blue);cursor:pointer;font-weight:500">Buka peta penuh →</span></div>
+              <div style="position:relative;height:280px;background:radial-gradient(700px 320px at 50% 40%,rgba(47,107,255,.1),transparent 70%),var(--surface-1);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:100% 100%,34px 34px,34px 34px">
+                <sc-for list="{{ dashMarkers }}" as="m" hint-placeholder-count="10">
+                  <span style="position:absolute;left:{{ m.left }};top:{{ m.top }};width:11px;height:11px;border-radius:50%;background:{{ m.color }};box-shadow:0 0 0 3px var(--marker-ring),0 0 var(--marker-glow) {{ m.color }};transform:translate(-50%,-50%)"></span>
+                </sc-for>
+                <div style="position:absolute;left:14px;bottom:12px;display:flex;gap:14px;flex-wrap:wrap;background:var(--overlay-bg);backdrop-filter:blur(4px);padding:8px 12px;border-radius:9px;border:1px solid var(--line)">
+                  <sc-for list="{{ legend }}" as="l" hint-placeholder-count="5"><span style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-dim)"><span style="width:9px;height:9px;border-radius:50%;background:{{ l.color }}"></span>{{ l.label }}</span></sc-for>
+                </div>
+                <div style="position:absolute;right:12px;top:12px;font-size:10.5px;font-family:'IBM Plex Mono';color:var(--text-faint);letter-spacing:1px;border:1px dashed rgba(148,163,184,.2);padding:4px 8px;border-radius:6px">BASEMAP · GMAPS/DECK.GL</div>
+              </div>
+            </div>
+            <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;box-shadow:var(--card-shadow);overflow:hidden">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)"><div style="font-size:14px;font-weight:600">Peringatan Gerbang Tol</div><span style="font-size:11.5px;color:var(--text-muted);font-family:'IBM Plex Mono'">{{ gateCount }} gerbang bermasalah</span></div>
+              <div>
+                <sc-for list="{{ gateAlerts }}" as="g" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:13px;padding:12px 16px;border-bottom:1px solid var(--line-soft)">
+                    <span style="width:9px;height:9px;border-radius:50%;flex:none;background:{{ g.color }}"></span>
+                    <div style="flex:none;width:150px"><div style="font-size:13px;font-weight:500">{{ g.gate }}</div><div style="font-size:11px;color:var(--text-faint)">{{ g.branch }}</div></div>
+                    <div style="flex:1;font-size:12px;color:var(--text-dim);font-family:'IBM Plex Mono'">{{ g.log }}</div>
+                    <span style="font-size:11px;font-weight:600;color:{{ g.color }};background:{{ g.chip }};padding:4px 10px;border-radius:6px">{{ g.status }}</span>
+                    <span style="font-size:11px;color:var(--text-faint);font-family:'IBM Plex Mono';width:52px;text-align:right">{{ g.at }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;box-shadow:var(--card-shadow);overflow:hidden">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)"><div style="font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px"><span style="width:15px;height:15px;background:var(--sem-red);-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/siren.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/siren.svg) center/contain no-repeat"></span>SOS Aktif</div><span onClick="{{ goSos }}" style="font-size:12px;color:var(--st-blue);cursor:pointer;font-weight:500">Semua →</span></div>
+              <div>
+                <sc-for list="{{ sosList }}" as="t" hint-placeholder-count="3">
+                  <div onClick="{{ t.onClick }}" style="padding:12px 16px;border-bottom:1px solid var(--line-soft);cursor:pointer" style-hover="background:rgba(47,107,255,.06)">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><span style="font-family:'IBM Plex Mono';font-size:12px;color:var(--st-blue)">{{ t.no }}</span><span style="font-size:10.5px;font-weight:600;color:{{ t.stColor }};background:{{ t.stChip }};padding:3px 8px;border-radius:5px">{{ t.status }}</span></div>
+                    <div style="font-size:13px;font-weight:500;margin-bottom:2px">{{ t.type }}</div>
+                    <div style="font-size:11.5px;color:var(--text-faint)">{{ t.ruas }} · {{ t.loc }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;box-shadow:var(--card-shadow);padding:16px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><div style="font-size:14px;font-weight:600">Monitoring WIM</div><span onClick="{{ goWim }}" style="font-size:12px;color:var(--st-blue);cursor:pointer;font-weight:500">Detail →</span></div>
+              <sc-for list="{{ wimBars }}" as="w" hint-placeholder-count="4">
+                <div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="color:var(--text-dim)">{{ w.label }}</span><span style="font-family:'IBM Plex Mono';color:{{ w.color }}">{{ w.val }}</span></div><div style="height:6px;border-radius:4px;background:var(--track);overflow:hidden"><div style="height:100%;width:{{ w.pct }};background:{{ w.color }};border-radius:4px"></div></div></div>
+              </sc-for>
+            </div>
+            <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;box-shadow:var(--card-shadow);overflow:hidden">
+              <div style="padding:14px 16px;border-bottom:1px solid var(--line);font-size:14px;font-weight:600">Aktivitas Terkini</div>
+              <div style="padding:6px 16px 12px">
+                <sc-for list="{{ events }}" as="e" hint-placeholder-count="5">
+                  <div style="display:flex;gap:11px;padding:9px 0;border-bottom:1px solid var(--line-soft)"><span style="width:8px;height:8px;border-radius:50%;background:{{ e.color }};margin-top:5px;flex:none"></span><div style="flex:1"><div style="font-size:12.5px;color:var(--text-dim)">{{ e.text }}</div><div style="font-size:10.5px;color:var(--text-faint);font-family:'IBM Plex Mono';margin-top:2px">{{ e.at }}</div></div></div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isPeta }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;height:100%;{{ petaFs }}">
+        <div style="width:250px;flex:none;border-right:1px solid var(--line);background:var(--surface-1);display:flex;flex-direction:column;overflow-y:auto;{{ petaLeftStyle }}">
+          <div style="padding:16px 16px 12px"><div style="font-size:11px;color:var(--text-faint);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:9px">Ruas</div><div style="display:flex;align-items:center;justify-content:space-between;padding:11px 13px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:9px;cursor:pointer"><span style="font-size:13px;font-weight:500">{{ branchLabel }}</span><span style="width:14px;height:14px;background:var(--text-faint);-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/chevron-down.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/chevron-down.svg) center/contain no-repeat"></span></div></div>
+          <div style="padding:4px 16px 8px"><div style="font-size:11px;color:var(--text-faint);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px">Layer Peta</div></div>
+          <sc-for list="{{ layers }}" as="l" hint-placeholder-count="8">
+            <div style="display:flex;align-items:center;gap:10px;padding:9px 12px 9px 16px;margin:1px 8px;border-radius:9px;background:{{ l.rowBg }};cursor:pointer" style-hover="background:rgba(47,107,255,.07)">
+              <span onClick="{{ l.onOpen }}" style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+                <span style="width:17px;height:17px;flex:none;background:{{ l.color }};-webkit-mask:url({{ l.iconUrl }}) center/contain no-repeat;mask:url({{ l.iconUrl }}) center/contain no-repeat"></span>
+                <span style="flex:1;min-width:0"><span style="display:block;font-size:13px;font-weight:500;color:var(--text)">{{ l.label }}</span><span style="display:block;font-size:10.5px;color:var(--text-faint);font-family:'IBM Plex Mono'">{{ l.count }} titik</span></span>
+                <sc-if value="{{ l.badge }}" hint-placeholder-val="{{ false }}"><span style="flex:none;font:600 10px/1 'IBM Plex Mono';background:rgba(244,63,94,.16);color:var(--st-red);border:1px solid rgba(244,63,94,.3);padding:3px 6px;border-radius:20px">{{ l.badge }}</span></sc-if>
+              </span>
+              <span onClick="{{ l.onToggle }}" style="width:36px;height:21px;border-radius:20px;background:{{ l.swBg }};position:relative;cursor:pointer;transition:background .15s;flex:none"><span style="position:absolute;top:2px;left:{{ l.knobX }};width:17px;height:17px;border-radius:50%;background:#fff;transition:left .15s"></span></span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="flex:1;position:relative;background:radial-gradient(900px 500px at 45% 40%,rgba(47,107,255,.09),transparent 70%),{{ mapBg }};background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:100% 100%,44px 44px,44px 44px;overflow:hidden">
+          <svg width="100%" height="100%" style="position: absolute; inset: 0; pointer-events: none"><line x1="30%" y1="66%" x2="48%" y2="38%" stroke="var(--sem-cyan)" stroke-width="1.5" stroke-dasharray="5 5" opacity="0.5"></line><line x1="48%" y1="38%" x2="72%" y2="24%" stroke="var(--sem-cyan)" stroke-width="1.5" stroke-dasharray="5 5" opacity="0.5"></line><line x1="48%" y1="38%" x2="52%" y2="52%" stroke="var(--sem-cyan)" stroke-width="1.5" stroke-dasharray="5 5" opacity="0.5"></line></svg>
+          <sc-for list="{{ mapMarkers }}" as="m" hint-placeholder-count="12">
+            <span onClick="{{ m.onClick }}" style="position:absolute;left:{{ m.left }};top:{{ m.top }};transform:translate(-50%,-50%);cursor:pointer">
+              <sc-if value="{{ m.pulse }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:14px;height:14px;border-radius:50%;background:{{ m.color }};animation:ts-pulse 1.8s infinite"></span></sc-if>
+              <span onClick="{{ m.onClick }}" style="position:relative;display:block;width:14px;height:14px;border-radius:50%;background:{{ m.color }};box-shadow:0 0 0 3px var(--marker-ring),0 0 var(--marker-glow) {{ m.color }};cursor:pointer"></span>
+            </span>
+          </sc-for>
+          <div style="position:absolute;right:16px;top:16px;display:flex;flex-direction:column;gap:1px;border-radius:9px;overflow:hidden;border:1px solid var(--line-strong)"><span style="width:34px;height:34px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:var(--text-dim)">+</span><span style="width:34px;height:34px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px;color:var(--text-dim)">−</span></div>
+          <div onClick="{{ toggleMapFull }}" title="Layar penuh peta" style="position: absolute; right: 16px; top: 96px; width: 34px; height: 34px; border-radius: 9px; background: var(--surface-2); border: 1px solid var(--line-strong); display: flex; align-items: center; justify-content: center; cursor: pointer" style-hover="border-color:rgba(47,107,255,.5)"><span style="width:16px;height:16px;background:var(--text-dim);-webkit-mask:url({{ mapFsIcon }}) center/contain no-repeat;mask:url({{ mapFsIcon }}) center/contain no-repeat"></span></div>
+          <sc-if value="{{ mapFull }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ toggleMapLayers }}" title="Layer Peta" style="position:absolute;left:{{ petaTabLeft }};top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:9px;background:var(--overlay-bg);backdrop-filter:blur(6px);border:1px solid var(--line-strong);border-left:none;border-radius:0 11px 11px 0;padding:14px 9px;cursor:pointer;z-index:7;opacity:{{ uiOpacity }};transition:left .18s ease,opacity .25s ease" style-hover="border-color:rgba(47,107,255,.5)"><span style="width:18px;height:18px;background:var(--text-dim);-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/layers.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/layers.svg) center/contain no-repeat"></span><span style="font-size:11px;color:var(--text-dim);font-weight:600;letter-spacing:1px;writing-mode:vertical-rl;text-orientation:mixed">LAYER</span></div>
+            <div style="position:absolute;right:14px;top:14px;display:flex;align-items:center;gap:12px;background:var(--overlay-bg);backdrop-filter:blur(6px);border:1px solid var(--line-strong);border-radius:11px;padding:7px 11px;z-index:7;opacity:{{ uiOpacity }};pointer-events:{{ uiEvents }};transition:opacity .25s ease">
+              <span style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--sem-green);font-family:'IBM Plex Mono'"><span style="width:8px;height:8px;border-radius:50%;background:var(--sem-green);animation:ts-blink 1.6s infinite"></span>SSE TERHUBUNG</span>
+              <span style="width:1px;height:16px;background:var(--line-strong)"></span>
+              <span style="font-family:'IBM Plex Mono';font-size:14px;font-weight:500;color:var(--text);letter-spacing:.5px">{{ now }}</span>
+              <span style="width:1px;height:18px;background:var(--line-strong)"></span>
+              <span onClick="{{ toggleMapFull }}" title="Keluar layar penuh" style="width:30px;height:30px;border-radius:8px;border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="border-color:rgba(47,107,255,.5)"><span style="width:15px;height:15px;background:var(--text-dim);-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/minimize.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/minimize.svg) center/contain no-repeat"></span></span>
+            </div>
+            <div onClick="{{ toggleMapFull }}" style="display:none"></div>
+          </sc-if>
+          <div style="position: absolute; left: 16px; top: 16px; font-size: 12px; font-family: 'IBM Plex Mono'; color: var(--text-muted); letter-spacing: 1px; padding: 5px 9px; border-radius: 0px; font-weight: 700; text-transform: capitalize; opacity: 1">Ruas Terbanggi Pematang Panggang - Kayu Agung</div>
+        </div>
+        <div style="width:288px;flex:none;border-left:1px solid var(--line);background:var(--surface-1);overflow-y:auto;position:relative;{{ petaRightStyle }}">
+          <sc-if value="{{ petaEmpty }}" hint-placeholder-val="{{ true }}">
+            <div style="height:100%;min-height:320px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;gap:13px">
+              <span style="width:32px;height:32px;background:#2a3752;-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/mouse-pointer-click.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/mouse-pointer-click.svg) center/contain no-repeat"></span>
+              <div style="font-size:12.5px;color:var(--text-muted);line-height:1.55">Klik salah satu layer di panel kiri untuk melihat daftarnya, atau klik marker di peta untuk detail.</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ petaShowList }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px">
+              <span style="width:17px;height:17px;flex:none;background:var(--st-blue);-webkit-mask:url({{ petaListIcon }}) center/contain no-repeat;mask:url({{ petaListIcon }}) center/contain no-repeat"></span>
+              <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">{{ petaListTitle }}</div><div style="font-size:10.5px;color:var(--text-faint);font-family:'IBM Plex Mono'">{{ petaListCount }} item · {{ branchLabel }}</div></div>
+              <span onClick="{{ closePeta }}" style="width:26px;height:26px;flex:none;border-radius:7px;background:var(--surface-2);border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="border-color:rgba(244,63,94,.6)"><span style="width:13px;height:13px;background:var(--text-muted);-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/x.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/x.svg) center/contain no-repeat"></span></span>
+            </div>
+            <div style="padding:10px 14px"><div style="display:flex;align-items:center;gap:8px;padding:8px 11px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:8px"><span style="width:14px;height:14px;flex:none;background:var(--text-faint);-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/search.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/search.svg) center/contain no-repeat"></span><input onInput="{{ onPetaSearch }}" placeholder="Cari..." style="flex:1;min-width:0;background:none;border:none;outline:none;color:var(--text);font-size:12.5px"></div></div>
+            <sc-for list="{{ petaListItems }}" as="it" hint-placeholder-count="6">
+              <div onClick="{{ it.onClick }}" style="display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--line-soft);cursor:pointer" style-hover="background:rgba(47,107,255,.06)">
+                <div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.title }}</div><div style="font-size:10.5px;color:var(--text-faint);font-family:'IBM Plex Mono';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.sub }}</div></div>
+                <span style="flex:none;font-size:10px;font-weight:600;color:{{ it.color }};background:{{ it.chip }};padding:3px 8px;border-radius:5px">{{ it.statusLabel }}</span>
+              </div>
+            </sc-for>
+          </sc-if>
+          <sc-if value="{{ petaShowDetail }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px">
+              <span onClick="{{ backToList }}" title="Kembali ke daftar" style="width:26px;height:26px;flex:none;border-radius:7px;background:var(--surface-2);border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="border-color:rgba(47,107,255,.5)"><span style="width:14px;height:14px;background:var(--text-muted);-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/arrow-left.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/arrow-left.svg) center/contain no-repeat"></span></span>
+              <span style="flex:1;font-size:11px;font-family:'IBM Plex Mono';color:{{ petaDetail.color }};background:{{ petaDetail.chip }};padding:4px 9px;border-radius:5px;text-align:center">{{ petaDetail.kindLabel }} · {{ petaDetail.statusLabel }}</span>
+              <span onClick="{{ closePeta }}" style="width:26px;height:26px;flex:none;border-radius:7px;background:var(--surface-2);border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="border-color:rgba(244,63,94,.6)"><span style="width:13px;height:13px;background:var(--text-muted);-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/x.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/x.svg) center/contain no-repeat"></span></span>
+            </div>
+            <div style="padding:16px">
+              <div style="font-size:15px;font-weight:600;margin-bottom:14px">{{ petaDetail.title }}</div>
+              <sc-if value="{{ petaDetail.isCctv }}" hint-placeholder-val="{{ false }}"><div style="position:relative;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:repeating-linear-gradient(45deg,var(--tile-1),var(--tile-1) 10px,var(--tile-2) 10px,var(--tile-2) 20px);border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;margin-bottom:14px"><span style="font-size:11px;font-family:'IBM Plex Mono';color:var(--on-scrim-dim)">LIVE STREAM · .m3u8</span><span style="position:absolute;top:9px;left:9px;display:flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:#fff;background:rgba(244,63,94,.9);padding:3px 7px;border-radius:4px"><span style="width:6px;height:6px;border-radius:50%;background:#fff;animation:ts-blink 1.4s infinite"></span>LIVE</span></div></sc-if>
+              <sc-for list="{{ petaDetail.rows }}" as="d" hint-placeholder-count="4"><div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line-soft)"><span style="font-size:12px;color:var(--text-muted);flex:none">{{ d.k }}</span><span style="font-size:12px;color:var(--text);font-family:'IBM Plex Mono';text-align:right">{{ d.v }}</span></div></sc-for>
+              <sc-if value="{{ petaDetail.isCctv }}" hint-placeholder-val="{{ false }}"><button style="width:100%;margin-top:16px;padding:11px;background:{{ accent }};border:none;border-radius:9px;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Buka Player Penuh</button></sc-if>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isCctv }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;height:100%;position:relative;{{ cctvFs }}">
+        <sc-if value="{{ cctvFull }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ toggleCctvList }}" title="Daftar Kamera" style="position:absolute;left:{{ cctvTabLeft }};top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:9px;background:var(--overlay-bg);backdrop-filter:blur(6px);border:1px solid var(--line-strong);border-left:none;border-radius:0 11px 11px 0;padding:14px 9px;cursor:pointer;z-index:7;opacity:{{ uiOpacity }};transition:left .18s ease,opacity .25s ease" style-hover="border-color:rgba(47,107,255,.5)"><span style="width:18px;height:18px;background:var(--text-dim);-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/cctv.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/cctv.svg) center/contain no-repeat"></span><span style="font-size:11px;color:var(--text-dim);font-weight:600;letter-spacing:1px;writing-mode:vertical-rl;text-orientation:mixed">KAMERA</span></div>
+          <div style="position:absolute;right:14px;top:14px;display:flex;align-items:center;gap:12px;background:var(--overlay-bg);backdrop-filter:blur(6px);border:1px solid var(--line-strong);border-radius:11px;padding:7px 11px;z-index:7;opacity:{{ uiOpacity }};pointer-events:{{ uiEvents }};transition:opacity .25s ease">
+            <span style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--sem-green);font-family:'IBM Plex Mono'"><span style="width:8px;height:8px;border-radius:50%;background:var(--sem-green);animation:ts-blink 1.6s infinite"></span>SSE TERHUBUNG</span>
+            <span style="width:1px;height:18px;background:var(--line-strong)"></span>
+            <span style="font-family:'IBM Plex Mono';font-size:14px;font-weight:500;color:var(--text);letter-spacing:.5px">{{ now }}</span>
+            <span style="width:1px;height:18px;background:var(--line-strong)"></span>
+            <span style="display:flex;gap:2px"><sc-for list="{{ layoutBtns }}" as="b" hint-placeholder-count="3"><span onClick="{{ b.onClick }}" style="padding:6px 11px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;color:{{ b.tint }};background:{{ b.bg }}">{{ b.label }}</span></sc-for></span>
+            <span onClick="{{ toggleCctvFull }}" title="Keluar layar penuh" style="width:30px;height:30px;border-radius:8px;border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="border-color:rgba(47,107,255,.5)"><span style="width:15px;height:15px;background:var(--text-dim);-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/minimize.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/minimize.svg) center/contain no-repeat"></span></span>
+          </div>
+        </sc-if>
+        <div style="width:250px;flex:none;border-right:1px solid var(--line);background:var(--surface-1);display:flex;flex-direction:column;{{ cctvLeftStyle }}">
+          <div style="padding:14px 16px;border-bottom:1px solid var(--line)"><div style="display:flex;align-items:center;gap:8px;padding:9px 11px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:8px"><span style="width:15px;height:15px;background:var(--text-faint);-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/search.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/search.svg) center/contain no-repeat"></span><input placeholder="Cari kamera..." style="flex:1;background:none;border:none;outline:none;color:var(--text);font-size:12.5px"></div></div>
+          <div style="flex:1;overflow-y:auto">
+            <sc-for list="{{ cameras }}" as="c" hint-placeholder-count="12">
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line-soft);cursor:pointer" style-hover="background:rgba(47,107,255,.06)"><span style="width:8px;height:8px;border-radius:50%;flex:none;background:{{ c.dot }}"></span><div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.name }}</div><div style="font-size:10.5px;color:var(--text-faint);font-family:'IBM Plex Mono'">{{ c.km }}</div></div></div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <sc-if value="{{ cctvNotFull }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;align-items:center;gap:14px;padding:12px 18px;border-bottom:1px solid var(--line)">
+            <div style="font-size:13.5px;font-weight:600">{{ branchLabel }}</div>
+            <span style="font-size:11.5px;color:var(--text-faint);font-family:'IBM Plex Mono'">{{ camOnline }} online · {{ camOffline }} offline</span>
+            <div style="flex:1"></div>
+            <div style="display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:9px;padding:3px">
+              <sc-for list="{{ layoutBtns }}" as="b" hint-placeholder-count="3"><span onClick="{{ b.onClick }}" style="padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;color:{{ b.tint }};background:{{ b.bg }}">{{ b.label }}</span></sc-for>
+            </div>
+            <span onClick="{{ toggleCctvFull }}" title="Layar penuh CCTV" style="width:34px;height:34px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="border-color:rgba(47,107,255,.5)"><span style="width:16px;height:16px;background:var(--text-muted);-webkit-mask:url({{ cctvFsIcon }}) center/contain no-repeat;mask:url({{ cctvFsIcon }}) center/contain no-repeat"></span></span>
+          </div>
+          </sc-if>
+          <div style="flex:1;{{ cctvBodyStyle }}">
+            <div style="display:grid;grid-template-columns:repeat({{ cctvCols }},1fr);gap:14px;{{ cctvGridStyle }}">
+              <sc-for list="{{ cctvTiles }}" as="c" hint-placeholder-count="16">
+                <div style="position:relative;{{ cctvTileStyle }}border-radius:10px;overflow:hidden;background:repeating-linear-gradient(45deg,var(--tile-1),var(--tile-1) 11px,var(--tile-2) 11px,var(--tile-2) 22px);border:1px solid var(--line)" style-hover="border-color:rgba(47,107,255,.5)">
+                  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><span style="width:30px;height:30px;background:var(--track);-webkit-mask:url({{ c.centerIcon }}) center/contain no-repeat;mask:url({{ c.centerIcon }}) center/contain no-repeat"></span></div>
+                  <div style="position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:6px;padding:8px 9px;background:linear-gradient(180deg,rgba(7,11,20,.85),transparent)"><span style="width:7px;height:7px;border-radius:50%;flex:none;background:{{ c.dot }}"></span><span style="font-size:11px;font-weight:500;color:var(--on-scrim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.name }}</span></div>
+                  <div style="position:absolute;bottom:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:7px 9px;background:linear-gradient(0deg,rgba(7,11,20,.85),transparent)"><span style="font-size:10px;font-family:'IBM Plex Mono';color:var(--on-scrim-dim)">{{ c.km }}</span><span style="font-size:9.5px;font-weight:600;color:{{ c.dot }};letter-spacing:.5px">{{ c.badge }}</span></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isSos }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;height:100%">
+        <div style="width:300px;flex:none;border-right:1px solid var(--line);background:var(--surface-1);display:flex;flex-direction:column">
+          <div style="padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between"><div style="font-size:14px;font-weight:600">Worklist SOS</div><span style="font-size:11px;font-family:'IBM Plex Mono';color:var(--sem-red);background:rgba(244,63,94,.12);padding:3px 8px;border-radius:5px">{{ sosCount }} OPEN</span></div>
+          <div style="flex:1;overflow-y:auto">
+            <sc-for list="{{ tickets }}" as="t" hint-placeholder-count="3">
+              <div onClick="{{ t.onClick }}" style="padding:13px 16px;border-bottom:1px solid var(--line-soft);cursor:pointer;background:{{ t.selBg }};border-left:3px solid {{ t.selBar }}">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px"><span style="font-family:'IBM Plex Mono';font-size:12px;color:var(--st-blue)">{{ t.no }}</span><span style="font-size:10px;font-weight:600;color:{{ t.stColor }};background:{{ t.stChip }};padding:3px 7px;border-radius:5px">{{ t.status }}</span></div>
+                <div style="font-size:13.5px;font-weight:500;margin-bottom:3px">{{ t.type }}</div>
+                <div style="font-size:11.5px;color:var(--text-faint);margin-bottom:8px">{{ t.ruas }} · {{ t.loc }}</div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-muted);font-family:'IBM Plex Mono'"><span style="width:12px;height:12px;background:var(--text-muted);-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/activity.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/activity.svg) center/contain no-repeat"></span>{{ t.resp }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:20px">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px">
+            <div><div style="display:flex;align-items:center;gap:11px;margin-bottom:6px"><span style="font-family:'IBM Plex Mono';font-size:14px;color:var(--st-blue)">{{ sel.no }}</span><span style="font-size:11px;font-weight:600;color:{{ sel.stColor }};background:{{ sel.stChip }};padding:4px 10px;border-radius:6px">{{ sel.status }}</span><span style="font-size:11px;font-weight:600;color:{{ sel.sosColor }};background:{{ sel.sosChip }};padding:4px 10px;border-radius:6px">{{ sel.sosStatus }}</span></div><div style="font-size:20px;font-weight:600">{{ sel.type }}</div><div style="font-size:13px;color:var(--text-muted);margin-top:3px">{{ sel.ruas }} · {{ sel.loc }} · dilaporkan {{ sel.at }}</div></div>
+            <div style="display:flex;gap:9px"><button style="padding:10px 16px;background:{{ accent }};border:none;border-radius:9px;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Konfirmasi Kedatangan</button><button style="padding:10px 16px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:9px;color:var(--text-dim);font-size:13px;font-weight:600;cursor:pointer">Selesaikan Tiket</button></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+            <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;box-shadow:var(--card-shadow);padding:16px"><div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase">Pelapor</div><div style="display:flex;align-items:center;gap:12px;margin-bottom:14px"><div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#334670,#1b2740);display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--text-dim)">{{ sel.initials }}</div><div><div style="font-size:14px;font-weight:600">{{ sel.reporter }}</div><div style="font-size:12px;color:var(--text-faint);font-family:'IBM Plex Mono'">{{ sel.phone }}</div></div></div><div style="display:flex;justify-content:space-between;font-size:12px;padding:7px 0;border-top:1px solid var(--line-soft)"><span style="color:var(--text-muted)">Koordinat</span><span style="font-family:'IBM Plex Mono';color:var(--text-dim)">{{ sel.coord }}</span></div></div>
+            <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;box-shadow:var(--card-shadow);overflow:hidden"><div style="padding:16px 16px 0;font-size:12px;color:var(--text-muted);font-weight:600;letter-spacing:.5px;text-transform:uppercase">Lokasi Insiden</div><div style="position:relative;height:120px;margin:12px 16px 16px;border-radius:9px;background:radial-gradient(200px 120px at 50% 50%,rgba(244,63,94,.14),transparent 70%),var(--surface-1);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:100% 100%,26px 26px,26px 26px;border:1px solid var(--line)"><span style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:14px;height:14px;border-radius:50%;background:var(--sem-red);box-shadow:0 0 0 4px var(--marker-ring),0 0 var(--marker-glow) var(--sem-red)"></span><span style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:14px;height:14px;border-radius:50%;background:var(--sem-red);animation:ts-pulse 1.8s infinite"></span></div></div>
+          </div>
+          <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;box-shadow:var(--card-shadow);padding:16px;margin-bottom:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><div style="font-size:14px;font-weight:600">Smart Response — Kandidat Kendaraan</div><span style="font-size:11.5px;color:var(--text-faint);font-family:'IBM Plex Mono'">{{ sel.candCount }} kandidat</span></div>
+            <sc-for list="{{ selCandidates }}" as="c" hint-placeholder-count="2">
+              <div style="display:flex;align-items:center;gap:14px;padding:13px;border-radius:10px;background:{{ c.bg }};border:1px solid {{ c.border }};margin-bottom:9px">
+                <div style="width:40px;height:40px;border-radius:10px;background:{{ c.iconBg }};display:flex;align-items:center;justify-content:center;flex:none"><span style="width:22px;height:22px;background:{{ c.iconColor }};-webkit-mask:url({{ c.iconUrl }}) center/contain no-repeat;mask:url({{ c.iconUrl }}) center/contain no-repeat"></span></div>
+                <div style="flex:1"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:13.5px;font-weight:600">{{ c.label }}</span><sc-if value="{{ c.primary }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;font-weight:600;color:var(--st-blue);background:rgba(47,107,255,.16);padding:2px 7px;border-radius:5px">UTAMA</span></sc-if></div><div style="font-size:11.5px;color:{{ c.stColor }};margin-top:3px">{{ c.st }}</div></div>
+                <div style="text-align:right"><div style="font-family:'IBM Plex Mono';font-size:15px;font-weight:600;color:var(--text)">{{ c.dist }}</div><div style="font-size:10.5px;color:var(--text-faint)">jarak · {{ c.spd }}</div></div>
+                <div style="width:56px;text-align:center"><div style="font-family:'IBM Plex Mono';font-size:13px;font-weight:600;color:{{ c.confColor }}">{{ c.conf }}</div><div style="font-size:9.5px;color:var(--text-faint)">confidence</div></div>
+              </div>
+            </sc-for>
+            <sc-if value="{{ sel.noCand }}" hint-placeholder-val="{{ false }}"><div style="text-align:center;padding:20px;font-size:12.5px;color:var(--text-faint)">Belum ada kandidat kendaraan yang valid. Tracking sedang berjalan.</div></sc-if>
+          </div>
+          <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;box-shadow:var(--card-shadow);padding:16px">
+            <div style="font-size:14px;font-weight:600;margin-bottom:16px">Timeline Response</div>
+            <sc-for list="{{ selTimeline }}" as="e" hint-placeholder-count="4">
+              <div style="display:flex;gap:14px;position:relative;padding-bottom:16px"><div style="display:flex;flex-direction:column;align-items:center;flex:none"><span style="width:12px;height:12px;border-radius:50%;background:{{ e.tone }};box-shadow:0 0 0 3px rgba(14,21,35,1)"></span><span style="width:2px;flex:1;background:var(--line-strong);margin-top:2px"></span></div><div style="flex:1;padding-top:-2px"><div style="font-size:13px;font-weight:500;color:var(--text)">{{ e.ev }}</div><sc-if value="{{ e.src }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;color:var(--text-muted);font-family:'IBM Plex Mono';margin-top:2px">{{ e.src }}</div></sc-if></div><span style="font-size:11px;color:var(--text-faint);font-family:'IBM Plex Mono';flex:none">{{ e.at }}</span></div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isWim }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:{{ pad }}">
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:12px;margin-bottom:16px">
+          <sc-for list="{{ wimCards }}" as="w" hint-placeholder-count="7">
+            <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:11px;box-shadow:var(--card-shadow);padding:14px"><div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">{{ w.label }}</div><div style="font-family:'IBM Plex Mono';font-size:24px;font-weight:600;color:{{ w.color }}">{{ w.value }}</div></div>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+          <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;box-shadow:var(--card-shadow);padding:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px"><div style="font-size:14px;font-weight:600">Tren Performa Site (14 hari)</div><div style="display:flex;gap:12px;font-size:11px"><span style="display:flex;align-items:center;gap:5px;color:var(--text-dim)"><span style="width:9px;height:9px;border-radius:2px;background:var(--sem-green)"></span>Online</span><span style="display:flex;align-items:center;gap:5px;color:var(--text-dim)"><span style="width:9px;height:9px;border-radius:2px;background:var(--sem-amber)"></span>Warning</span><span style="display:flex;align-items:center;gap:5px;color:var(--text-dim)"><span style="width:9px;height:9px;border-radius:2px;background:var(--sem-red)"></span>Offline</span></div></div>
+            <div style="display:flex;align-items:flex-end;gap:6px;height:150px">
+              <sc-for list="{{ trend }}" as="d" hint-placeholder-count="14"><div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:2px;height:100%"><div style="background:var(--sem-red);height:{{ d.off }};border-radius:2px 2px 0 0"></div><div style="background:var(--sem-amber);height:{{ d.warn }}"></div><div style="background:var(--sem-green);height:{{ d.on }};border-radius:0 0 2px 2px"></div></div></sc-for>
+            </div>
+          </div>
+          <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;box-shadow:var(--card-shadow);padding:16px">
+            <div style="font-size:14px;font-weight:600;margin-bottom:16px">Ketersediaan Data Harian</div>
+            <div style="display:flex;align-items:flex-end;gap:6px;height:150px">
+              <sc-for list="{{ trend }}" as="d" hint-placeholder-count="14"><div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%"><div style="background:var(--st-blue);height:{{ d.data }};border-radius:2px"></div></div></sc-for>
+            </div>
+            <div style="font-size:11px;color:var(--text-faint);margin-top:10px;font-family:'IBM Plex Mono'">Site dengan data harian per tanggal</div>
+          </div>
+        </div>
+        <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;box-shadow:var(--card-shadow);overflow:hidden">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)"><div style="font-size:14px;font-weight:600">Status Monitoring per Site</div><button style="display:flex;align-items:center;gap:7px;padding:8px 14px;background:{{ accent }};border:none;border-radius:8px;color:#fff;font-size:12.5px;font-weight:600;cursor:pointer"><span style="width:14px;height:14px;background:#fff;-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/refresh-cw.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/refresh-cw.svg) center/contain no-repeat"></span>Refresh Manual</button></div>
+          <div style="display:grid;grid-template-columns:2fr 1.3fr 1fr 1.4fr 1.3fr 1fr;padding:11px 16px;border-bottom:1px solid var(--line);font-size:11px;color:var(--text-faint);letter-spacing:.5px;text-transform:uppercase;font-weight:600"><span>Site</span><span>Ruas</span><span>Status</span><span>Device (On/Off/Warn)</span><span>Data Harian</span><span>Cek Terakhir</span></div>
+          <sc-for list="{{ wimSites }}" as="s" hint-placeholder-count="7">
+            <div style="display:grid;grid-template-columns:2fr 1.3fr 1fr 1.4fr 1.3fr 1fr;padding:12px 16px;border-bottom:1px solid var(--line-soft);align-items:center" style-hover="background:rgba(47,107,255,.05)"><div><div style="font-size:13px;font-weight:500">{{ s.name }}</div><div style="font-size:10.5px;color:var(--text-faint);font-family:'IBM Plex Mono'">{{ s.code }}</div></div><span style="font-size:12px;color:var(--text-dim)">{{ s.branch }}</span><span><span style="font-size:11px;font-weight:600;color:{{ s.stColor }};background:{{ s.stChip }};padding:3px 9px;border-radius:5px">{{ s.status }}</span></span><span style="font-family:'IBM Plex Mono';font-size:12.5px;color:var(--text-dim)">{{ s.devices }}</span><span style="font-size:12px;color:{{ s.dataColor }}">{{ s.data }}</span><span style="font-size:11.5px;color:var(--text-faint);font-family:'IBM Plex Mono'">{{ s.last }}</span></div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isUsers }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:{{ pad }}">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;flex-wrap:wrap">
+          <div style="display:flex;gap:3px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:10px;padding:3px">
+            <sc-for list="{{ userTabs }}" as="t" hint-placeholder-count="3"><span onClick="{{ t.onClick }}" style="display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;color:{{ t.tint }};background:{{ t.bg }}"><span style="width:15px;height:15px;background:{{ t.tint }};-webkit-mask:url({{ t.iconUrl }}) center/contain no-repeat;mask:url({{ t.iconUrl }}) center/contain no-repeat"></span>{{ t.label }}</span></sc-for>
+          </div>
+          <div style="flex:1"></div>
+          <sc-if value="{{ uShowPengguna }}" hint-placeholder-val="{{ true }}"><div style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:9px;width:250px"><span style="width:15px;height:15px;flex:none;background:var(--text-faint);-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/search.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/search.svg) center/contain no-repeat"></span><input onInput="{{ onUserSearch }}" placeholder="Cari nama, username, email..." style="flex:1;min-width:0;background:none;border:none;outline:none;color:var(--text);font-size:12.5px"></div></sc-if>
+          <sc-if value="{{ showAddBtn }}" hint-placeholder-val="{{ true }}"><button style="display:flex;align-items:center;gap:7px;padding:10px 16px;background:{{ accent }};border:none;border-radius:9px;color:#fff;font-size:12.5px;font-weight:600;cursor:pointer"><span style="width:15px;height:15px;background:#fff;-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/plus.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/plus.svg) center/contain no-repeat"></span>{{ addLabel }}</button></sc-if>
+        </div>
+
+        <sc-if value="{{ uShowPengguna }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start">
+          <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;box-shadow:var(--card-shadow);overflow:hidden">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)"><div style="font-size:14px;font-weight:600">Pengguna Internal</div><span style="font-size:11.5px;color:var(--text-muted);font-family:'IBM Plex Mono'">{{ userCount }} pengguna</span></div>
+            <div style="display:grid;grid-template-columns:2fr 1.6fr 1.3fr 0.9fr 0.9fr;gap:12px;padding:11px 16px;border-bottom:1px solid var(--line);font-size:11px;color:var(--text-faint);letter-spacing:.5px;text-transform:uppercase;font-weight:600"><span>Pengguna</span><span>Role Efektif</span><span>Ruas</span><span>Sumber</span><span>Status</span></div>
+            <sc-for list="{{ users }}" as="u" hint-placeholder-count="6">
+              <div onClick="{{ u.onClick }}" style="display:grid;grid-template-columns:2fr 1.6fr 1.3fr 0.9fr 0.9fr;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line-soft);align-items:center;cursor:pointer;background:{{ u.selBg }}" style-hover="background:var(--nav-active-bg)">
+                <div style="display:flex;align-items:center;gap:10px;min-width:0"><div style="width:32px;height:32px;flex:none;border-radius:50%;background:var(--surface-3);border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;color:var(--text-dim)">{{ u.initials }}</div><div style="min-width:0"><div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ u.full }}</div><div style="font-size:10.5px;color:var(--text-faint);font-family:'IBM Plex Mono';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ u.username }}</div></div></div>
+                <div style="display:flex;flex-wrap:wrap;gap:5px"><sc-for list="{{ u.roleChips }}" as="r" hint-placeholder-count="1"><span style="font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:5px;color:var(--st-blue);background:rgba(91,141,255,.14)">{{ r.label }}</span></sc-for></div>
+                <span style="font-size:12px;color:var(--text-dim)">{{ u.scopeText }}</span>
+                <span style="font-size:11px;color:var(--text-muted);font-family:'IBM Plex Mono'">{{ u.srcLabel }}</span>
+                <span style="justify-self:start;font-size:11px;font-weight:600;color:{{ u.stColor }};background:{{ u.stChip }};padding:3px 10px;border-radius:5px">{{ u.statusLabel }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;box-shadow:var(--card-shadow);overflow:hidden">
+            <div style="padding:16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px">
+              <div style="width:44px;height:44px;flex:none;border-radius:50%;background:var(--surface-3);border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:var(--text-dim)">{{ selU.initials }}</div>
+              <div style="min-width:0"><div style="font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ selU.full }}</div><div style="font-size:11.5px;color:var(--text-faint);font-family:'IBM Plex Mono'">{{ selU.username }}</div></div>
+            </div>
+            <div style="padding:14px 16px;display:flex;gap:8px;border-bottom:1px solid var(--line)">
+              <span style="font-size:11px;font-weight:600;color:{{ selU.stColor }};background:{{ selU.stChip }};padding:4px 10px;border-radius:5px">{{ selU.statusLabel }}</span>
+              <span style="font-size:11px;font-weight:600;color:var(--text-muted);background:var(--surface-3);padding:4px 10px;border-radius:5px;font-family:'IBM Plex Mono'">{{ selU.srcLabel }}</span>
+            </div>
+            <div style="padding:14px 16px;border-bottom:1px solid var(--line)">
+              <div style="font-size:11px;color:var(--text-faint);letter-spacing:.5px;text-transform:uppercase;font-weight:600;margin-bottom:10px">Identitas</div>
+              <sc-for list="{{ selU.rows }}" as="d" hint-placeholder-count="6"><div style="display:flex;justify-content:space-between;gap:12px;padding:7px 0"><span style="font-size:12px;color:var(--text-muted);flex:none">{{ d.k }}</span><span style="font-size:12px;color:var(--text);font-family:'IBM Plex Mono';text-align:right;word-break:break-all">{{ d.v }}</span></div></sc-for>
+            </div>
+            <div style="padding:14px 16px;border-bottom:1px solid var(--line)">
+              <div style="font-size:11px;color:var(--text-faint);letter-spacing:.5px;text-transform:uppercase;font-weight:600;margin-bottom:10px">Role Efektif</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ selU.roleChips }}" as="r" hint-placeholder-count="1"><span style="font-size:11px;font-weight:600;padding:4px 10px;border-radius:5px;color:var(--st-blue);background:rgba(91,141,255,.14)">{{ r.label }}</span></sc-for></div>
+            </div>
+            <div style="padding:14px 16px;border-bottom:1px solid var(--line)">
+              <div style="font-size:11px;color:var(--text-faint);letter-spacing:.5px;text-transform:uppercase;font-weight:600;margin-bottom:10px">Permission Efektif</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ selU.perms }}" as="p" hint-placeholder-count="3"><span style="font-size:11px;padding:4px 9px;border-radius:5px;color:var(--text-dim);background:var(--surface-3);font-family:'IBM Plex Mono'">{{ p }}</span></sc-for></div>
+            </div>
+            <div style="padding:14px 16px">
+              <div style="font-size:11px;color:var(--text-faint);letter-spacing:.5px;text-transform:uppercase;font-weight:600;margin-bottom:10px">Branch Scope</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px"><sc-for list="{{ selU.scopes }}" as="b" hint-placeholder-count="1"><span style="font-size:11px;font-weight:500;padding:4px 9px;border-radius:5px;color:var(--sem-green);background:rgba(52,211,153,.16)">{{ b }}</span></sc-for></div>
+              <div style="display:flex;gap:8px"><button style="flex:1;padding:10px;background:{{ accent }};border:none;border-radius:9px;color:#fff;font-size:12.5px;font-weight:600;cursor:pointer">Ubah</button><button style="padding:10px 14px;background:var(--surface-3);border:1px solid var(--line-strong);border-radius:9px;color:var(--sem-red);font-size:12.5px;font-weight:600;cursor:pointer">Hapus</button></div>
+            </div>
+          </div>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ uShowRole }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px">
+          <sc-for list="{{ roleCards }}" as="r" hint-placeholder-count="5">
+            <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;box-shadow:var(--card-shadow);padding:16px">
+              <div style="display:flex;align-items:center;gap:11px;margin-bottom:10px">
+                <div style="width:36px;height:36px;flex:none;border-radius:9px;background:var(--surface-3);display:flex;align-items:center;justify-content:center"><span style="width:19px;height:19px;background:var(--st-blue);-webkit-mask:url({{ r.iconUrl }}) center/contain no-repeat;mask:url({{ r.iconUrl }}) center/contain no-repeat"></span></div>
+                <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">{{ r.label }}</div><div style="font-size:10.5px;color:var(--text-faint);font-family:'IBM Plex Mono'">{{ r.code }}</div></div>
+                <span style="font-size:10.5px;font-weight:600;color:var(--text-muted);background:var(--surface-3);padding:4px 9px;border-radius:5px;font-family:'IBM Plex Mono'">{{ r.userCount }} user</span>
+              </div>
+              <div style="font-size:12.5px;color:var(--text-dim);line-height:1.55;margin-bottom:13px">{{ r.desc }}</div>
+              <div style="font-size:11px;color:var(--text-faint);letter-spacing:.5px;text-transform:uppercase;font-weight:600;margin-bottom:8px">Permission · {{ r.permCount }}</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ r.perms }}" as="p" hint-placeholder-count="3"><span style="font-size:11px;padding:4px 9px;border-radius:5px;color:var(--text-dim);background:var(--surface-3);font-family:'IBM Plex Mono'">{{ p }}</span></sc-for></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="margin-top:14px;display:flex;align-items:center;gap:9px;padding:12px 15px;background:var(--surface-3);border:1px solid var(--line);border-radius:10px"><span style="width:16px;height:16px;flex:none;background:var(--text-muted);-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/info.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/info.svg) center/contain no-repeat"></span><span style="font-size:12px;color:var(--text-dim)">Role bersifat system role dan tidak dapat dibuat atau dihapus dari antarmuka. Untuk memberi akses, ubah role dan branch scope pengguna pada tab Pengguna.</span></div>
+        </sc-if>
+
+        <sc-if value="{{ uShowMenu }}" hint-placeholder-val="{{ false }}">
+        <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;box-shadow:var(--card-shadow);overflow:hidden">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)"><div style="font-size:14px;font-weight:600">Struktur Menu & Hak Akses</div><span style="font-size:11.5px;color:var(--text-muted);font-family:'IBM Plex Mono'">2 level · kategori & submenu</span></div>
+          <div style="display:grid;grid-template-columns:2fr 1.4fr 0.9fr 1.7fr 0.7fr 0.9fr;gap:12px;padding:11px 16px;border-bottom:1px solid var(--line);font-size:11px;color:var(--text-faint);letter-spacing:.5px;text-transform:uppercase;font-weight:600"><span>Menu</span><span>Route</span><span>Tipe</span><span>Hak Akses</span><span>Urutan</span><span>Status</span></div>
+          <sc-for list="{{ menuRows }}" as="m" hint-placeholder-count="9">
+            <div style="display:grid;grid-template-columns:2fr 1.4fr 0.9fr 1.7fr 0.7fr 0.9fr;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line-soft);align-items:center" style-hover="background:var(--nav-active-bg)">
+              <div style="display:flex;align-items:center;gap:9px;padding-left:{{ m.indent }};min-width:0"><span style="width:15px;height:15px;flex:none;background:var(--text-faint);-webkit-mask:url({{ m.iconUrl }}) center/contain no-repeat;mask:url({{ m.iconUrl }}) center/contain no-repeat"></span><div style="min-width:0"><div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.name }}</div><div style="font-size:10.5px;color:var(--text-faint);font-family:'IBM Plex Mono'">{{ m.code }}</div></div></div>
+              <span style="font-size:11.5px;color:var(--text-dim);font-family:'IBM Plex Mono';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.route }}</span>
+              <span style="font-size:12px;color:var(--text-muted)">{{ m.typeLabel }}</span>
+              <span style="justify-self:start;font-size:11px;font-weight:500;color:{{ m.gateColor }};background:{{ m.gateChip }};padding:3px 9px;border-radius:5px;font-family:'IBM Plex Mono'">{{ m.gate }}</span>
+              <span style="font-size:12px;color:var(--text-muted);font-family:'IBM Plex Mono'">{{ m.order }}</span>
+              <span style="justify-self:start;font-size:11px;font-weight:600;color:{{ m.stColor }};background:{{ m.stChip }};padding:3px 10px;border-radius:5px">{{ m.statusLabel }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="margin-top:14px;display:flex;align-items:center;gap:9px;padding:12px 15px;background:var(--surface-3);border:1px solid var(--line);border-radius:10px"><span style="width:16px;height:16px;flex:none;background:var(--text-muted);-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/info.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/info.svg) center/contain no-repeat"></span><span style="font-size:12px;color:var(--text-dim)">Menu tampil otomatis mengikuti hak akses pengguna. Kategori hanya muncul bila memiliki minimal satu submenu yang terlihat.</span></div>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isPengaturan }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;height:100%">
+        <div style="width:230px;flex:none;border-right:1px solid var(--line);background:var(--surface-1);padding:14px 0">
+          <sc-for list="{{ setTabs }}" as="t" hint-placeholder-count="7">
+            <div onClick="{{ t.onClick }}" style="display:flex;align-items:center;gap:11px;padding:11px 16px;margin:1px 10px;border-radius:8px;cursor:pointer;background:{{ t.bg }}" style-hover="background:rgba(47,107,255,.08)"><span style="width:17px;height:17px;background:{{ t.tint }};-webkit-mask:url({{ t.iconUrl }}) center/contain no-repeat;mask:url({{ t.iconUrl }}) center/contain no-repeat"></span><span style="font-size:13px;font-weight:500;color:{{ t.tint }}">{{ t.label }}</span></div>
+          </sc-for>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:26px 32px">
+          <div style="max-width:660px">
+            <div style="font-size:18px;font-weight:600;margin-bottom:4px">{{ setTitle }}</div>
+            <div style="font-size:13px;color:var(--text-muted);margin-bottom:24px">{{ setDesc }}</div>
+            <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;box-shadow:var(--card-shadow);overflow:hidden">
+              <sc-for list="{{ setRows }}" as="r" hint-placeholder-count="4">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px 18px;border-bottom:1px solid var(--line-soft)">
+                  <div style="flex:1"><div style="font-size:13.5px;font-weight:500;margin-bottom:2px">{{ r.l }}</div><div style="font-size:12px;color:var(--text-faint)">{{ r.d }}</div></div>
+                  <sc-if value="{{ r.isSelect }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface-1);border:1px solid var(--line-strong);border-radius:8px;cursor:pointer;flex:none"><span style="font-size:12.5px;color:var(--text-dim);font-family:'IBM Plex Mono'">{{ r.v }}</span><span style="width:13px;height:13px;background:var(--text-faint);-webkit-mask:url(https://unpkg.com/lucide-static@latest/icons/chevron-down.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@latest/icons/chevron-down.svg) center/contain no-repeat"></span></div></sc-if>
+                  <sc-if value="{{ r.isToggle }}" hint-placeholder-val="{{ false }}"><span onClick="{{ r.onToggle }}" style="width:42px;height:24px;border-radius:20px;background:{{ r.swBg }};position:relative;cursor:pointer;flex:none;transition:background .15s"><span style="position:absolute;top:2px;left:{{ r.knobX }};width:20px;height:20px;border-radius:50%;background:#fff;transition:left .15s"></span></span></sc-if>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:20px"><button style="padding:11px 20px;background:{{ accent }};border:none;border-radius:9px;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Simpan Perubahan</button><button style="padding:11px 20px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:9px;color:var(--text-dim);font-size:13px;font-weight:600;cursor:pointer">Reset</button></div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+    </main>
+  </div>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Gelap&quot;,&quot;options&quot;:[&quot;Gelap&quot;,&quot;Terang&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Tema&quot;},&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:[&quot;#6366f1&quot;,&quot;#818cf8&quot;],&quot;options&quot;:[[&quot;#2f6bff&quot;,&quot;var(--st-blue)&quot;],[&quot;#0ea5e9&quot;,&quot;var(--sem-cyan)&quot;],[&quot;#6366f1&quot;,&quot;#818cf8&quot;]],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Tema&quot;},&quot;density&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Nyaman&quot;,&quot;options&quot;:[&quot;Nyaman&quot;,&quot;Padat&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Tema&quot;},&quot;mapStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Gelap&quot;,&quot;options&quot;:[&quot;Gelap&quot;,&quot;Terang&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Peta&quot;}}">
+class Component extends DCLogic {
+  state = {
+    loggedIn: false, screen: 'dashboard', branch: 'JORRS', cctvLayout: 16, ticket: 'TKT-24081',
+    layers: { cctv: true, vms: true, fo: true, gps: true, gate: true, wim: false, weather: false, sos: true },
+    setTab: 'umum', toggles: {}, now: '--:--:--', sideOpen: true, mapFull: false, mapLayersOpen: false, petaMode: 'empty', petaListKey: null, petaSearch: '', petaSel: null, theme: null, cctvFull: false, cctvListOpen: false, uiVisible: true, usersTab: 'pengguna', selUser: 0, userQ: ''
+  };
+
+  roleCatalog = [
+    ['super_admin', 'Super Admin', 'Akses penuh seluruh modul, user, dan menu.', ['*'], 'shield-check'],
+    ['operator_cctv', 'Operator CCTV', 'Memantau dan mengelola kamera pada ruas yang ditugaskan.', ['camera.view', 'camera.manage', 'branch.view.assigned'], 'cctv'],
+    ['operator_asset', 'Operator Asset', 'Mengelola aset VMS, FO, gerbang, dan WIM.', ['asset.view', 'asset.manage', 'vms.view', 'wim.view'], 'boxes'],
+    ['operator_sos', 'Operator SOS', 'Menangani tiket SOS dan pelacakan kendaraan.', ['sos.view', 'sos.handle', 'vehicle.track'], 'siren'],
+    ['viewer_branch', 'Viewer Branch', 'Hanya melihat data pada ruas yang ditugaskan.', ['branch.view.assigned', 'camera.view', 'asset.view'], 'eye']
+  ];
+
+  userList = [
+    { username: 'admin', full: 'System Administrator', display: 'System Administrator', email: 'admin@tollsentra.id', roles: ['super_admin'], scopes: ['Semua ruas'], src: 'rbac', active: true, legacy: 'admin', updated: '23 Apr 2026 09:12', sub: 'oidc-subject-123' },
+    { username: 'rangga.p', full: 'Rangga Prasetyo', display: 'Rangga Prasetyo', email: 'rangga.p@tollsentra.id', roles: ['operator_cctv'], scopes: ['JORRS'], src: 'rbac', active: true, legacy: 'user', updated: '12 Agu 2026 08:40', sub: 'oidc-subject-441' },
+    { username: 'sarah.a', full: 'Sarah Amelia', display: 'Sarah Amelia', email: 'sarah.a@tollsentra.id', roles: ['operator_sos'], scopes: ['PEKDUM', 'BAKTER'], src: 'rbac', active: true, legacy: 'user', updated: '11 Agu 2026 17:05', sub: 'oidc-subject-512' },
+    { username: 'andi.k', full: 'Andi Kusuma', display: 'Andi Kusuma', email: 'andi.k@tollsentra.id', roles: ['operator_asset'], scopes: ['BETEJAM'], src: 'rbac', active: true, legacy: 'user', updated: '10 Agu 2026 14:22', sub: '\u2014' },
+    { username: 'firhan.p', full: 'Firhan Prayoga', display: 'Firhan Prayoga', email: 'firhan.p@tollsentra.id', roles: ['operator_cctv', 'operator_sos'], scopes: ['JORRS', 'ATP'], src: 'rbac', active: true, legacy: 'user', updated: '09 Agu 2026 11:58', sub: 'oidc-subject-733' },
+    { username: 'dwi.n', full: 'Dwi Nugroho', display: 'Dwi Nugroho', email: 'dwi.n@tollsentra.id', roles: ['viewer_branch'], scopes: ['MEDBIN'], src: 'legacy', active: false, legacy: 'user', updated: '02 Agu 2026 16:30', sub: '\u2014' }
+  ];
+
+  menuTree = [
+    { code: 'monitoring', name: 'Monitoring', icon: 'monitor-dot', route: '\u2014', level: 1, gate: 'Tanpa batasan', gateType: 'none', order: 10, active: true },
+    { code: 'monitoring_peta', name: 'Peta Aset', icon: 'map', route: '/peta', level: 2, gate: 'module: asset \u00b7 read', gateType: 'module', order: 20, active: true },
+    { code: 'monitoring_cctv', name: 'CCTV', icon: 'cctv', route: '/cctv', level: 2, gate: 'module: kamera \u00b7 read', gateType: 'module', order: 30, active: true },
+    { code: 'monitoring_sos', name: 'SOS', icon: 'siren', route: '/sos', level: 2, gate: 'permission: sos.view', gateType: 'permission', order: 40, active: true },
+    { code: 'monitoring_wim', name: 'WIM', icon: 'scale', route: '/wim', level: 2, gate: 'module: wim \u00b7 read', gateType: 'module', order: 50, active: true },
+    { code: 'master_data', name: 'Master Data', icon: 'database', route: '\u2014', level: 1, gate: 'Tanpa batasan', gateType: 'none', order: 60, active: true },
+    { code: 'master_kamera', name: 'Kamera', icon: 'videocam', route: '/admin/kamera', level: 2, gate: 'module: kamera \u00b7 write', gateType: 'module', order: 70, active: true },
+    { code: 'master_kendaraan', name: 'Tipe Kendaraan', icon: 'truck', route: '/admin/vehicle-type', level: 2, gate: 'module: vehicle_type \u00b7 write', gateType: 'module', order: 80, active: false },
+    { code: 'admin_akses', name: 'Pengguna & Akses', icon: 'users', route: '/admin/users', level: 2, gate: 'permission: user.manage', gateType: 'permission', order: 90, active: true }
+  ];
+
+  vmsList = [
+    ['VMS-2701', 'JORRS GT AMPERA 1', 'JORRS', '20.21.3.15', 'online'],
+    ['VMS-2697', 'JORRS GT. CIPUTAT 1', 'JORRS', '20.21.3.12', 'offline'],
+    ['VMS-2712', 'JORRS KM 12+500', 'JORRS', '20.21.3.22', 'online'],
+    ['VMS-3140', 'PEKDUM KM 26+400', 'PEKDUM', '10.55.2.8', 'online'],
+    ['VMS-3155', 'BAKTER KM 33+100', 'BAKTER', '10.60.1.4', 'offline'],
+    ['VMS-3201', 'BETEJAM KM 12+600', 'BETEJAM', '10.70.3.9', 'online']
+  ];
+  gpsList = [
+    ['PJR-07', 'Patroli', 'JORRS', '0 km/j', '2 dtk lalu', 'berhenti'],
+    ['AMB-02', 'Ambulans', 'JORRS', '48 km/j', '5 dtk lalu', 'bergerak'],
+    ['RSC-11', 'Rescue', 'PEKDUM', '62 km/j', '3 dtk lalu', 'bergerak'],
+    ['TOW-04', 'Towing', 'BAKTER', '0 km/j', '1 mnt lalu', 'berhenti'],
+    ['PJR-15', 'Patroli', 'BETEJAM', '54 km/j', '4 dtk lalu', 'bergerak'],
+    ['PJR-22', 'Patroli', 'MEDBIN', '\u2014', '12 mnt lalu', 'offline']
+  ];
+  gateList = [
+    ['GT FATMAWATI 1', 'JORRS', '26 device', '2 device error', 'error'],
+    ['GT CIPUTAT 2', 'JORRS', '18 device', 'Perangkat offline', 'offline'],
+    ['GT AMPERA 1', 'JORRS', '24 device', '1 device warning', 'warning'],
+    ['GT PONDOK INDAH 1', 'JORRS', '22 device', 'Normal', 'normal'],
+    ['GT KALIKANGKUNG', 'PEKDUM', '20 device', '1 device warning', 'warning'],
+    ['GT BAKAUHENI', 'BAKTER', '16 device', 'Normal', 'normal']
+  ];
+  foList = [
+    ['Fatmawati 1 → KC JORR', 'Fiber · 10 Gbps', 'JORRS', 'normal'],
+    ['KC JORR → Kantor Pusat', 'Fiber · 40 Gbps', 'JORRS', 'normal'],
+    ['Ampera 1 → Fatmawati 1', 'Fiber · 10 Gbps', 'JORRS', 'warning'],
+    ['Ciputat 2 → KC JORR', 'Backup · 1 Gbps', 'JORRS', 'error'],
+    ['Pondok Indah → KC JORR', 'Fiber · 10 Gbps', 'JORRS', 'normal']
+  ];
+
+  ic(n) { return 'https://unpkg.com/lucide-static@latest/icons/' + n + '.svg'; }
+
+  branches = { JORRS: 'JORRS · Jakarta Outer Ring Road', ATP: 'ATP · Akses Tanjung Priok', PEKDUM: 'PEKDUM · Pekanbaru–Dumai', BAKTER: 'BAKTER · Bakauheni–Terbanggi', BETEJAM: 'BETEJAM · Betung–Jambi', MEDBIN: 'MEDBIN · Medan–Binjai' };
+
+  camDefs = [
+    ['JORRS GT AMPERA 1','KM 09+100','normal'],['JORRS GT AMPERA 2','KM 09+150','normal'],
+    ['JORRS GT CIPUTAT 1','KM 09+800','normal'],['JORRS GT CIPUTAT 2','KM 09+850','offline'],
+    ['JORRS KM 10+200 A','KM 10+200','normal'],['JORRS KM 10+200 B','KM 10+200','normal'],
+    ['JORRS GT FATMAWATI 1','KM 11+400','warning'],['JORRS GT FATMAWATI 2','KM 11+450','normal'],
+    ['JORRS KM 12+500 A','KM 12+500','normal'],['JORRS KM 12+500 B','KM 12+500','normal'],
+    ['JORRS GT PONDOK INDAH 1','KM 13+900','normal'],['JORRS GT PONDOK INDAH 2','KM 13+950','offline'],
+    ['JORRS KM 15+000 A','KM 15+000','normal'],['JORRS KM 15+000 B','KM 15+000','warning'],
+    ['JORRS GT LEBAK BULUS 1','KM 16+200','normal'],['JORRS MAINLINE KM 17','KM 17+000','normal']
+  ];
+
+  gateAlerts = [
+    { gate: 'GT FATMAWATI 1', branch: 'JORRS', log: 'LOG_LPR_MACET', status: 'ERROR', at: '09:56' },
+    { gate: 'GT CIPUTAT 2', branch: 'JORRS', log: 'LOG_DEVICE_OFFLINE', status: 'OFFLINE', at: '09:41' },
+    { gate: 'GT KALIKANGKUNG', branch: 'PEKDUM', log: 'LOG_IVS_OBS_WARN', status: 'WARNING', at: '09:12' },
+    { gate: 'GT AMPERA 1', branch: 'JORRS', log: 'LOG_LPR_TIMEOUT', status: 'WARNING', at: '08:58' }
+  ];
+
+  events = [
+    { text: 'SOS baru TKT-24079 — Butuh ambulans di BETEJAM KM 5+100', at: '10:03 WIB', color: 'var(--sem-red)' },
+    { text: 'Kedatangan PJR-07 terkonfirmasi otomatis di TKT-24081', at: '09:41 WIB', color: 'var(--sem-green)' },
+    { text: 'Device LPR Gardu 2 (FATMAWATI 1) berubah ke status error', at: '09:56 WIB', color: 'var(--sem-amber)' },
+    { text: 'Kamera CIPUTAT 2 terputus dari stream', at: '09:41 WIB', color: 'var(--sem-red)' },
+    { text: 'Refresh monitoring WIM selesai — 12 site online', at: '09:30 WIB', color: 'var(--st-blue)' }
+  ];
+
+  wimSites = [
+    ['WIM JORR KM 08','WIM-JORRS-08','JORRS','online','24 / 0 / 0','Ada data','09:28'],
+    ['WIM JORR KM 14','WIM-JORRS-14','JORRS','online','18 / 0 / 0','Ada data','09:28'],
+    ['WIM PEKDUM KM 26','WIM-PEKDUM-26','PEKDUM','warning','15 / 0 / 3','Ada data','09:27'],
+    ['WIM PEKDUM KM 52','WIM-PEKDUM-52','PEKDUM','online','20 / 0 / 0','Ada data','09:27'],
+    ['WIM BAKTER KM 33','WIM-BAKTER-33','BAKTER','offline','0 / 22 / 0','Tidak ada data','08:55'],
+    ['WIM BETEJAM KM 12','WIM-BETEJAM-12','BETEJAM','online','16 / 0 / 0','Ada data','09:26'],
+    ['WIM MEDBIN KM 05','WIM-MEDBIN-05','MEDBIN','unknown','—','Tidak ada data','—']
+  ];
+
+  tickets = [
+    { no: 'TKT-24081', type: 'Kecelakaan Lalu Lintas', ruas: 'JORRS', loc: 'KM 10+200 arah Serpong', reporter: 'Firhan Prayoga', phone: '0821-2130-3097', coord: '-6.29240, 106.81913', status: 'In Handling', sosStatus: 'Sedang ditangani', resp: 'Kedatangan terkonfirmasi', at: '09:41',
+      candidates: [
+        { label: 'PJR-07 Patroli JORR', type: 'patroli', st: 'Kedatangan terkonfirmasi (otomatis)', conf: '0.92', dist: '340 m', spd: '0 km/j', primary: true },
+        { label: 'AMB-02 Ambulans', type: 'ambulance', st: 'Kemungkinan menuju SOS', conf: '0.61', dist: '1.2 km', spd: '48 km/j', primary: false }
+      ],
+      timeline: [
+        { ev: 'Tracking dimulai', at: '09:31', src: '', tone: 'var(--text-muted)' },
+        { ev: 'Kandidat terdekat ditemukan', at: '09:33', src: 'PJR-07 Patroli JORR', tone: 'var(--st-blue)' },
+        { ev: 'Kemungkinan menuju SOS', at: '09:36', src: 'PJR-07 Patroli JORR', tone: 'var(--sem-amber)' },
+        { ev: 'Tiba, menunggu konfirmasi', at: '09:40', src: 'PJR-07 Patroli JORR', tone: 'var(--sem-sky)' },
+        { ev: 'Kedatangan terkonfirmasi', at: '09:41', src: 'source: system_auto_arrival', tone: 'var(--sem-green)' }
+      ] },
+    { no: 'TKT-24080', type: 'Kendaraan Mogok', ruas: 'PEKDUM', loc: 'KM 32+500 lajur 1', reporter: 'Sarah Amelia', phone: '0812-8890-1122', coord: '0.51234, 101.44567', status: 'Dispatched', sosStatus: 'Dispatched', resp: 'Kandidat terdekat ditemukan', at: '09:52',
+      candidates: [ { label: 'RSC-11 Rescue', type: 'rescue', st: 'Kandidat terdekat ditemukan', conf: '0.48', dist: '2.1 km', spd: '62 km/j', primary: true } ],
+      timeline: [ { ev: 'Tracking dimulai', at: '09:52', src: '', tone: 'var(--text-muted)' }, { ev: 'Kandidat terdekat ditemukan', at: '09:54', src: 'RSC-11 Rescue', tone: 'var(--st-blue)' } ] },
+    { no: 'TKT-24079', type: 'Butuh Ambulans', ruas: 'BETEJAM', loc: 'KM 5+100 arah Jambi', reporter: 'Andi Kusuma', phone: '0853-2211-7788', coord: '-1.87047, 103.65025', status: 'Dispatched', sosStatus: 'Dispatched', resp: 'Tracking dimulai', at: '10:03',
+      candidates: [], timeline: [ { ev: 'Tracking dimulai', at: '10:03', src: '', tone: 'var(--text-muted)' } ] }
+  ];
+
+  setData = {
+    umum: { title: 'Umum', desc: 'Preferensi dasar aplikasi dan operasional.', rows: [
+      { l: 'Bahasa Antarmuka', d: 'Bahasa yang digunakan seluruh aplikasi', c: 'select', v: 'Bahasa Indonesia' },
+      { l: 'Zona Waktu', d: 'Dipakai untuk seluruh timestamp', c: 'select', v: 'WIB (GMT+7)' },
+      { l: 'Interval Refresh Data', d: 'Polling snapshot peta & monitoring', c: 'select', v: '30 detik' },
+      { l: 'Mode Layar Penuh', d: 'Sembunyikan bilah judul saat operasi', c: 'toggle', k: 'fs', dv: true } ] },
+    tampilan: { title: 'Tampilan', desc: 'Tema, warna, dan kepadatan tampilan.', rows: [
+      { l: 'Tema', d: 'Mode terang atau gelap', c: 'select', v: 'Gelap' },
+      { l: 'Warna Aksen', d: 'Warna utama tombol & sorotan', c: 'select', v: 'Biru' },
+      { l: 'Kepadatan', d: 'Jarak antar elemen', c: 'select', v: 'Nyaman' },
+      { l: 'Animasi Marker', d: 'Efek pulse pada marker peta', c: 'toggle', k: 'anim', dv: true } ] },
+    cctv: { title: 'CCTV', desc: 'Konfigurasi sumber dan tampilan streaming.', rows: [
+      { l: 'Sumber Stream', d: 'Base URL pemutar HLS (.m3u8)', c: 'select', v: 'pub2.hk-opt.com' },
+      { l: 'Tata Letak Default', d: 'Grid saat membuka CCTV', c: 'select', v: '4×4' },
+      { l: 'Auto-reconnect Stream', d: 'Sambung ulang otomatis bila terputus', c: 'toggle', k: 'rec', dv: true },
+      { l: 'Overlay Nama Kamera', d: 'Tampilkan nama & KM pada tiap tile', c: 'toggle', k: 'ov', dv: true } ] },
+    peta: { title: 'Peta & Cuaca', desc: 'Layer, peta dasar, dan data cuaca.', rows: [
+      { l: 'Peta Dasar', d: 'Gaya basemap Google Maps', c: 'select', v: 'Gelap' },
+      { l: 'Layer Cuaca', d: 'Tampilkan marker cuaca per ruas', c: 'toggle', k: 'wx', dv: false },
+      { l: 'Refresh Cuaca', d: 'Frekuensi ambil snapshot cuaca', c: 'select', v: 'Setiap 2 jam' },
+      { l: 'Arc Jaringan FO', d: 'Tampilkan koneksi fiber (deck.gl)', c: 'toggle', k: 'fo', dv: true } ] },
+    notifikasi: { title: 'Notifikasi SOS', desc: 'Peringatan dan suara untuk kejadian SOS.', rows: [
+      { l: 'Suara Alarm SOS', d: 'Bunyikan alarm saat SOS baru masuk', c: 'toggle', k: 'snd', dv: true },
+      { l: 'Popup SOS Otomatis', d: 'Buka overlay saat ada SOS baru', c: 'toggle', k: 'pop', dv: true },
+      { l: 'Notifikasi Gerbang Bermasalah', d: 'Peringatan device gerbang error', c: 'toggle', k: 'gt', dv: true },
+      { l: 'Notifikasi WIM Offline', d: 'Peringatan bila site WIM offline', c: 'toggle', k: 'wm', dv: false } ] },
+    koneksi: { title: 'Koneksi', desc: 'Endpoint backend, autentikasi, dan realtime.', rows: [
+      { l: 'URL Backend API', d: 'Alamat layanan REST/SSE', c: 'select', v: '127.0.0.1:3000' },
+      { l: 'Mode Autentikasi', d: 'JWT lokal atau hybrid OIDC', c: 'select', v: 'JWT + SSO (OIDC)' },
+      { l: 'Reconnect SSE Otomatis', d: 'Sambung ulang stream map-events', c: 'toggle', k: 'sse', dv: true },
+      { l: 'Timeout Permintaan', d: 'Batas waktu request API', c: 'select', v: '15 detik' } ] },
+    akun: { title: 'Akun', desc: 'Profil operator dan cakupan akses.', rows: [
+      { l: 'Nama Operator', d: 'Nama yang ditampilkan di sistem', c: 'select', v: 'Rangga Prasetyo' },
+      { l: 'Peran', d: 'Role RBAC aktif', c: 'select', v: 'Operator Ruang Kendali' },
+      { l: 'Ruas Cakupan', d: 'Branch scope yang dapat diakses', c: 'select', v: '6 ruas' },
+      { l: 'Ubah Kata Sandi', d: 'Perbarui kredensial login', c: 'select', v: 'Ubah' } ] }
+  };
+
+  componentDidMount() {
+    this.t = setInterval(() => this.clock(), 1000); this.clock();
+    this.onMove = () => {
+      if (!this.state.cctvFull && !this.state.mapFull) return;
+      if (!this.state.uiVisible) this.setState({ uiVisible: true });
+      clearTimeout(this.idleT);
+      this.idleT = setTimeout(() => this.setState({ uiVisible: false }), 2600);
+    };
+    window.addEventListener('mousemove', this.onMove);
+  }
+  componentWillUnmount() { clearInterval(this.t); clearTimeout(this.idleT); window.removeEventListener('mousemove', this.onMove); }
+  clock() { const d = new Date(), p = n => String(n).padStart(2, '0'); this.setState({ now: p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds()) }); }
+
+  go(s) { this.setState({ screen: s }); }
+  toggleLayer(k) { this.setState(st => ({ layers: { ...st.layers, [k]: !st.layers[k] } })); }
+  toggleSet(k, dv) { this.setState(st => { const cur = (k in st.toggles) ? st.toggles[k] : dv; return { toggles: { ...st.toggles, [k]: !cur } }; }); }
+
+  renderVals() {
+    const s = this.state;
+    const accentRaw = this.props.accent;
+    const accent = Array.isArray(accentRaw) ? accentRaw[0] : (accentRaw || '#2f6bff');
+    const dense = (this.props.density || 'Nyaman') === 'Padat';
+    const pad = dense ? '16px' : '22px';
+    const theme = s.theme || this.props.theme || 'Gelap';
+    const themeAttr = theme === 'Terang' ? 'light' : 'dark';
+    const mapBg = (this.props.mapStyle || 'Gelap') === 'Terang' ? '#d8e3f2' : 'var(--map-bg)';
+
+    const navDef = [['dashboard', 'Dashboard', 'layout-dashboard'], ['peta', 'Peta Aset', 'map'], ['cctv', 'CCTV', 'cctv'], ['sos', 'SOS', 'siren'], ['wim', 'WIM', 'scale'], ['users', 'Pengguna & Akses', 'users'], ['pengaturan', 'Pengaturan', 'settings']];
+    const open = this.tickets.filter(t => t.status !== 'Selesai');
+    const sosCount = open.length;
+    const nav = navDef.map(([id, label, icon]) => { const hb = id === 'sos' && sosCount; return { id, label, iconUrl: this.ic(icon), active: s.screen === id, tint: s.screen === id ? 'var(--nav-active-text)' : 'var(--text-muted)', bg: s.screen === id ? 'var(--nav-active-bg)' : 'transparent', badge: (hb && s.sideOpen) ? String(sosCount) : '', dotCollapsed: !!(hb && !s.sideOpen), onClick: () => this.go(id) }; });
+
+    const statusChip = (st) => {
+      const m = { 'In Handling': ['var(--st-amber)', 'rgba(217,160,20,.16)'], 'Dispatched': ['var(--st-blue)', 'rgba(91,141,255,.16)'], 'Selesai': ['var(--st-green)', 'rgba(52,211,153,.16)'], 'Sedang ditangani': ['var(--st-amber)', 'rgba(217,160,20,.16)'] };
+      return m[st] || ['var(--text-muted)', 'rgba(132,148,173,.14)'];
+    };
+
+    const mkTicket = (t) => { const [c, ch] = statusChip(t.status); return { ...t, stColor: c, stChip: ch, onClick: () => this.setState({ screen: 'sos', ticket: t.no }) }; };
+    const tickets = this.tickets.map(t => { const b = mkTicket(t); const seld = s.ticket === t.no; return { ...b, selBg: seld ? 'var(--nav-active-bg)' : 'transparent', selBar: seld ? accent : 'transparent' }; });
+    const sosList = open.map(mkTicket);
+
+    const kpiTone = { 'var(--st-blue)': 'rgba(91,141,255,.14)', 'var(--sem-green)': 'rgba(52,211,153,.14)', 'var(--sem-amber)': 'rgba(251,191,36,.14)', 'var(--sem-red)': 'rgba(244,63,94,.14)', 'var(--sem-cyan)': 'rgba(34,211,238,.14)', 'var(--sem-purple)': 'rgba(167,139,250,.14)' };
+    const kpis = [
+      { label: 'Ruas Aktif', value: '6', sub: 'Semua beroperasi', icon: 'git-fork', tone: 'var(--st-blue)' },
+      { label: 'CCTV Online', value: '412', sub: 'dari 428 kamera', icon: 'cctv', tone: 'var(--sem-green)' },
+      { label: 'VMS Offline', value: '4', sub: 'dari 72 perangkat', icon: 'monitor', tone: 'var(--sem-amber)' },
+      { label: 'SOS Aktif', value: String(sosCount), sub: 'butuh penanganan', icon: 'siren', tone: 'var(--sem-red)' },
+      { label: 'Kendaraan Live', value: '37', sub: 'patroli & rescue', icon: 'truck', tone: 'var(--sem-cyan)' },
+      { label: 'Site WIM Online', value: '12', sub: 'dari 15 site', icon: 'scale', tone: 'var(--sem-purple)' }
+    ].map(k => ({ ...k, iconUrl: this.ic(k.icon), tintBg: kpiTone[k.tone] }));
+
+    const gateChip = { ERROR: ['var(--st-red)', 'rgba(244,63,94,.16)'], OFFLINE: ['var(--st-gray)', 'rgba(120,140,170,.18)'], WARNING: ['var(--st-amber)', 'rgba(217,160,20,.16)'] };
+    const gateAlerts = this.gateAlerts.map(g => { const [c, ch] = gateChip[g.status]; return { ...g, color: c, chip: ch }; });
+
+    const wimBars = [
+      { label: 'Online', val: '12 / 15', pct: '80%', color: 'var(--sem-green)' },
+      { label: 'Warning', val: '1 / 15', pct: '7%', color: 'var(--sem-amber)' },
+      { label: 'Offline', val: '1 / 15', pct: '7%', color: 'var(--sem-red)' },
+      { label: 'Ada data harian', val: '13 / 15', pct: '87%', color: 'var(--st-blue)' }
+    ];
+
+    const legend = [ { label: 'CCTV', color: 'var(--sem-green)' }, { label: 'VMS', color: 'var(--sem-amber)' }, { label: 'Gerbang', color: 'var(--sem-red)' }, { label: 'GPS', color: 'var(--st-blue)' }, { label: 'SOS', color: 'var(--sem-rose)' } ];
+    const cmap = { cctv: 'var(--sem-green)', vms: 'var(--sem-amber)', fo: 'var(--sem-cyan)', gps: 'var(--st-blue)', gate: 'var(--sem-red)', wim: 'var(--sem-purple)', weather: 'var(--sem-sky)', sos: 'var(--sem-rose)' };
+    const mkPts = [ { t: 'cctv', l: 22, tp: 30 }, { t: 'cctv', l: 40, tp: 55 }, { t: 'cctv', l: 63, tp: 24 }, { t: 'cctv', l: 72, tp: 62 }, { t: 'vms', l: 33, tp: 44 }, { t: 'vms', l: 58, tp: 70 }, { t: 'gate', l: 48, tp: 38, pulse: true }, { t: 'gate', l: 30, tp: 66 }, { t: 'gps', l: 52, tp: 52 }, { t: 'gps', l: 68, tp: 40 }, { t: 'wim', l: 44, tp: 20 }, { t: 'weather', l: 78, tp: 30 }, { t: 'sos', l: 56, tp: 60, pulse: true } ];
+    const dashMarkers = mkPts.filter(m => ['cctv', 'vms', 'gate', 'gps', 'sos'].includes(m.t)).map(m => ({ left: m.l + '%', top: m.tp + '%', color: cmap[m.t] }));
+    const bc = s.branch;
+    const pill = (k) => ({ normal: ['var(--st-green)', 'rgba(52,211,153,.16)'], online: ['var(--st-green)', 'rgba(52,211,153,.16)'], bergerak: ['var(--st-green)', 'rgba(52,211,153,.16)'], warning: ['var(--st-amber)', 'rgba(217,160,20,.16)'], berhenti: ['var(--st-amber)', 'rgba(217,160,20,.16)'], dispatched: ['var(--st-blue)', 'rgba(91,141,255,.16)'], offline: ['var(--st-gray)', 'rgba(120,140,170,.18)'], error: ['var(--st-red)', 'rgba(244,63,94,.16)'] }[k] || ['var(--st-gray)', 'rgba(120,140,170,.16)']);
+    const sKey = { normal: 'Online', warning: 'Warning', offline: 'Offline' };
+    const listData = {
+      cctv: this.camDefs.map((c, i) => ({ id: 'CCTV-' + (210 + i), title: c[0], sub: c[1], statusKey: c[2] === 'normal' ? 'online' : c[2], statusLabel: sKey[c[2]], ruas: 'JORRS', kind: 'cctv' })),
+      vms: this.vmsList.map(v => ({ id: v[0], title: v[1], sub: v[3], statusKey: v[4], statusLabel: v[4] === 'online' ? 'Online' : 'Offline', ruas: v[2], kind: 'vms' })),
+      fo: this.foList.map(f => ({ id: f[0], title: f[0], sub: f[1], statusKey: f[3], statusLabel: { normal: 'Normal', warning: 'Warning', error: 'Error' }[f[3]], ruas: f[2], kind: 'fo' })),
+      gps: this.gpsList.map(g => ({ id: g[0], title: g[0], sub: g[1] + ' · ' + g[3], statusKey: g[5], statusLabel: { bergerak: 'Bergerak', berhenti: 'Berhenti', offline: 'Offline' }[g[5]], ruas: g[2], kind: 'gps' })),
+      gate: this.gateList.map(x => ({ id: x[0], title: x[0], sub: x[3], statusKey: x[4], statusLabel: { error: 'Error', offline: 'Offline', warning: 'Warning', normal: 'Normal' }[x[4]], ruas: x[1], kind: 'gate' })),
+      wim: this.wimSites.map(w => ({ id: w[1], title: w[0], sub: w[4], statusKey: w[3], statusLabel: { online: 'Online', warning: 'Warning', offline: 'Offline', unknown: 'Unknown' }[w[3]], ruas: w[2], kind: 'wim' })),
+      sos: this.tickets.map(t => ({ id: t.no, title: t.no + ' · ' + t.type, sub: t.loc, statusKey: t.status === 'In Handling' ? 'warning' : (t.status === 'Selesai' ? 'online' : 'dispatched'), statusLabel: t.status, ruas: t.ruas, kind: 'sos' }))
+    };
+    const repr = (t) => { const arr = listData[t] || []; return arr.find(it => it.ruas === bc) || arr[0] || null; };
+    const openDetail = (it, key) => this.setState({ petaMode: it ? 'detail' : 'empty', petaSel: it, petaListKey: key });
+    const mapMarkers = mkPts.filter(m => s.layers[m.t]).map(m => ({ left: m.l + '%', top: m.tp + '%', color: cmap[m.t], pulse: !!m.pulse, onClick: () => openDetail(repr(m.t), listData[m.t] ? m.t : null) }));
+
+    const layerDef = [['cctv', 'CCTV', 'cctv', 'var(--sem-green)', 428], ['vms', 'VMS', 'monitor', 'var(--sem-amber)', 72], ['fo', 'Jaringan FO', 'share-2', 'var(--sem-cyan)', 96], ['gps', 'GPS Kendaraan', 'truck', 'var(--st-blue)', 37], ['gate', 'Gerbang Tol', 'building-2', 'var(--sem-red)', 48], ['wim', 'WIM', 'scale', 'var(--sem-purple)', 15], ['weather', 'Cuaca', 'cloud', 'var(--sem-sky)', 24], ['sos', 'SOS', 'siren', 'var(--sem-rose)', sosCount]];
+    const layers = layerDef.map(([key, label, icon, color, count]) => {
+      const on = s.layers[key];
+      const hasList = key !== 'weather';
+      const arr = listData[key] || [];
+      const alerts = key === 'sos' ? arr.filter(it => it.ruas === bc && it.statusLabel !== 'Selesai').length : arr.filter(it => it.ruas === bc && (it.statusKey === 'offline' || it.statusKey === 'error')).length;
+      return { key, label, iconUrl: this.ic(icon), color, count: String(count), on, hasList, badge: alerts > 0 ? String(alerts) : '', rowBg: (s.petaMode === 'list' && s.petaListKey === key) ? 'var(--nav-active-bg)' : 'transparent', onToggle: () => this.toggleLayer(key), onOpen: hasList ? (() => this.setState({ petaMode: 'list', petaListKey: key, petaSearch: '', petaSel: null })) : (() => {}), swBg: on ? accent : 'var(--track)', knobX: on ? '18px' : '2px' };
+    });
+
+    const assetDetail = [ { k: 'Kode Aset', v: 'CCTV-218' }, { k: 'Status', v: 'ONLINE' }, { k: 'Live Stream', v: 'Tersedia' }, { k: 'Gerbang', v: '—' }, { k: 'Koordinat', v: '-6.29240, 106.81913' } ];
+
+    const camIcon = { normal: 'video', warning: 'video', offline: 'video-off' };
+    const camBadge = { normal: 'ONLINE', warning: 'WARNING', offline: 'OFFLINE' };
+    const camDot = { normal: 'var(--sem-green)', warning: 'var(--sem-amber)', offline: 'var(--sem-red)' };
+    const cameras = this.camDefs.map(([name, km, status]) => ({ name, km, status, dot: camDot[status], badge: camBadge[status], centerIcon: this.ic(camIcon[status]) }));
+    const camOffline = this.camDefs.filter(c => c[2] === 'offline').length;
+    const camOnline = this.camDefs.length - camOffline;
+    const cctvCols = s.cctvLayout === 4 ? 2 : s.cctvLayout === 9 ? 3 : 4;
+    const layoutBtns = [[4, '2×2'], [9, '3×3'], [16, '4×4']].map(([n, label]) => ({ label, onClick: () => this.setState({ cctvLayout: n }), tint: s.cctvLayout === n ? '#fff' : 'var(--text-muted)', bg: s.cctvLayout === n ? accent : 'transparent' }));
+
+    const sel0 = this.tickets.find(t => t.no === s.ticket) || this.tickets[0];
+    const [sc, sch] = statusChip(sel0.status);
+    const [ssc, ssch] = statusChip(sel0.sosStatus);
+    const vIcon = { patroli: 'shield', ambulance: 'ambulance', rescue: 'truck', police: 'shield-check', towing: 'truck' };
+    const selCandidates = sel0.candidates.map(c => {
+      const conf = parseFloat(c.conf);
+      const confColor = conf >= 0.8 ? 'var(--sem-green)' : conf >= 0.5 ? 'var(--sem-amber)' : 'var(--sem-red)';
+      const stColor = c.st.includes('terkonfirmasi') ? 'var(--sem-green)' : c.st.includes('menuju') ? 'var(--sem-amber)' : 'var(--text-muted)';
+      return { ...c, iconUrl: this.ic(vIcon[c.type] || 'truck'), iconColor: c.primary ? 'var(--st-blue)' : 'var(--text-muted)', iconBg: c.primary ? 'rgba(47,107,255,.14)' : 'rgba(132,148,173,.1)', bg: c.primary ? 'rgba(47,107,255,.06)' : 'transparent', border: c.primary ? 'rgba(47,107,255,.3)' : 'var(--line)', confColor, stColor };
+    });
+    const sel = { ...sel0, stColor: sc, stChip: sch, sosColor: ssc, sosChip: ssch, initials: sel0.reporter.split(' ').map(w => w[0]).slice(0, 2).join(''), candCount: sel0.candidates.length, noCand: sel0.candidates.length === 0 };
+
+    const wimColor = { online: 'var(--st-green)', warning: 'var(--st-amber)', offline: 'var(--st-red)', unknown: 'var(--st-gray)' };
+    const wimChip = { online: 'rgba(52,211,153,.16)', warning: 'rgba(217,160,20,.16)', offline: 'rgba(244,63,94,.16)', unknown: 'rgba(120,140,170,.18)' };
+    const wimSites = this.wimSites.map(([name, code, branch, status, devices, data, last]) => ({ name, code, branch, status: status.toUpperCase(), devices, data, last, stColor: wimColor[status], stChip: wimChip[status], dataColor: data === 'Ada data' ? 'var(--sem-green)' : 'var(--sem-slate)' }));
+    const wimCards = [ ['Total Site', '15', 'var(--text)'], ['Online', '12', 'var(--sem-green)'], ['Warning', '1', 'var(--sem-amber)'], ['Offline', '1', 'var(--sem-red)'], ['Unknown', '1', 'var(--sem-slate)'], ['Ada Data', '13', 'var(--st-blue)'], ['Tanpa Data', '2', 'var(--text-muted)'] ].map(([label, value, color]) => ({ label, value, color }));
+
+    const th = [ [55, 25, 20, 80], [60, 20, 20, 85], [50, 30, 20, 78], [65, 15, 20, 88], [58, 22, 20, 82], [62, 18, 20, 86], [45, 30, 25, 74], [60, 20, 20, 84], [63, 17, 20, 87], [55, 25, 20, 80], [66, 14, 20, 90], [60, 20, 20, 85], [52, 28, 20, 76], [64, 16, 20, 88] ];
+    const trend = th.map(([on, warn, off, data]) => ({ on: on + '%', warn: warn + '%', off: off + '%', data: data + '%' }));
+
+    const setTabDef = [['umum', 'Umum', 'sliders-horizontal'], ['tampilan', 'Tampilan', 'palette'], ['cctv', 'CCTV', 'cctv'], ['peta', 'Peta & Cuaca', 'map'], ['notifikasi', 'Notifikasi SOS', 'bell'], ['koneksi', 'Koneksi', 'plug'], ['akun', 'Akun', 'user']];
+    const setTabs = setTabDef.map(([id, label, icon]) => ({ id, label, iconUrl: this.ic(icon), active: s.setTab === id, tint: s.setTab === id ? 'var(--nav-active-text)' : 'var(--text-muted)', bg: s.setTab === id ? 'var(--nav-active-bg)' : 'transparent', onClick: () => this.setState({ setTab: id }) }));
+    const cur = this.setData[s.setTab];
+    const setRows = cur.rows.map(r => { const isToggle = r.c === 'toggle'; const on = isToggle ? ((r.k in s.toggles) ? s.toggles[r.k] : r.dv) : false; return { l: r.l, d: r.d, v: r.v || '', isSelect: r.c === 'select', isToggle, onToggle: () => this.toggleSet(r.k, r.dv), swBg: on ? accent : 'var(--track)', knobX: on ? '20px' : '2px' }; });
+
+    const q = (s.petaSearch || '').toLowerCase();
+    const curKey = s.petaListKey;
+    const rawList = (curKey && listData[curKey]) ? listData[curKey] : [];
+    const petaListItems = rawList.filter(it => it.ruas === bc && it.title.toLowerCase().includes(q)).map(it => { const [c, ch] = pill(it.statusKey); return { title: it.title, sub: it.sub, statusLabel: it.statusLabel, color: c, chip: ch, active: !!(s.petaSel && s.petaSel.id === it.id), onClick: () => this.setState({ petaMode: 'detail', petaSel: it }) }; });
+    const petaListTitle = { cctv: 'Kamera CCTV', vms: 'Perangkat VMS', fo: 'Jaringan FO', gps: 'GPS Kendaraan', gate: 'Gerbang Tol', wim: 'Site WIM', sos: 'SOS Aktif' }[curKey] || 'Aset';
+    const petaListIcon = this.ic({ cctv: 'cctv', vms: 'monitor', fo: 'share-2', gps: 'truck', gate: 'building-2', wim: 'scale', sos: 'siren' }[curKey] || 'list');
+    const petaListCount = petaListItems.length;
+    const psel = s.petaSel;
+    let petaDetail = { title: '', kindLabel: '', statusLabel: '', color: 'var(--text-muted)', chip: 'rgba(132,148,173,.14)', rows: [], isCctv: false };
+    if (psel) {
+      const [c, ch] = pill(psel.statusKey);
+      const kindLabel = { cctv: 'CCTV', vms: 'VMS', fo: 'Koneksi FO', gps: 'GPS Kendaraan', gate: 'Gerbang Tol', wim: 'Site WIM', sos: 'SOS' }[psel.kind] || 'Aset';
+      const subKey = { cctv: 'Lokasi', vms: 'IP Address', fo: 'Koneksi', gps: 'Info', gate: 'Catatan', wim: 'Device', sos: 'Lokasi' }[psel.kind] || 'Detail';
+      petaDetail = { title: psel.title, kindLabel, statusLabel: psel.statusLabel, color: c, chip: ch, isCctv: psel.kind === 'cctv', rows: [{ k: 'Jenis', v: kindLabel }, { k: 'Ruas', v: bc }, { k: 'Status', v: psel.statusLabel }, { k: subKey, v: psel.sub }] };
+    }
+    const petaEmpty = s.petaMode === 'empty', petaShowList = s.petaMode === 'list', petaShowDetail = s.petaMode === 'detail';
+
+    const roleMap = {}; this.roleCatalog.forEach(r => { roleMap[r[0]] = r; });
+    const uTabDef = [['pengguna', 'Pengguna', 'users'], ['role', 'Role & Permission', 'shield'], ['menu', 'Hak Akses Menu', 'list-tree']];
+    const userTabs = uTabDef.map(([id, label, icon]) => ({ id, label, iconUrl: this.ic(icon), tint: s.usersTab === id ? '#fff' : 'var(--text-muted)', bg: s.usersTab === id ? accent : 'transparent', onClick: () => this.setState({ usersTab: id }) }));
+    const uShowPengguna = s.usersTab === 'pengguna', uShowRole = s.usersTab === 'role', uShowMenu = s.usersTab === 'menu';
+    const uq = (s.userQ || '').toLowerCase();
+    const mkRoleChips = (codes) => codes.map(c => ({ label: roleMap[c] ? roleMap[c][1] : c, isAdmin: c === 'super_admin' }));
+    const usersView = this.userList.filter(u => !uq || u.username.toLowerCase().includes(uq) || u.full.toLowerCase().includes(uq) || u.email.toLowerCase().includes(uq)).map((u, i) => {
+      const [sc2, sch2] = u.active ? ['var(--sem-green)', 'rgba(52,211,153,.16)'] : ['var(--st-gray)', 'rgba(120,140,170,.18)'];
+      return { ...u, initials: u.full.split(' ').map(w => w[0]).slice(0, 2).join(''), roleChips: mkRoleChips(u.roles), scopeText: u.scopes.join(', '), statusLabel: u.active ? 'Aktif' : 'Nonaktif', stColor: sc2, stChip: sch2, srcLabel: u.src === 'rbac' ? 'RBAC' : 'Legacy', selBg: this.userList[s.selUser] === u ? 'var(--nav-active-bg)' : 'transparent', onClick: () => this.setState({ selUser: this.userList.indexOf(u) }) };
+    });
+    const su = this.userList[s.selUser] || this.userList[0];
+    const suPerms = su.roles.includes('super_admin') ? ['Seluruh permission (*)'] : Array.from(new Set(su.roles.flatMap(r => (roleMap[r] ? roleMap[r][3] : []))));
+    const selU = { ...su, initials: su.full.split(' ').map(w => w[0]).slice(0, 2).join(''), roleChips: mkRoleChips(su.roles), perms: suPerms, statusLabel: su.active ? 'Aktif' : 'Nonaktif', stColor: su.active ? 'var(--sem-green)' : 'var(--st-gray)', stChip: su.active ? 'rgba(52,211,153,.16)' : 'rgba(120,140,170,.18)', srcLabel: su.src === 'rbac' ? 'RBAC' : 'Legacy', rows: [{ k: 'Username', v: su.username }, { k: 'Nama Lengkap', v: su.full }, { k: 'Email', v: su.email }, { k: 'Legacy Role', v: su.legacy }, { k: 'Subject ID', v: su.sub }, { k: 'Diperbarui', v: su.updated }] };
+    const roleCards = this.roleCatalog.map(([code, label, desc, perms, icon]) => ({ code, label, desc, iconUrl: this.ic(icon), isAdmin: code === 'super_admin', perms, permCount: perms[0] === '*' ? 'Semua' : String(perms.length), userCount: String(this.userList.filter(u => u.roles.includes(code)).length) }));
+    const gateTone = { module: ['var(--st-blue)', 'rgba(91,141,255,.16)'], permission: ['var(--sem-amber)', 'rgba(217,160,20,.16)'], none: ['var(--st-gray)', 'rgba(120,140,170,.18)'] };
+    const menuRows = this.menuTree.map(m => { const [gc, gch] = gateTone[m.gateType]; return { ...m, isSub: m.level === 2, indent: m.level === 2 ? '26px' : '0px', typeLabel: m.level === 1 ? 'Kategori' : 'Submenu', gateColor: gc, gateChip: gch, statusLabel: m.active ? 'Aktif' : 'Nonaktif', stColor: m.active ? 'var(--sem-green)' : 'var(--st-gray)', stChip: m.active ? 'rgba(52,211,153,.16)' : 'rgba(120,140,170,.18)', iconUrl: this.ic(m.level === 1 ? 'folder' : 'file') }; });
+
+    return {
+      isLogin: !s.loggedIn, isApp: s.loggedIn,
+      isDashboard: s.screen === 'dashboard', isPeta: s.screen === 'peta', isCctv: s.screen === 'cctv', isSos: s.screen === 'sos', isWim: s.screen === 'wim', isUsers: s.screen === 'users', isPengaturan: s.screen === 'pengaturan',
+      userTabs, uShowPengguna, uShowRole, uShowMenu, addLabel: uShowMenu ? 'Tambah Menu' : 'Tambah Pengguna', showAddBtn: !uShowRole, users: usersView, userCount: usersView.length, onUserSearch: (e) => this.setState({ userQ: e.target.value }),
+      selU, roleCards, menuRows,
+      sideOpen: s.sideOpen, sideW: s.sideOpen ? '236px' : '66px', sideJustify: s.sideOpen ? 'flex-start' : 'center', navPad: s.sideOpen ? '11px 14px 11px 20px' : '11px 0', toggleSide: () => this.setState(st => ({ sideOpen: !st.sideOpen })), toggleLabel: s.sideOpen ? 'Sembunyikan menu' : '', toggleIcon: this.ic(s.sideOpen ? 'panel-left-close' : 'panel-left-open'),
+      mapFull: s.mapFull, petaFs: s.mapFull ? 'position:fixed;inset:0;z-index:200;height:100vh;background:var(--app-bg)' : '', toggleMapFull: () => this.setState(st => ({ mapFull: !st.mapFull, uiVisible: true, mapLayersOpen: false, petaMode: 'empty', petaListKey: null, petaSel: null })), mapFsIcon: this.ic(s.mapFull ? 'minimize' : 'maximize'),
+      uiOpacity: s.uiVisible ? '1' : '0', uiEvents: s.uiVisible ? 'auto' : 'none',
+      cctvTiles: s.cctvFull ? cameras.slice(0, s.cctvLayout) : cameras,
+      cctvBodyStyle: s.cctvFull ? 'padding:14px;background:var(--app-bg);overflow:hidden;min-height:0' : 'overflow-y:auto;padding:14px 18px;background:var(--app-bg)',
+      cctvGridStyle: s.cctvFull ? 'height:100%;grid-template-rows:repeat(' + cctvCols + ',1fr)' : '',
+      cctvTileStyle: s.cctvFull ? 'min-height:0;' : 'aspect-ratio:16/9;',
+      cctvFull: s.cctvFull, cctvNotFull: !s.cctvFull, cctvFs: s.cctvFull ? 'position:fixed;inset:0;z-index:200;height:100vh;background:var(--app-bg)' : '',
+      toggleCctvFull: () => this.setState(st => ({ cctvFull: !st.cctvFull, cctvListOpen: false, uiVisible: true })),
+      cctvFsIcon: this.ic(s.cctvFull ? 'minimize' : 'maximize'),
+      cctvListOpen: s.cctvListOpen, toggleCctvList: () => this.setState(st => ({ cctvListOpen: !st.cctvListOpen })),
+      cctvTabLeft: (s.cctvFull && s.cctvListOpen) ? '250px' : '0px',
+      cctvLeftStyle: !s.cctvFull ? '' : (s.cctvListOpen ? 'position:absolute;left:0;top:0;bottom:0;z-index:6;box-shadow:2px 0 28px rgba(0,0,0,.35)' : 'display:none'),
+      mapLayersOpen: s.mapLayersOpen, toggleMapLayers: () => this.setState(st => ({ mapLayersOpen: !st.mapLayersOpen })), petaTabLeft: (s.mapFull && s.mapLayersOpen) ? '250px' : '0px',
+      petaListItems, petaListTitle, petaListIcon, petaListCount, petaDetail, petaEmpty, petaShowList, petaShowDetail,
+      onPetaSearch: (e) => this.setState({ petaSearch: e.target.value }),
+      backToList: () => this.setState({ petaMode: s.petaListKey ? 'list' : 'empty', petaSel: null }),
+      closePeta: () => this.setState({ petaMode: 'empty', petaListKey: null, petaSel: null }),
+      petaLeftStyle: !s.mapFull ? '' : (s.mapLayersOpen ? 'position:absolute;left:0;top:0;bottom:0;z-index:6;box-shadow:2px 0 28px rgba(0,0,0,.55)' : 'display:none'),
+      petaRightStyle: !s.mapFull ? '' : (s.petaMode !== 'empty' ? 'position:absolute;right:0;top:0;bottom:0;z-index:6;box-shadow:-2px 0 28px rgba(0,0,0,.55)' : 'display:none'),
+      themeAttr, toggleTheme: () => this.setState(st => ({ theme: ((st.theme || this.props.theme || 'Gelap') === 'Terang') ? 'Gelap' : 'Terang' })), themeIcon: this.ic(theme === 'Terang' ? 'moon' : 'sun'),
+      accent, pad, mapBg, now: s.now, nav, sosCount, sosActive: sosCount > 0, sosLatest: open[open.length - 1] ? (open[open.length - 1].no + ' · ' + open[open.length - 1].type) : '',
+      screenTitle: { dashboard: 'Dashboard Operasi', peta: 'Peta Sebaran Aset', cctv: 'Streaming CCTV', sos: 'SOS Smart Response', wim: 'Monitoring WIM', users: 'Pengguna & Akses', pengaturan: 'Pengaturan' }[s.screen],
+      branchLabel: this.branches[s.branch],
+      doLogin: () => this.setState({ loggedIn: true, screen: 'dashboard' }), logout: () => this.setState({ loggedIn: false }),
+      goPeta: () => this.go('peta'), goSos: () => this.go('sos'), goWim: () => this.go('wim'),
+      kpis, gateAlerts, gateCount: this.gateAlerts.length, events: this.events, sosList, tickets, wimBars, legend, dashMarkers, mapMarkers, layers,
+      cameras, camOnline, camOffline, cctvCols, layoutBtns,
+      sel, selCandidates, selTimeline: sel0.timeline,
+      wimSites, wimCards, trend,
+      setTabs, setRows, setTitle: cur.title, setDesc: cur.desc
+    };
+  }
+}
+</script>
+</body>
+</html>

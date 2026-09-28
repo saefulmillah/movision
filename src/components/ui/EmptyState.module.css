@@ -1,0 +1,46 @@
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 100%;
+  min-height: 320px;
+  text-align: center;
+  color: var(--text-muted);
+  padding: 40px;
+}
+
+.iconWrap {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--r-2xl);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  color: var(--text-faint);
+}
+
+.title {
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.desc {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  max-width: 420px;
+  line-height: 1.55;
+}
+
+.badge {
+  margin-top: 4px;
+  padding: 4px 10px;
+  border-radius: var(--r-sm);
+  background: var(--nav-active-bg);
+  color: var(--st-blue);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}

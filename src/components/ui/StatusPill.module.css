@@ -1,0 +1,41 @@
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: var(--r-sm);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+/* Peta status → warna teks + latar alpha ~16% */
+.green {
+  color: var(--st-green);
+  background: rgba(52, 211, 153, 0.16);
+}
+.amber {
+  color: var(--st-amber);
+  background: rgba(217, 160, 20, 0.16);
+}
+.red {
+  color: var(--st-red);
+  background: rgba(244, 63, 94, 0.16);
+}
+.blue {
+  color: var(--st-blue);
+  background: rgba(91, 141, 255, 0.16);
+}
+.gray {
+  color: var(--st-gray);
+  background: rgba(120, 140, 170, 0.18);
+}

@@ -1,0 +1,75 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(9, 16, 30, 0.55);
+  backdrop-filter: blur(2px);
+  animation: overlayIn var(--t-fade);
+}
+.content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 101;
+  width: min(92vw, 460px);
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-1);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-2xl);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  animation: contentIn var(--t-panel);
+  overflow: hidden;
+}
+.head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--line);
+  flex: none;
+}
+.title {
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  color: var(--text);
+}
+.close {
+  margin-left: auto;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--r-md);
+  color: var(--text-muted);
+}
+.close:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.body {
+  padding: 18px;
+  overflow: auto;
+}
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 18px;
+  border-top: 1px solid var(--line);
+  flex: none;
+}
+
+@keyframes overlayIn {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes contentIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -46%) scale(0.98);
+  }
+}

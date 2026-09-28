@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cuaca Error / Offline">
+  <title>Cuaca - Error / Offline</title>
+  <!-- Icon path supplied by Lucide v0.469.0, ISC License. -->
+  <defs>
+    <filter id="marker-shadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="2" stdDeviation="1.8" flood-color="#0F172A" flood-opacity="0.24" />
+    </filter>
+  </defs>
+  
+  
+  <circle cx="32" cy="32" r="23" fill="#9CA3AF" opacity="0.14" />
+  <circle cx="32" cy="32" r="20.5" fill="#FFFFFF" filter="url(#marker-shadow)" />
+  <circle cx="32" cy="32" r="20.5" stroke="#9CA3AF" stroke-width="3" />
+  <circle cx="32" cy="32" r="16.5" fill="#E5E7EB" opacity="0.5" />
+  <g color="#9CA3AF">
+    <svg x="16" y="16" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 2v2" />
+  <path d="m4.93 4.93 1.41 1.41" />
+  <path d="M20 12h2" />
+  <path d="m19.07 4.93-1.41 1.41" />
+  <path d="M15.947 12.65a4 4 0 0 0-5.925-4.128" />
+  <path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z" />
+  </svg>
+    
+  </g>
+</svg>

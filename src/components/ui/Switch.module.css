@@ -1,0 +1,35 @@
+.switch {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--track);
+  border: 1px solid var(--line-strong);
+  cursor: pointer;
+  flex: none;
+  transition: background var(--t-fast), border-color var(--t-fast);
+}
+.switch[data-state="checked"] {
+  background: var(--st-blue);
+  border-color: var(--st-blue);
+}
+.switch:focus-visible {
+  outline: 2px solid var(--focus-border);
+  outline-offset: 2px;
+}
+.thumb {
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  transform: translateY(-50%);
+  transition: transform var(--t-fast);
+  will-change: transform;
+}
+.thumb[data-state="checked"] {
+  transform: translateY(-50%) translateX(16px);
+}

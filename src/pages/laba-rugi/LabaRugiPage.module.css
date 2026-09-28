@@ -1,0 +1,380 @@
+/* Halaman Laba Rugi — tabel keuangan padat 3 tampilan.
+   Memakai design token TollSentra; tint regional diturunkan via color-mix
+   dari token semantik agar otomatis mengikuti tema terang/gelap. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  height: 100%;
+  min-height: 0;
+  background: var(--app-bg);
+
+  /* Skala teks tabel (A-/A+) */
+  --lr-fs: 13.5px;
+
+  /* Header laporan (navy tetap di kedua tema, teks putih) */
+  --lr-brand: #1e4c87;
+  --lr-brand-2: #16386b;
+  --lr-brand-ink: #eaf1fb;
+
+  /* Tint per regional/kelompok */
+  --lr-JKT: color-mix(in srgb, var(--sem-sky) 24%, var(--surface-1));
+  --lr-SUMBAGSEL: color-mix(in srgb, var(--sem-amber) 26%, var(--surface-1));
+  --lr-SUMBAGTENG: color-mix(in srgb, var(--sem-green) 22%, var(--surface-1));
+  --lr-SUMBAGUT: color-mix(in srgb, var(--sem-amber) 12%, var(--surface-1));
+  --lr-JTTS: color-mix(in srgb, var(--text-muted) 22%, var(--surface-1));
+  --lr-PBBL: color-mix(in srgb, var(--sem-sky) 14%, var(--surface-1));
+  --lr-DIVISI: color-mix(in srgb, var(--text-muted) 13%, var(--surface-1));
+
+  --lr-section: var(--surface-3);
+  --lr-total: color-mix(in srgb, var(--st-blue) 20%, var(--surface-1));
+}
+
+/* ---------- Header ---------- */
+.header {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--sp-4);
+  flex: none;
+  flex-wrap: wrap;
+  padding-bottom: var(--sp-2);
+  border-bottom: 2px solid var(--lr-brand);
+}
+.titleBox {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.title {
+  margin: 0;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  font-size: var(--fs-2xl);
+  color: var(--text);
+  line-height: 1.05;
+}
+.sub {
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+}
+.sub b {
+  color: var(--text);
+  font-weight: 600;
+}
+.headSpacer {
+  flex: 1 1 auto;
+}
+
+/* ---------- Toolbar (satu baris, minimalis) ---------- */
+.toolbar {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--sp-3);
+  align-items: center;
+  padding: 10px var(--sp-4);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2xl);
+  box-shadow: var(--card-shadow);
+  flex: none;
+  min-width: 0;
+}
+.pills {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+.pill {
+  flex: none;
+  white-space: nowrap;
+  font: inherit;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  border: 1px solid var(--line-strong);
+  background: var(--surface-1);
+  color: var(--text-muted);
+  padding: 7px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all var(--t-fast);
+  user-select: none;
+}
+.pill:hover {
+  border-color: var(--st-blue);
+  color: var(--text);
+}
+.pill[aria-pressed="true"] {
+  background: var(--nav-active-bg);
+  border-color: var(--st-blue);
+  color: var(--nav-active-text);
+}
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+}
+.optRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-sm);
+  color: var(--text-dim);
+  flex: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.sizer {
+  display: inline-flex;
+  gap: 6px;
+  flex: none;
+}
+
+/* ---------- Tabel ---------- */
+.stateBox {
+  flex: 1 1 auto;
+  display: grid;
+  place-items: center;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2xl);
+  min-height: 220px;
+}
+.tableCard {
+  flex: 1 1 auto;
+  min-height: 0;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2xl);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.scroll {
+  overflow: auto;
+  min-height: 0;
+}
+.table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--lr-fs);
+  color: var(--text);
+}
+.table th,
+.table td {
+  padding: 6px 11px;
+  text-align: right;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--line);
+}
+.table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+.hTitle {
+  background: var(--lr-brand);
+  color: var(--lr-brand-ink);
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.03em;
+  font-size: calc(var(--lr-fs) + 1px);
+  padding: 9px 12px;
+}
+.hReg {
+  text-align: center;
+  font-weight: 700;
+  color: var(--text);
+  font-size: calc(var(--lr-fs) - 1px);
+  border-left: 2px solid var(--surface-1);
+}
+.hSub {
+  background: var(--surface-3);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: calc(var(--lr-fs) - 2px);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.cUraian {
+  text-align: left !important;
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--surface-1);
+  font-weight: 500;
+  min-width: 172px;
+}
+.table thead .cUraian {
+  z-index: 5;
+  background: var(--lr-brand-2);
+  color: var(--lr-brand-ink);
+  vertical-align: bottom;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+.rSection td {
+  background: var(--lr-section);
+  font-weight: 700;
+}
+.rSection .cUraian {
+  background: var(--lr-section);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.rTotal td {
+  background: var(--lr-total);
+  font-weight: 700;
+}
+.rTotal .cUraian {
+  background: var(--lr-total);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.rSub .cUraian {
+  padding-left: 26px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.rHpp td {
+  background: var(--lr-brand-2);
+  color: var(--lr-brand-ink);
+  font-weight: 700;
+  border-bottom: 0;
+}
+.rHpp .cUraian {
+  background: var(--lr-brand-2);
+  color: var(--lr-brand-ink);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.real {
+  font-weight: 600;
+  border-right: 1px solid var(--line);
+}
+.rkap {
+  color: var(--text-muted);
+}
+.rSection .rkap,
+.rTotal .rkap {
+  opacity: 0.72;
+}
+.rHpp .rkap,
+.rHpp .real {
+  color: var(--lr-brand-ink);
+}
+.neg {
+  color: var(--sem-red) !important;
+}
+.grp {
+  border-left: 2px solid var(--line-strong);
+}
+.hReg.grp {
+  border-left: 2px solid var(--surface-1);
+}
+
+/* ---------- Catatan kaki ---------- */
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  flex: none;
+}
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.sw {
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+/* ---------- Modal validasi ---------- */
+.validation {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.valSummary {
+  padding: 10px 12px;
+  border-radius: var(--r-lg);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+.valOk {
+  background: color-mix(in srgb, var(--sem-green) 16%, var(--surface-1));
+  color: var(--st-green);
+}
+.valWarn {
+  background: color-mix(in srgb, var(--sem-red) 14%, var(--surface-1));
+  color: var(--st-red);
+}
+.valList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+.valList li {
+  display: flex;
+  gap: 8px;
+  font-size: var(--fs-sm);
+  color: var(--text-dim);
+  line-height: 1.45;
+}
+.valMark {
+  flex: none;
+  font-weight: 700;
+}
+.valPass .valMark {
+  color: var(--st-green);
+}
+.valFail .valMark {
+  color: var(--st-red);
+}
+.valDetail {
+  color: var(--text-muted);
+}
+
+/* ---------- Mode layar penuh ---------- */
+/* Saat elemen halaman masuk fullscreen, beri padding + background agar tidak
+   mepet ke tepi layar dan konten tetap bisa digulir. */
+.page:fullscreen {
+  padding: var(--sp-6);
+  overflow: auto;
+  background: var(--app-bg);
+}
+.page:-webkit-full-screen {
+  padding: var(--sp-6);
+  overflow: auto;
+  background: var(--app-bg);
+}

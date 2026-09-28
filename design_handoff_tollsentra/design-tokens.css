@@ -1,0 +1,187 @@
+/* ============================================================
+   TollSentra Control Center — Design Tokens
+   Sumber: mockup TollSentra.dc.html
+   Versi 1.0 · 13 Agustus 2026
+
+   CARA PAKAI
+   1. Impor berkas ini sekali di entry point aplikasi.
+   2. Pasang atribut data-theme pada elemen pembungkus aplikasi:
+        <div id="app" data-theme="dark">  atau  data-theme="light"
+   3. Elemen pembungkus WAJIB menetapkan background dan color:
+        #app { background: var(--app-bg); color: var(--text); }
+      Tanpa ini, teks yang mewarisi warna tidak ikut berganti saat
+      tema diubah.
+   4. Dilarang menulis nilai warna literal di komponen.
+      Semua warna melalui token di bawah.
+   ============================================================ */
+
+:root,
+[data-theme="dark"] {
+  /* Permukaan */
+  --app-bg:        #133A73;
+  --surface-1:     #1E4C87;
+  --surface-2:     rgba(39, 84, 143, .78);
+  --surface-3:     rgba(30, 72, 130, .62);
+  --track:         rgba(210, 225, 250, .16);
+
+  /* Teks */
+  --text:          #EAF1FB;
+  --text-dim:      #C8D6EE;
+  --text-muted:    #93A8C9;
+  --text-faint:    #6F88AE;
+
+  /* Garis */
+  --line-soft:     rgba(150, 185, 230, .10);
+  --line:          rgba(150, 185, 230, .16);
+  --line-strong:   rgba(150, 185, 230, .26);
+
+  /* Peta */
+  --map-bg:        #102F5C;
+  --grid:          rgba(130, 170, 230, .09);
+  --marker-ring:   rgba(10, 17, 32, .85);
+  --marker-glow:   13px;
+
+  /* Tile video CCTV — sengaja gelap di KEDUA tema */
+  --tile-1:        rgba(9, 26, 54, .66);
+  --tile-2:        rgba(24, 52, 96, .66);
+
+  /* Teks di atas scrim gelap — terang di KEDUA tema */
+  --on-scrim:      #EAF1FB;
+  --on-scrim-dim:  rgba(228, 238, 252, .72);
+
+  /* Strip SOS */
+  --sos-bg:        linear-gradient(90deg, rgba(244,63,94,.22), rgba(244,63,94,.06));
+  --sos-border:    rgba(244, 63, 94, .30);
+  --sos-text:      #FFD7DD;
+  --sos-sub:       #F7A9B4;
+
+  /* Semantik status */
+  --sem-green:     #34D399;
+  --sem-amber:     #FBBF24;
+  --sem-red:       #F43F5E;
+  --sem-rose:      #FB7185;
+  --sem-cyan:      #22D3EE;
+  --sem-purple:    #A78BFA;
+  --sem-sky:       #38BDF8;
+  --sem-slate:     #8496B0;
+
+  /* Status teks (varian kontras untuk teks kecil) */
+  --st-green:      var(--sem-green);
+  --st-amber:      var(--sem-amber);
+  --st-red:        var(--sem-rose);
+  --st-blue:       #7EA6FF;
+  --st-gray:       #A4B5D2;
+
+  /* Elevasi & state */
+  --card-shadow:      0 1px 2px rgba(0, 0, 0, .18);
+  --nav-active-bg:    rgba(90, 141, 255, .16);
+  --nav-active-text:  #EAF1FB;
+  --overlay-bg:       rgba(10, 15, 26, .85);
+}
+
+[data-theme="light"] {
+  --app-bg:        #EDF0F5;
+  --surface-1:     #F8FAFC;
+  --surface-2:     #FCFDFE;
+  --surface-3:     #F1F4F9;
+  --track:         #E3E8EF;
+
+  --text:          #2E3D4F;
+  --text-dim:      #586878;
+  --text-muted:    #76859A;
+  --text-faint:    #9AA8B9;
+
+  --line-soft:     rgba(45, 65, 95, .045);
+  --line:          #E4E9EF;
+  --line-strong:   #D8DFE7;
+
+  --map-bg:        #E6EBF2;
+  --grid:          rgba(90, 120, 165, .05);
+  --marker-ring:   #F8FAFC;
+  --marker-glow:   0px;
+
+  /* tetap gelap — tile merepresentasikan layar video */
+  --tile-1:        #1E242E;
+  --tile-2:        #262E3A;
+
+  /* tetap terang — teks berada di atas scrim gelap */
+  --on-scrim:      #F2F6FB;
+  --on-scrim-dim:  rgba(240, 246, 252, .80);
+
+  --sos-bg:        #FCF5F6;
+  --sos-border:    #EDD9DC;
+  --sos-text:      #B45360;
+  --sos-sub:       #AE7C84;
+
+  --sem-green:     #2E9C77;
+  --sem-amber:     #B8891C;
+  --sem-red:       #C4525F;
+  --sem-rose:      #C05C6C;
+  --sem-cyan:      #2189A0;
+  --sem-purple:    #7A64C4;
+  --sem-sky:       #3690BE;
+  --sem-slate:     #79879A;
+
+  --st-green:      #2E9C77;
+  --st-amber:      #A8801F;
+  --st-red:        #C4525F;
+  --st-blue:       #3C63B4;
+  --st-gray:       #6B7A8D;
+
+  --card-shadow:      0 1px 3px rgba(40, 60, 90, .05);
+  --nav-active-bg:    #E8EEF9;
+  --nav-active-text:  #2E5794;
+  --overlay-bg:       rgba(252, 253, 254, .92);
+}
+
+/* ============================================================
+   SKALA NON-WARNA
+   ============================================================ */
+:root {
+  /* Tipografi */
+  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --fs-micro:  10.5px;  /* metadata, kode kecil */
+  --fs-xs:     11px;    /* label tabel, pill */
+  --fs-sm:     12px;    /* keterangan */
+  --fs-base:   12.5px;  /* teks tabel */
+  --fs-body:   13px;    /* teks utama */
+  --fs-md:     13.5px;  /* label menu */
+  --fs-lg:     14px;    /* judul kartu */
+  --fs-xl:     16px;    /* judul layar */
+  --fs-2xl:    20px;    /* judul detail */
+  --fs-kpi:    27px;    /* angka KPI */
+
+  /* Radius */
+  --r-sm:  5px;   /* pill, chip */
+  --r-md:  8px;   /* tombol ikon */
+  --r-lg:  9px;   /* tombol, input */
+  --r-xl:  10px;  /* tile, tab kontainer */
+  --r-2xl: 12px;  /* kartu */
+
+  /* Jarak */
+  --sp-1:  4px;
+  --sp-2:  8px;
+  --sp-3:  12px;
+  --sp-4:  14px;   /* gap grid CCTV & padding layar penuh */
+  --sp-5:  16px;   /* padding kartu */
+  --sp-6:  18px;
+  --sp-7:  22px;   /* padding halaman (mode nyaman) */
+
+  /* Lebar tetap */
+  --w-sidebar:        236px;
+  --w-sidebar-collapsed: 66px;
+  --w-panel-left:     250px;
+  --w-panel-right:    288px;
+  --w-panel-sos:      300px;
+  --w-panel-user:     320px;
+  --w-panel-settings: 230px;
+  --h-topbar:         60px;
+
+  /* Transisi */
+  --t-fast:   .15s ease;
+  --t-panel:  .18s ease;
+  --t-fade:   .25s ease;
+  --t-idle:   2600ms;   /* jeda auto-hide panel mengambang */
+}
