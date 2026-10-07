@@ -20,15 +20,15 @@
   gap: 12px;
   flex-wrap: wrap;
   flex: none;
-  border-bottom: 2px solid var(--st-blue);
+  border-bottom: 2px solid #1e4c87;
   padding-bottom: 8px;
 }
 .title {
   margin: 0;
-  font-size: 23px;
+  font-size: 25px;
   font-weight: 800;
   letter-spacing: -0.01em;
-  color: var(--st-blue);
+  color: var(--text);
 }
 .sub {
   color: var(--text-muted);
@@ -36,6 +36,17 @@
   font-weight: 500;
 }
 .sub b {
+  color: var(--text);
+}
+.spacer {
+  flex: 1 1 auto;
+}
+.note {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.note b {
   color: var(--text);
 }
 
@@ -102,11 +113,11 @@
   display: inline-block;
 }
 .swRkap {
-  background: color-mix(in srgb, var(--st-blue) 45%, var(--surface-1));
-  border: 1px solid var(--st-blue);
+  background: #7e97c4;
+  border: 1px solid #5f79ad;
 }
 .swReal {
-  background: var(--sem-red);
+  background: #e0a32e;
 }
 .dots {
   display: inline-flex;

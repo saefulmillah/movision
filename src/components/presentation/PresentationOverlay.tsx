@@ -115,11 +115,19 @@ export function PresentationOverlay() {
 
   if (p.mode !== "present") return null;
 
+  // Nomor "Bagian" dinamis — mengikuti urutan sampul bagian yang aktif.
+  const SECTION_COVERS = ["lr-cover", "risk-cover", "pend-cover"];
+  const sectionNo = (coverKey: string) => {
+    const active = p.activeSlides.filter((id) => SECTION_COVERS.includes(id));
+    const idx = active.indexOf(coverKey);
+    return idx >= 0 ? idx + 1 : 1;
+  };
+
   const renderSlide = () => {
     if (key === "title") {
       return (
         <CoverSlide
-          kicker="Movision · Control Center"
+          kicker="Movision"
           title={p.meetingTitle || "Rapat Direktorat"}
           sub={p.meetingSubtitle}
           facts={facts.title}
@@ -139,7 +147,7 @@ export function PresentationOverlay() {
     if (key === "lr-cover") {
       return (
         <CoverSlide
-          kicker="Bagian 1"
+          kicker={`Bagian ${sectionNo("lr-cover")}`}
           title="Laba Rugi"
           sub="Realisasi terhadap RKAP — konsolidasi, per regional, dan per ruas."
           facts={facts["lr-cover"]}
@@ -149,7 +157,7 @@ export function PresentationOverlay() {
     if (key === "risk-cover") {
       return (
         <CoverSlide
-          kicker="Bagian 2"
+          kicker={`Bagian ${sectionNo("risk-cover")}`}
           title="Manajemen Risiko"
           sub="Top Risk Divisi pada peta risiko 5×5 beserta nilai eksposur tiap tahapan."
           facts={facts["risk-cover"]}
@@ -168,7 +176,7 @@ export function PresentationOverlay() {
     if (key === "pend-cover") {
       return (
         <CoverSlide
-          kicker="Bagian 3"
+          kicker={`Bagian ${sectionNo("pend-cover")}`}
           title="Pendapatan"
           sub="Pencapaian pendapatan tol dan lainnya terhadap RKAP."
           facts={facts["pend-cover"]}

@@ -26,8 +26,9 @@ export function PendapatanOverviewSlide({ data, periodLabel }: PendapatanOvervie
     <div className={styles.slide}>
       <div className={styles.head}>
         <h1 className={styles.title}>Pendapatan Tol dan Lainnya</h1>
-        <span className={styles.sub}>
-          {monthLabel} dan {sdLabel}
+        <span className={styles.spacer} />
+        <span className={styles.note}>
+          Pendapatan <b>(dalam juta)</b>
         </span>
       </div>
 

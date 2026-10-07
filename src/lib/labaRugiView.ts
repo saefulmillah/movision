@@ -138,9 +138,11 @@ export function buildColumns(data: PeriodData, view: LrView): LrColumn[] {
     // Bulan TERBARU = bulan berjalan/proyeksi → sub-kolom realisasi diberi label "RKK".
     const keys = Object.keys(data.konsol);
     const latest = Math.max(-1, ...keys.map(monthOrder));
-    return keys.map((k) => ({
+    // Warna kolom berbeda-beda per periode (biar mudah dibedakan).
+    const KONSOL_TINTS = ["JKT", "SUMBAGTENG", "SUMBAGSEL", "SUMBAGUT"];
+    return keys.map((k, i) => ({
       label: k.replace(/ 20\d\d$/, ""),
-      tint: /^SD/i.test(k) ? "JTTS" : "DIVISI",
+      tint: KONSOL_TINTS[i % KONSOL_TINTS.length],
       data: data.konsol[k],
       code: k,
       realLabel: monthOrder(k) === latest && latest >= 0 ? "RKK" : "REAL"
@@ -160,7 +162,7 @@ export function buildColumns(data: PeriodData, view: LrView): LrColumn[] {
 }
 
 export const LR_FOOTNOTES: Record<LrView, string> = {
-  konsol: "Kolom Total resmi = JKT + JTTS + PBBL + DIVISI (pusat).",
+  konsol: "",
   regional: "JTTS sudah mencakup 3 regional Sumatra (SUMBAGSEL + SUMBAGTENG + SUMBAGUT).",
   ruas: "Ruas dikelompokkan per regional (warna). JTTS = SUMBAGSEL + SUMBAGTENG + SUMBAGUT."
 };

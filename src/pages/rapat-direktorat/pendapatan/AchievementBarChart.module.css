@@ -3,10 +3,11 @@
 
 .scroll,
 .fitWrap {
-  /* Palet chart lokal (auto-tema) */
-  --pd-rkap: color-mix(in srgb, var(--st-blue) 45%, var(--surface-1));
-  --pd-brand-2: var(--st-blue);
-  --pd-real: var(--sem-red);
+  /* Palet chart "Navy–Emas": RKAP navy lembut, Realisasi emas. */
+  --pd-rkap: #7e97c4;
+  --pd-brand-2: #5f79ad; /* stroke batang RKAP */
+  --pd-real: #e0a32e; /* batang Realisasi (emas) */
+  --pd-real-ink: #a9761a; /* teks nilai Realisasi (emas tua, lebih terbaca) */
 }
 
 /* Varian halaman: bisa scroll horizontal bila sempit. */
@@ -66,7 +67,7 @@
 }
 .valReal {
   font-weight: 700;
-  fill: var(--pd-real);
+  fill: var(--pd-real-ink);
 }
 .pct {
   font-size: 12px;

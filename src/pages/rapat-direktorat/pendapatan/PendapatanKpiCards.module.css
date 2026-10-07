@@ -1,15 +1,41 @@
 /* Enam kartu KPI compact Pendapatan — dipakai bersama halaman & slide. */
 
+/* Dua grup berheader: "Periode Ini" & "Kumulatif s.d" (masing-masing 3 kartu). */
+.kpiGroups {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 900px) {
+  .kpiGroups {
+    grid-template-columns: 1fr;
+  }
+}
+.kpiGroupHead {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding-bottom: 5px;
+  margin-bottom: 8px;
+  border-bottom: 2px solid var(--st-blue);
+}
+.kpiGroupTitle {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--st-blue);
+}
+.kpiGroupSub {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
 .kpiRow {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
-}
-/* Halaman: bungkus ke baris lebih sedikit pada layar sempit (slide selalu lebar). */
-@media (max-width: 1100px) {
-  .kpiRow {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
 }
 @media (max-width: 640px) {
   .kpiRow {

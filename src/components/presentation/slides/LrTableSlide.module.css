@@ -149,20 +149,30 @@
   top: 53px;
 }
 
-/* Kolom "periode ini" muncul dgn fade + kilat saat dibuka. */
+/* Kolom "periode ini": highlight biru transparan permanen (overlay inset agar tampil
+   di SEMUA baris, termasuk band section/total), + fade & kilat saat dibuka. */
 .monthCell {
-  animation: lrMonthIn 0.34s ease;
+  box-shadow: inset 0 0 0 999px color-mix(in srgb, var(--st-blue) 9%, transparent);
+  animation: lrMonthIn 0.45s ease;
 }
 @keyframes lrMonthIn {
   0% {
     opacity: 0;
-    background: var(--lr-item-blink);
+    box-shadow: inset 0 0 0 999px color-mix(in srgb, var(--st-blue) 32%, transparent);
+  }
+  30% {
+    opacity: 1;
+    box-shadow: inset 0 0 0 999px color-mix(in srgb, var(--st-blue) 32%, transparent);
   }
   55% {
-    background: var(--lr-item-blink);
+    box-shadow: inset 0 0 0 999px color-mix(in srgb, var(--st-blue) 9%, transparent);
+  }
+  78% {
+    box-shadow: inset 0 0 0 999px color-mix(in srgb, var(--st-blue) 30%, transparent);
   }
   100% {
     opacity: 1;
+    box-shadow: inset 0 0 0 999px color-mix(in srgb, var(--st-blue) 9%, transparent);
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -194,6 +204,12 @@
   font-weight: 600;
 }
 .neg {
+  color: var(--sem-red);
+}
+/* Nilai negatif tetap merah walau di baris section/total/item (yang meng-override warna). */
+.rSection .num.neg,
+.rTotal .num.neg,
+.rItem .num.neg {
   color: var(--sem-red);
 }
 
