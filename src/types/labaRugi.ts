@@ -65,6 +65,8 @@ export type EntityBreakdown = Record<string, BreakdownItem[]>;
 /** Breakdown per entitas (ruas/regional/dll) & per kolom konsol. */
 export interface LrBreakdown {
   entity: Record<string, EntityBreakdown>;
+  /** Breakdown "periode ini" (bulan tunggal) per entitas. */
+  entity_month?: Record<string, EntityBreakdown>;
   konsol: Record<string, EntityBreakdown>;
 }
 
@@ -83,6 +85,10 @@ export interface PeriodData {
   ruas: RuasMeta[];
   total_definition: string[];
   entities: Record<string, EntityData>;
+  /** "Periode ini" (bulan tunggal) per entitas = SD periode ini − SD periode lalu. */
+  entities_month?: Record<string, EntityData>;
+  /** Label bulan tunggal, mis. "September 2026". */
+  period_month_label?: string | null;
   konsol: Record<string, EntityData>;
   breakdown?: LrBreakdown;
   validation?: ValidationResult | null;

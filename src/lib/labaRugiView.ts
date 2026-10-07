@@ -80,18 +80,17 @@ export interface FmtOut {
 }
 export function fmtNum(v: number | null | undefined): FmtOut {
   if (v == null) return { t: "–", neg: false };
-  // Presentasi: tampilkan 2 angka di belakang koma. Nilai yang membulat ke 0,00 → "–".
-  const r = Math.round(v * 100) / 100;
+  // Presentasi: nilai dibulatkan ke bilangan bulat (tanpa desimal).
+  const r = Math.round(v);
   if (r === 0) return { t: "–", neg: false };
   const neg = r < 0;
-  const s = Math.abs(r).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const s = Math.abs(r).toLocaleString("en-US");
   return { t: neg ? `(${s})` : s, neg };
 }
 export function fmtPct(v: number | null | undefined): FmtOut {
   if (v == null) return { t: "–", neg: false };
-  // Presentasi: persentase dengan 2 angka di belakang koma.
-  const s = v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  return { t: `${s}%`, neg: v > 100 };
+  // Presentasi: persentase dibulatkan ke bilangan bulat.
+  return { t: `${Math.round(v)}%`, neg: v > 100 };
 }
 
 function hppOf(d: EntityData): Cell {

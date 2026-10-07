@@ -118,6 +118,58 @@
 .grp {
   border-left: 2px solid var(--line-strong);
 }
+/* Pembatas tipis antara kolom "periode ini" dan "s.d" dalam satu entitas. */
+.grpSub {
+  border-left: 1px dashed var(--line-strong);
+}
+
+/* Header 3-tingkat (Regional/Ruas): entitas → periode → RKAP/REAL. */
+.hEntityClickable {
+  cursor: pointer;
+}
+.entityHead {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.hPeriod {
+  position: sticky;
+  top: 31px;
+  z-index: 3;
+  background: var(--surface-2);
+  color: var(--text-dim);
+  font-weight: 700;
+  font-size: 11.5px;
+  text-align: center;
+  padding: 5px 11px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.grouped .hSub {
+  top: 53px;
+}
+
+/* Kolom "periode ini" muncul dgn fade + kilat saat dibuka. */
+.monthCell {
+  animation: lrMonthIn 0.34s ease;
+}
+@keyframes lrMonthIn {
+  0% {
+    opacity: 0;
+    background: var(--lr-item-blink);
+  }
+  55% {
+    background: var(--lr-item-blink);
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .monthCell {
+    animation: none;
+  }
+}
 
 .uraian {
   position: sticky;

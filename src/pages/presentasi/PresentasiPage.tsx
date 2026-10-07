@@ -13,7 +13,12 @@ export function PresentasiPage() {
   const p = usePresentation();
   const auth = useAuth();
   const toast = useToast();
-  const canManage = auth.hasRole("super_admin");
+  const ACCESS_RANK = { none: 0, read: 1, write: 2, delete: 3 } as const;
+  const presLevel = auth.hasRole("super_admin")
+    ? 3
+    : ACCESS_RANK[(auth.moduleLevel("presentasi") || "none") as keyof typeof ACCESS_RANK] ?? 0;
+  const canUpload = presLevel >= 2; // write
+  const canDelete = presLevel >= 3; // delete
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -165,7 +170,7 @@ export function PresentasiPage() {
             <span className={styles.pdfHeadTitle}>
               <Icon name="file-text" size={15} /> Dokumen PDF
             </span>
-            {canManage && (
+            {canUpload && (
               <>
                 <input ref={fileRef} type="file" accept="application/pdf,.pdf" hidden onChange={handleFile} />
                 <Button
@@ -182,7 +187,7 @@ export function PresentasiPage() {
           </div>
           {p.pdfs.length === 0 ? (
             <div className={styles.pdfEmpty}>
-              Belum ada dokumen PDF.{canManage ? " Unggah PDF — tiap halaman menjadi satu slide." : ""}
+              Belum ada dokumen PDF.{canUpload ? " Unggah PDF — tiap halaman menjadi satu slide." : ""}
             </div>
           ) : (
             <div className={styles.pdfList}>
@@ -203,7 +208,7 @@ export function PresentasiPage() {
                         Tambah ke agenda
                       </Button>
                     )}
-                    {canManage && (
+                    {canDelete && (
                       <Button
                         size="sm"
                         variant="ghost"
