@@ -4,8 +4,9 @@ import { Button, EmptyState, Modal, Select, Switch, Tabs, useToast } from "@/com
 import type { SelectOption, TabItem } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/api";
-import { getPeriod, getPeriods, importPeriod } from "@/lib/labaRugi";
+import { getPeriod, getPeriods, importPeriod, uploadBreakdown } from "@/lib/labaRugi";
 import type {
+  BreakdownMismatch,
   Cell,
   EntityData,
   ImportResult,
@@ -185,6 +186,10 @@ export function LabaRugiPage() {
   const [uploading, setUploading] = useState(false);
   const [validationView, setValidationView] = useState<ValidationResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const breakdownInputRef = useRef<HTMLInputElement>(null);
+  const [bdUploading, setBdUploading] = useState(false);
+  // Modal konfirmasi saat rekonsiliasi breakdown menemukan selisih.
+  const [reconModal, setReconModal] = useState<{ mismatches: BreakdownMismatch[]; file: File } | null>(null);
   const pageRef = useRef<HTMLDivElement>(null);
 
   // Persist preferensi tampilan.
@@ -289,7 +294,11 @@ export function LabaRugiPage() {
     }));
   }, [data, view, regions, konsolCol, showPaltung, sdKonsol]);
 
-  const periodOptions: SelectOption[] = passedPeriods.map((p) => ({ value: p.key, label: p.label }));
+  const periodOptions: SelectOption[] = passedPeriods.map((p) => ({
+    value: p.key,
+    label: p.has_breakdown ? `${p.label} · breakdown ✓` : p.label
+  }));
+  const currentHasBreakdown = periods.find((p) => p.key === period)?.has_breakdown ?? false;
 
   const viewTitle =
     view === "konsol"
@@ -351,6 +360,40 @@ export function LabaRugiPage() {
     }
   }
 
+  async function doUploadBreakdown(file: File, force: boolean) {
+    setBdUploading(true);
+    try {
+      const res = await uploadBreakdown(period, file, force);
+      setReconModal(null);
+      toast.success(
+        "Breakdown tersimpan",
+        res.forced ? `Disimpan dengan ${res.mismatches.length} selisih (dipaksa).` : "Cocok dengan ringkasan."
+      );
+      await loadPeriods();
+      const fresh = await getPeriod(period);
+      setData(fresh);
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 422 && err.payload && typeof err.payload === "object") {
+        const payload = err.payload as { mismatches?: BreakdownMismatch[] };
+        if (Array.isArray(payload.mismatches) && payload.mismatches.length > 0) {
+          setReconModal({ mismatches: payload.mismatches, file });
+        } else {
+          toast.error("Upload breakdown gagal", err.message);
+        }
+      } else {
+        toast.error("Upload breakdown gagal", err instanceof Error ? err.message : "Terjadi kesalahan");
+      }
+    } finally {
+      setBdUploading(false);
+      if (breakdownInputRef.current) breakdownInputRef.current.value = "";
+    }
+  }
+
+  function onBreakdownPicked(file: File | undefined) {
+    if (!file || !period) return;
+    void doUploadBreakdown(file, false);
+  }
+
   /* ---------- render ---------- */
   const tableStyle = { "--lr-fs": `${fs}px` } as CSSProperties;
   const headerColspan = columns.length * 2;
@@ -362,7 +405,8 @@ export function LabaRugiPage() {
         <div className={styles.titleBox}>
           <h1 className={styles.title}>{viewTitle}</h1>
           <div className={styles.sub}>
-            Periode <b>{periodLabel || "—"}</b> · Nilai dalam <b>Rp juta</b> · Sumber: LR_CF_PER_RUAS
+            Periode <b>{periodLabel || "—"}</b> · Nilai dalam <b>Rp juta</b> · Breakdown:{" "}
+            <b>{period ? (currentHasBreakdown ? "ada" : "belum") : "—"}</b>
           </div>
         </div>
         <div className={styles.headSpacer} />
@@ -382,6 +426,22 @@ export function LabaRugiPage() {
               onClick={() => fileInputRef.current?.click()}
             >
               {uploading ? "Mengunggah…" : "Upload Periode"}
+            </Button>
+            <input
+              ref={breakdownInputRef}
+              type="file"
+              accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              hidden
+              onChange={(e) => onBreakdownPicked(e.target.files?.[0])}
+            />
+            <Button
+              variant="secondary"
+              icon={bdUploading ? "loader" : "layers"}
+              disabled={bdUploading || !period}
+              title={!period ? "Pilih periode dulu" : "Upload file breakdown detail untuk periode ini"}
+              onClick={() => breakdownInputRef.current?.click()}
+            >
+              {bdUploading ? "Mengunggah…" : "Upload Breakdown"}
             </Button>
           </>
         )}
@@ -593,6 +653,52 @@ export function LabaRugiPage() {
                   </li>
                 ))}
             </ul>
+          </div>
+        )}
+      </Modal>
+
+      {/* Selisih rekonsiliasi breakdown */}
+      <Modal
+        open={!!reconModal}
+        onOpenChange={(o) => !o && !bdUploading && setReconModal(null)}
+        title="Selisih Rekonsiliasi Breakdown"
+        width={660}
+      >
+        {reconModal && (
+          <div className={styles.validation}>
+            <div className={`${styles.valSummary} ${styles.valWarn}`}>
+              Ditemukan {reconModal.mismatches.length} selisih antara detail dan total ringkasan. Data belum disimpan.
+            </div>
+            <ul className={styles.valList}>
+              {reconModal.mismatches.slice(0, 60).map((m, i) => (
+                <li key={i} className={styles.valFail}>
+                  <span className={styles.valMark}>✕</span>
+                  <span>
+                    <b>
+                      {m.scope === "konsol" ? "Konsol" : m.entity} · {m.parent} · {m.side}
+                    </b>
+                    <span className={styles.valDetail}>
+                      {" "}
+                      — detail {m.breakdown_sum.toLocaleString("id-ID")} vs ringkasan{" "}
+                      {m.summary.toLocaleString("id-ID")} (selisih {m.diff.toLocaleString("id-ID")})
+                    </span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 12 }}>
+              <Button variant="ghost" disabled={bdUploading} onClick={() => setReconModal(null)}>
+                Batal
+              </Button>
+              <Button
+                variant="primary"
+                icon={bdUploading ? "loader" : "save"}
+                disabled={bdUploading}
+                onClick={() => void doUploadBreakdown(reconModal.file, true)}
+              >
+                {bdUploading ? "Menyimpan…" : "Simpan tetap"}
+              </Button>
+            </div>
           </div>
         )}
       </Modal>

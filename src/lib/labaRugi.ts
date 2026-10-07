@@ -1,5 +1,5 @@
 import { api } from "@/lib/api";
-import type { ImportResult, Period, PeriodData } from "@/types/labaRugi";
+import type { BreakdownUploadResult, ImportResult, Period, PeriodData } from "@/types/labaRugi";
 
 /**
  * Daftar periode untuk dropdown.
@@ -26,4 +26,16 @@ export function importPeriod(file: File): Promise<ImportResult> {
   const form = new FormData();
   form.append("file", file);
   return api.post<ImportResult>("/laba-rugi/import", form);
+}
+
+/**
+ * Upload file breakdown detail untuk sebuah periode. Bila rekonsiliasi menemukan
+ * selisih & `force` tidak diset, backend membalas 422 (ApiError.payload berisi
+ * `mismatches`). Dengan `force=true`, tetap disimpan.
+ */
+export function uploadBreakdown(periodKey: string, file: File, force = false): Promise<BreakdownUploadResult> {
+  const form = new FormData();
+  form.append("file", file);
+  if (force) form.append("force", "true");
+  return api.post<BreakdownUploadResult>(`/laba-rugi/${encodeURIComponent(periodKey)}/breakdown`, form);
 }

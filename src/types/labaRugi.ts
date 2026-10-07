@@ -12,10 +12,31 @@ export interface Period {
   key: string;
   label: string;
   validation_passed: boolean;
+  /** Apakah periode ini sudah punya breakdown detail (file kedua). */
+  has_breakdown?: boolean;
   uploaded_at?: string | null;
   source_sheet?: string | null;
   source_file?: string | null;
   unit?: string;
+}
+
+/** Satu selisih rekonsiliasi breakdown vs ringkasan. */
+export interface BreakdownMismatch {
+  scope: string;
+  entity: string;
+  parent: string;
+  side: string;
+  breakdown_sum: number;
+  summary: number;
+  diff: number;
+}
+
+/** Hasil POST /laba-rugi/:periodKey/breakdown. */
+export interface BreakdownUploadResult {
+  saved: boolean;
+  mismatches: BreakdownMismatch[];
+  rows?: number;
+  forced?: boolean;
 }
 
 export type AccountType = "section" | "sub" | "total";
