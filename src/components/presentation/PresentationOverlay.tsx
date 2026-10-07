@@ -97,21 +97,14 @@ export function PresentationOverlay() {
 
   const meetingDateLabel = formatDateId(p.meetingDate);
   const facts = useMemo<Record<string, Fact[]>>(() => {
-    const riskCount = p.snapshot.data?.risk?.risks.length ?? 0;
     const pendRuas = p.snapshot.data?.pend?.lhr.length ?? 0;
     const pendMonth = p.snapshot.data?.pend?.meta.period_label_month;
     const titleFacts: Fact[] = [{ k: "Periode", v: p.periodLabel }];
     if (meetingDateLabel) titleFacts.push({ k: "Tanggal Rapat", v: meetingDateLabel });
     return {
       title: titleFacts,
-      "lr-cover": [
-        { k: "Tampilan", v: "3 sudut pandang" },
-        { k: "Periode", v: p.periodLabel }
-      ],
-      "risk-cover": [
-        { k: "Metode", v: "Peta 5×5" },
-        { k: "Top Risk", v: `${riskCount} risiko` }
-      ],
+      "lr-cover": [{ k: "Periode", v: p.periodLabel }],
+      "risk-cover": [],
       "pend-cover": [
         { k: "Periode", v: pendMonth ? `${pendMonth} & ${p.periodLabel}` : p.periodLabel },
         { k: "Ruas", v: pendRuas ? `${pendRuas} ruas` : "—" },
