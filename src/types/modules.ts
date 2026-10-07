@@ -19,6 +19,8 @@ export interface UserRef {
 }
 
 /* ---------- News ---------- */
+export type ApprovalStatus = "draft" | "pending" | "published" | "rejected";
+
 export interface NewsItem {
   id: number;
   title: string | null;
@@ -33,6 +35,15 @@ export interface NewsItem {
   is_published: boolean;
   published_at: string | null;
   posted_at: string | null;
+  // Approval workflow (maker–checker)
+  approval_status: ApprovalStatus;
+  branch_id: number | null;
+  regional_id: number | null;
+  submitted_by: number | null;
+  submitted_at: string | null;
+  approved_by: number | null;
+  approved_at: string | null;
+  review_note: string | null;
 }
 
 export interface NewsFormValues {

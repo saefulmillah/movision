@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button, Input, Modal, Switch, useToast } from "@/components/ui";
 import { ApiError } from "@/lib/api";
 import { createUser, updateUser } from "@/lib/users";
-import { ROLE_CATALOG } from "@/constants/rbac";
+import { listRoles } from "@/lib/access";
+import type { Role } from "@/types/access";
 import type { Branch } from "@/types/monitoring";
 import type { UserFormValues, UserRecord } from "@/types/users";
 import styles from "./users.module.css";
@@ -35,6 +36,8 @@ export function UserFormModal({ open, mode, user, branches, onClose, onSaved }: 
   const [form, setForm] = useState<UserFormValues>(() => toForm(user));
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [rolesError, setRolesError] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -42,6 +45,34 @@ export function UserFormModal({ open, mode, user, branches, onClose, onSaved }: 
       setErrors({});
     }
   }, [open, user]);
+
+  // Katalog role dinamis dari backend (/api/admin/roles) — sinkron dengan
+  // halaman Manajemen Akses, bukan daftar hardcode.
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    setRolesError(false);
+    listRoles()
+      .then((data) => {
+        if (!cancelled) setRoles(data.filter((r) => r.is_active));
+      })
+      .catch(() => {
+        if (!cancelled) setRolesError(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [open]);
+
+  // Opsi role = role aktif dari server + role terpilih yang mungkin sudah
+  // nonaktif/terhapus (agar assignment lama tetap terlihat saat edit).
+  const roleOptions = useMemo(() => {
+    const list = roles.map((r) => ({ code: r.role_code, label: r.role_name }));
+    for (const code of form.role_codes) {
+      if (!list.some((o) => o.code === code)) list.push({ code, label: code });
+    }
+    return list;
+  }, [roles, form.role_codes]);
 
   const set = <K extends keyof UserFormValues>(k: K, v: UserFormValues[K]) => setForm((f) => ({ ...f, [k]: v }));
   const toggleIn = (arr: (string | number)[], val: string | number) =>
@@ -144,8 +175,9 @@ export function UserFormModal({ open, mode, user, branches, onClose, onSaved }: 
 
       <div className={styles.field}>
         <label className={styles.fieldLabel}>Role</label>
+        {rolesError && <div className={styles.fieldError}>Gagal memuat daftar role.</div>}
         <div className={styles.multi}>
-          {ROLE_CATALOG.map((r) => (
+          {roleOptions.map((r) => (
             <button
               key={r.code}
               type="button"

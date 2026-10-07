@@ -1,29 +1,58 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
-import { Button, EmptyState, Icon, Input, Pagination, Select, StatusPill, useToast } from "@/components/ui";
-import { Modal } from "@/components/ui";
+import { Button, EmptyState, Icon, Input, Modal, Pagination, Select, StatusPill, useToast } from "@/components/ui";
+import type { PillTone } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
+import { useBranch } from "@/context/BranchContext";
 import { backendAsset } from "@/lib/api";
 import { formatDate } from "@/lib/format";
-import { deleteNews, fetchNews, newsCategoryLabel, setNewsPublish } from "@/lib/news";
-import type { NewsItem } from "@/types/modules";
+import { approveNews, deleteNews, fetchNews, newsCategoryLabel, rejectNews, submitNews } from "@/lib/news";
+import type { ApprovalStatus, NewsItem } from "@/types/modules";
 import { NewsFormModal } from "./NewsFormModal";
 import styles from "../modules.module.css";
 
-const COLS = "2.6fr 0.8fr 0.9fr 1fr";
+const COLS = "2.4fr 0.8fr 1fr 1fr";
 const PER_PAGE = 12;
 
 const STATUS_OPTIONS = [
   { value: "all", label: "Semua status" },
-  { value: "1", label: "Terbit" },
-  { value: "0", label: "Draft" }
+  { value: "draft", label: "Draft" },
+  { value: "pending", label: "Menunggu persetujuan" },
+  { value: "published", label: "Terbit" },
+  { value: "rejected", label: "Ditolak" }
 ];
+
+function approvalMeta(s: ApprovalStatus | string): { label: string; tone: PillTone } {
+  switch (s) {
+    case "pending":
+      return { label: "Menunggu", tone: "amber" };
+    case "published":
+      return { label: "Terbit", tone: "green" };
+    case "rejected":
+      return { label: "Ditolak", tone: "red" };
+    default:
+      return { label: "Draft", tone: "gray" };
+  }
+}
 
 export function NewsPage() {
   const toast = useToast();
-  const { hasPermission } = useAuth();
+  const { hasPermission, hasRole, capability } = useAuth();
+  const { branches } = useBranch();
   const canManage = hasPermission("news.manage");
-  const canPublish = hasPermission("news.publish");
+  const canApprove = hasPermission("news.approve");
+  const canViewAll = hasRole("super_admin") || hasPermission("branch.view.all");
+
+  // Cabang yang boleh dipilih maker saat mengajukan (scope).
+  const scopeBranches = useMemo<{ id: number; label: string }[]>(() => {
+    if (canViewAll) {
+      return branches.map((b) => ({ id: b.id, label: b.branch_code || b.branch_name || `Ruas ${b.id}` }));
+    }
+    return (capability?.branch_scopes ?? []).map((b) => ({
+      id: Number(b.branch_id),
+      label: String(b.branch_name || `Ruas ${b.branch_id}`)
+    }));
+  }, [canViewAll, branches, capability]);
 
   const [items, setItems] = useState<NewsItem[]>([]);
   const [total, setTotal] = useState(0);
@@ -39,13 +68,20 @@ export function NewsPage() {
   const [deleteTarget, setDeleteTarget] = useState<NewsItem | null>(null);
   const [busy, setBusy] = useState(false);
 
+  // Modal pengajuan (maker) & penolakan (checker).
+  const [submitTarget, setSubmitTarget] = useState<NewsItem | null>(null);
+  const [submitBranch, setSubmitBranch] = useState<string>("");
+  const [submitNote, setSubmitNote] = useState("");
+  const [rejectTarget, setRejectTarget] = useState<NewsItem | null>(null);
+  const [rejectNote, setRejectNote] = useState("");
+
   const load = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetchNews({
         page,
         per_page: PER_PAGE,
-        status: status === "all" ? undefined : status,
+        approval_status: status === "all" ? undefined : status,
         search: query || undefined
       });
       setItems(res.items);
@@ -62,7 +98,6 @@ export function NewsPage() {
     load();
   }, [load]);
 
-  // Reset ke halaman 1 saat filter/pencarian berubah.
   useEffect(() => {
     setPage(1);
   }, [status, query]);
@@ -72,14 +107,58 @@ export function NewsPage() {
   const to = Math.min(page * PER_PAGE, total);
   const gridStyle = { gridTemplateColumns: COLS } as CSSProperties;
 
-  async function togglePublish(item: NewsItem) {
+  function openSubmit(item: NewsItem) {
+    setSubmitBranch(item.branch_id ? String(item.branch_id) : scopeBranches[0] ? String(scopeBranches[0].id) : "");
+    setSubmitNote("");
+    setSubmitTarget(item);
+  }
+
+  async function confirmSubmit() {
+    if (!submitTarget) return;
+    if (!submitBranch) {
+      toast.error("Pilih ruas (scope) terlebih dahulu");
+      return;
+    }
     setBusy(true);
     try {
-      await setNewsPublish(item.id, item.status === 1 ? 0 : 1);
-      toast.success(item.status === 1 ? "Berita disembunyikan" : "Berita diterbitkan");
+      await submitNews(submitTarget.id, { branch_id: Number(submitBranch), note: submitNote.trim() || undefined });
+      toast.success("Berita diajukan untuk persetujuan");
+      setSubmitTarget(null);
       await load();
     } catch (e) {
-      toast.error("Gagal mengubah status", e instanceof Error ? e.message : undefined);
+      toast.error("Gagal mengajukan", e instanceof Error ? e.message : undefined);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function doApprove(item: NewsItem) {
+    setBusy(true);
+    try {
+      await approveNews(item.id);
+      toast.success("Berita disetujui & diterbitkan");
+      await load();
+    } catch (e) {
+      toast.error("Gagal menyetujui", e instanceof Error ? e.message : undefined);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function confirmReject() {
+    if (!rejectTarget) return;
+    if (!rejectNote.trim()) {
+      toast.error("Catatan penolakan wajib diisi");
+      return;
+    }
+    setBusy(true);
+    try {
+      await rejectNews(rejectTarget.id, rejectNote.trim());
+      toast.success("Berita ditolak");
+      setRejectTarget(null);
+      await load();
+    } catch (e) {
+      toast.error("Gagal menolak", e instanceof Error ? e.message : undefined);
     } finally {
       setBusy(false);
     }
@@ -101,6 +180,13 @@ export function NewsPage() {
     }
   }
 
+  const myUserId = capability?.user?.id ?? null;
+  // Pengaju tidak boleh menyetujui/menolak beritanya sendiri (selaras aturan backend maker≠checker).
+  const isOwnSubmission = selected ? selected.submitted_by != null && Number(selected.submitted_by) === Number(myUserId) : false;
+  const isMaker = selected ? canManage && ["draft", "rejected"].includes(selected.approval_status) : false;
+  const isChecker = selected ? canApprove && selected.approval_status === "pending" && !isOwnSubmission : false;
+  const ownPending = selected ? canApprove && selected.approval_status === "pending" && isOwnSubmission : false;
+
   return (
     <div className={styles.page}>
       <div className={styles.header}>
@@ -113,13 +199,7 @@ export function NewsPage() {
             setQuery(search.trim());
           }}
         >
-          <Input
-            wrapClassName={styles.search}
-            icon="search"
-            placeholder="Cari judul / isi…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          <Input wrapClassName={styles.search} icon="search" placeholder="Cari judul / isi…" value={search} onChange={(e) => setSearch(e.target.value)} />
         </form>
         {canManage && (
           <Button variant="primary" icon="plus" onClick={() => setFormMode("create")}>
@@ -136,7 +216,7 @@ export function NewsPage() {
                 <span>Berita</span>
                 <span>Kategori</span>
                 <span>Status</span>
-                <span>Terbit</span>
+                <span>Diperbarui</span>
               </div>
               {loading && items.length === 0 ? (
                 <EmptyState icon="newspaper" title="Memuat berita…" />
@@ -145,6 +225,7 @@ export function NewsPage() {
               ) : (
                 items.map((n) => {
                   const img = backendAsset(n.image_url);
+                  const meta = approvalMeta(n.approval_status);
                   return (
                     <div
                       key={n.id}
@@ -168,9 +249,9 @@ export function NewsPage() {
                       </span>
                       <span className={styles.muted}>{newsCategoryLabel(n.category)}</span>
                       <span>
-                        <StatusPill label={n.status === 1 ? "Terbit" : "Draft"} tone={n.status === 1 ? "green" : "gray"} />
+                        <StatusPill label={meta.label} tone={meta.tone} />
                       </span>
-                      <span className={styles.muted}>{formatDate(n.published_at) || "—"}</span>
+                      <span className={styles.muted}>{formatDate(n.submitted_at || n.approved_at || n.posted_at) || "—"}</span>
                     </div>
                   );
                 })
@@ -188,9 +269,17 @@ export function NewsPage() {
             <div className={styles.detailBody}>
               {backendAsset(selected.image_url) && <img className={styles.detailImage} src={backendAsset(selected.image_url)} alt="" />}
               <div className={styles.chips}>
-                <StatusPill label={selected.status === 1 ? "Terbit" : "Draft"} tone={selected.status === 1 ? "green" : "gray"} />
+                <StatusPill label={approvalMeta(selected.approval_status).label} tone={approvalMeta(selected.approval_status).tone} />
                 {selected.category !== null && <span className={`${styles.chip} ${styles.chipMono}`}>{newsCategoryLabel(selected.category)}</span>}
               </div>
+
+              {selected.approval_status === "rejected" && selected.review_note && (
+                <div className={styles.section}>
+                  <span className={styles.sectionLabel}>Catatan penolakan</span>
+                  <p className={styles.bodyText} style={{ color: "var(--color-danger, #c0392b)" }}>{selected.review_note}</p>
+                </div>
+              )}
+
               <div className={styles.section}>
                 <span className={styles.sectionLabel}>Isi</span>
                 <p className={styles.bodyText}>{selected.content || "—"}</p>
@@ -199,22 +288,51 @@ export function NewsPage() {
                 <span className={styles.sectionLabel}>Metadata</span>
                 <div className={styles.kv}><span className={styles.kvKey}>Sumber</span><span className={styles.kvVal}>{selected.source || "—"}</span></div>
                 <div className={styles.kv}><span className={styles.kvKey}>Penulis</span><span className={styles.kvVal}>{selected.author || "—"}</span></div>
-                <div className={styles.kv}><span className={styles.kvKey}>Diposting oleh</span><span className={styles.kvVal}>{selected.posted_by || "—"}</span></div>
+                <div className={styles.kv}><span className={styles.kvKey}>Diajukan</span><span className={styles.kvVal}>{formatDate(selected.submitted_at) || "—"}</span></div>
+                <div className={styles.kv}><span className={styles.kvKey}>Disetujui</span><span className={styles.kvVal}>{formatDate(selected.approved_at) || "—"}</span></div>
                 <div className={styles.kv}><span className={styles.kvKey}>Tgl terbit</span><span className={styles.kvVal}>{formatDate(selected.published_at) || "—"}</span></div>
               </div>
             </div>
-            {(canManage || canPublish) && (
+
+            {(isMaker || isChecker || canManage || ownPending) && (
               <div className={styles.detailFooter}>
-                {canPublish && (
-                  <Button variant="secondary" icon={selected.status === 1 ? "eye-off" : "eye"} onClick={() => togglePublish(selected)} disabled={busy}>
-                    {selected.status === 1 ? "Sembunyikan" : "Terbitkan"}
+                {ownPending && (
+                  <span className={styles.muted} style={{ fontSize: "var(--fs-sm)", alignSelf: "center" }}>
+                    Anda pengaju berita ini — persetujuan oleh pemeriksa lain.
+                  </span>
+                )}
+                {isMaker && (
+                  <Button variant="primary" icon="send" onClick={() => openSubmit(selected)} disabled={busy}>
+                    Ajukan
+                  </Button>
+                )}
+                {isChecker && (
+                  <Button variant="primary" icon="check" onClick={() => doApprove(selected)} disabled={busy}>
+                    Setujui
+                  </Button>
+                )}
+                {isChecker && (
+                  <Button
+                    variant="danger"
+                    icon="x"
+                    onClick={() => {
+                      setRejectNote("");
+                      setRejectTarget(selected);
+                    }}
+                    disabled={busy}
+                  >
+                    Tolak
+                  </Button>
+                )}
+                {canManage && ["draft", "rejected"].includes(selected.approval_status) && (
+                  <Button variant="secondary" icon="pencil" onClick={() => setFormMode("edit")}>
+                    Ubah
                   </Button>
                 )}
                 {canManage && (
-                  <Button variant="secondary" icon="pencil" onClick={() => setFormMode("edit")}>Ubah</Button>
-                )}
-                {canManage && (
-                  <Button variant="danger" icon="trash-2" onClick={() => setDeleteTarget(selected)}>Hapus</Button>
+                  <Button variant="ghost" icon="trash-2" onClick={() => setDeleteTarget(selected)}>
+                    Hapus
+                  </Button>
                 )}
               </div>
             )}
@@ -222,13 +340,62 @@ export function NewsPage() {
         )}
       </div>
 
-      <NewsFormModal
-        open={formMode !== null}
-        mode={formMode ?? "create"}
-        news={formMode === "edit" ? selected : null}
-        onClose={() => setFormMode(null)}
-        onSaved={load}
-      />
+      <NewsFormModal open={formMode !== null} mode={formMode ?? "create"} news={formMode === "edit" ? selected : null} onClose={() => setFormMode(null)} onSaved={load} />
+
+      {/* Modal pengajuan (maker) */}
+      <Modal
+        open={!!submitTarget}
+        onOpenChange={(o) => !o && setSubmitTarget(null)}
+        title="Ajukan Berita"
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setSubmitTarget(null)}>Batal</Button>
+            <Button variant="primary" onClick={confirmSubmit} disabled={busy}>{busy ? "Mengajukan…" : "Ajukan"}</Button>
+          </>
+        }
+      >
+        <p className={styles.muted} style={{ marginTop: 0 }}>
+          Pilih ruas (scope) berita. Berita akan masuk antrean persetujuan pemeriksa yang membawahi ruas tersebut.
+        </p>
+        <div className={styles.field}>
+          <label className={styles.fieldLabel}>Ruas (scope)</label>
+          <Select
+            value={submitBranch}
+            onValueChange={setSubmitBranch}
+            options={scopeBranches.map((b) => ({ value: String(b.id), label: b.label }))}
+            placeholder="Pilih ruas…"
+          />
+          {scopeBranches.length === 0 && <div className={styles.fieldError}>Tidak ada ruas dalam cakupan Anda.</div>}
+        </div>
+        <div className={styles.field}>
+          <label className={styles.fieldLabel}>Catatan (opsional)</label>
+          <textarea className={styles.textarea} value={submitNote} onChange={(e) => setSubmitNote(e.target.value)} placeholder="Catatan untuk pemeriksa…" />
+        </div>
+      </Modal>
+
+      {/* Modal penolakan (checker) */}
+      <Modal
+        open={!!rejectTarget}
+        onOpenChange={(o) => !o && setRejectTarget(null)}
+        title="Tolak Berita"
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setRejectTarget(null)}>Batal</Button>
+            <Button variant="danger" onClick={confirmReject} disabled={busy}>{busy ? "Menolak…" : "Tolak"}</Button>
+          </>
+        }
+      >
+        <div className={styles.field}>
+          <label className={styles.fieldLabel}>Catatan penolakan *</label>
+          <textarea
+            className={styles.textarea}
+            style={{ minHeight: 110 }}
+            value={rejectNote}
+            onChange={(e) => setRejectNote(e.target.value)}
+            placeholder="Jelaskan alasan penolakan agar pembuat dapat merevisi…"
+          />
+        </div>
+      </Modal>
 
       <Modal
         open={!!deleteTarget}

@@ -1,0 +1,326 @@
+.slide {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 100%;
+
+  /* Tint per regional/kelompok (mengikuti LabaRugiPage; ikut tema via color-mix). */
+  --lr-brand: #1e4c87;
+  --lr-brand-2: #16386b;
+  --lr-brand-ink: #eaf1fb;
+  --lr-JKT: color-mix(in srgb, var(--sem-sky) 24%, var(--surface-1));
+  --lr-SUMBAGSEL: color-mix(in srgb, var(--sem-amber) 26%, var(--surface-1));
+  --lr-SUMBAGTENG: color-mix(in srgb, var(--sem-green) 22%, var(--surface-1));
+  --lr-SUMBAGUT: color-mix(in srgb, var(--sem-amber) 12%, var(--surface-1));
+  --lr-JTTS: color-mix(in srgb, var(--text-muted) 22%, var(--surface-1));
+  --lr-PBBL: color-mix(in srgb, var(--sem-sky) 14%, var(--surface-1));
+  --lr-DIVISI: color-mix(in srgb, var(--text-muted) 13%, var(--surface-1));
+  --lr-section: var(--surface-3);
+  --lr-total: color-mix(in srgb, var(--st-blue) 20%, var(--surface-1));
+  /* Breakdown: latar highlight item + warna kilat (blink). */
+  --lr-item-bg: color-mix(in srgb, var(--st-blue) 9%, var(--surface-1));
+  --lr-item-blink: color-mix(in srgb, var(--st-blue) 34%, var(--surface-1));
+}
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-bottom: 2px solid var(--lr-brand);
+  padding-bottom: 8px;
+  flex: none;
+}
+.title {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.sub {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+.sub b,
+.header b {
+  color: var(--text);
+}
+.spacer {
+  flex: 1 1 auto;
+}
+.note {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.tableCard {
+  flex: 1 1 auto;
+  min-height: 0;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: auto;
+}
+
+.table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.corner {
+  position: sticky;
+  left: 0;
+  top: 0;
+  z-index: 5;
+  background: var(--lr-brand-2);
+  color: var(--lr-brand-ink);
+  vertical-align: bottom;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-align: left;
+  padding: 8px 12px;
+  min-width: 180px;
+  border-bottom: 1px solid var(--line);
+}
+.hEntity {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  text-align: center;
+  font-weight: 700;
+  color: var(--text);
+  border-left: 2px solid var(--surface-1);
+  padding: 8px 11px;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+.hSub {
+  position: sticky;
+  top: 33px;
+  z-index: 3;
+  background: var(--surface-3);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-align: right;
+  padding: 6px 11px;
+  border-bottom: 1px solid var(--line);
+}
+.grp {
+  border-left: 2px solid var(--line-strong);
+}
+
+.uraian {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  text-align: left;
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--line);
+  min-width: 180px;
+  white-space: nowrap;
+  background: var(--surface-1);
+  color: var(--text-muted);
+  font-weight: 500;
+  padding-left: 26px;
+}
+.num {
+  padding: 7px 11px;
+  text-align: right;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--line);
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.neg {
+  color: var(--sem-red);
+}
+
+/* Baris section / total / hpp */
+.rSection .uraian {
+  background: var(--lr-section);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  padding-left: 12px;
+}
+.rSection .num {
+  background: var(--lr-section);
+  font-weight: 700;
+  color: var(--text);
+}
+.rTotal .uraian {
+  background: var(--lr-total);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  padding-left: 12px;
+}
+.rTotal .num {
+  background: var(--lr-total);
+  font-weight: 700;
+  color: var(--text);
+}
+.rHpp .uraian {
+  background: var(--lr-brand-2);
+  color: var(--lr-brand-ink);
+  font-weight: 800;
+  text-transform: uppercase;
+  border-bottom: 0;
+  padding-left: 12px;
+}
+.rHpp .num {
+  background: var(--lr-brand-2);
+  color: var(--lr-brand-ink);
+  font-weight: 700;
+  border-bottom: 0;
+}
+
+/* Tombol expand breakdown + baris item detail */
+.expLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+/* Seluruh baris uraian yang bisa di-breakdown dapat diklik (bukan hanya judulnya). */
+.rowClickable {
+  cursor: pointer;
+}
+.rowClickable:focus-visible {
+  outline: 2px solid var(--st-blue);
+  outline-offset: -2px;
+}
+.chev {
+  display: inline-block;
+  font-size: 10px;
+  line-height: 1;
+  color: var(--st-blue);
+  transition: transform 0.15s ease;
+}
+.chevOpen {
+  transform: rotate(90deg);
+}
+
+/* Kilat (blink) sekali saat baris dibuka. Keyframes WAJIB lokal di module ini
+   (bila global → di-hash CSS Modules → mati). */
+@keyframes lrItemBlink {
+  0% {
+    background: var(--lr-item-blink);
+  }
+  25% {
+    background: var(--lr-item-bg);
+  }
+  50% {
+    background: var(--lr-item-blink);
+  }
+  75% {
+    background: var(--lr-item-bg);
+  }
+  100% {
+    background: var(--lr-item-bg);
+  }
+}
+
+/* Baris item breakdown: selalu ter-render, collapse/slide via tinggi (grid-rows)
+   + padding sel. Tertutup → tinggi 0; dibuka → slide-down. */
+.rItem td {
+  background: var(--lr-item-bg);
+  color: var(--text-dim);
+  font-size: 12px;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-bottom: 0 solid var(--line);
+  transition: padding-top 0.28s ease, padding-bottom 0.28s ease, border-bottom-width 0.28s ease;
+}
+.rItem.open td {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-bottom-width: 1px;
+}
+.cellInner {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.28s ease;
+}
+.rItem.open .cellInner {
+  grid-template-rows: 1fr;
+}
+.cellInner > span {
+  display: block;
+  min-height: 0;
+  overflow: hidden;
+}
+.itemLabel {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  text-align: left;
+  padding-left: 42px;
+  padding-right: 12px;
+  border-left: 3px solid color-mix(in srgb, var(--st-blue) 60%, transparent);
+  min-width: 180px;
+  white-space: nowrap;
+  font-weight: 500;
+}
+.rItem .num {
+  padding-left: 11px;
+  padding-right: 11px;
+  font-weight: 600;
+}
+/* Kilat sekali saat kelas .open ditambahkan (buka). */
+.rItem.open .itemLabel,
+.rItem.open .num {
+  animation: lrItemBlink 0.95s ease;
+}
+
+/* Highlight saat hover/focus pada sel: baris tersorot tipis, sel aktif lebih tegas. */
+.table tbody tr:hover td {
+  background: color-mix(in srgb, var(--st-blue) 9%, var(--surface-1));
+}
+.table tbody tr td:hover,
+.table tbody tr td:focus-within {
+  background: color-mix(in srgb, var(--st-blue) 22%, var(--surface-1));
+}
+/* Baris HPP berlatar gelap/teks terang → pertahankan latar, cukup outline saja. */
+.table tbody tr.rHpp:hover td,
+.table tbody tr.rHpp td:hover {
+  background: var(--lr-brand-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rItem td,
+  .cellInner,
+  .chev {
+    transition: none;
+  }
+  .rItem.open .itemLabel,
+  .rItem.open .num {
+    animation: none;
+  }
+}
+
+.emptyBox {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.foot {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  flex: none;
+}

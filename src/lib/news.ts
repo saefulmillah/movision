@@ -21,6 +21,7 @@ export interface NewsListParams {
   page?: number;
   per_page?: number;
   status?: string;
+  approval_status?: string;
   category?: string;
   search?: string;
 }
@@ -64,23 +65,16 @@ export async function fetchNewsDetail(id: number): Promise<NewsItem> {
   return first(await api.get<NewsItem[] | NewsItem>(`/admin/news/${id}`));
 }
 
-/** "YYYY-MM-DDTHH:mm" (waktu lokal) -> unix epoch detik. */
-function localInputToUnix(local: string): number | undefined {
-  if (!local) return undefined;
-  const ms = new Date(local).getTime();
-  return Number.isNaN(ms) ? undefined : Math.floor(ms / 1000);
-}
-
 function toPayload(v: NewsFormValues): Record<string, unknown> {
+  // Catatan: `status`/`published_at` TIDAK dikirim lagi — publikasi hanya lewat
+  // approval (approve). Create selalu draft; edit tidak boleh menyentuh is_open.
   return {
     title: v.title,
     content: v.content,
     category: v.category === "" ? undefined : Number(v.category),
     source: v.source || undefined,
     author: v.author || undefined,
-    image: v.image || undefined,
-    status: v.status,
-    published_at: localInputToUnix(v.published_at)
+    image: v.image || undefined
   };
 }
 
@@ -155,6 +149,26 @@ export async function setNewsPublish(id: number, status: number): Promise<NewsIt
 
 export function deleteNews(id: number): Promise<unknown> {
   return api.delete(`/admin/news/${id}`);
+}
+
+/* ---------------- Approval workflow (maker–checker) ---------------- */
+
+/** Maker mengajukan berita. Wajib scope: salah satu branch_id ATAU regional_id. */
+export async function submitNews(
+  id: number,
+  body: { branch_id?: number; regional_id?: number; note?: string }
+): Promise<NewsItem> {
+  return first(await api.patch<NewsItem[] | NewsItem>(`/admin/news/${id}/submit`, body));
+}
+
+/** Checker menyetujui berita (pending → published, tampil di mobile). */
+export async function approveNews(id: number): Promise<NewsItem> {
+  return first(await api.patch<NewsItem[] | NewsItem>(`/admin/news/${id}/approve`, {}));
+}
+
+/** Checker menolak berita (pending → rejected). Catatan wajib. */
+export async function rejectNews(id: number, note: string): Promise<NewsItem> {
+  return first(await api.patch<NewsItem[] | NewsItem>(`/admin/news/${id}/reject`, { note }));
 }
 
 export { buildQuery, paged };

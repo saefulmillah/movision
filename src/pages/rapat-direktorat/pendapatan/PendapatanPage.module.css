@@ -1,0 +1,197 @@
+/* Halaman Pendapatan — KPI + 2 grafik batang per ruas. Memakai design token
+   TollSentra; mengikuti tema terang/gelap. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+  min-height: 0;
+  background: var(--app-bg);
+}
+
+/* ---------- Header ---------- */
+.header {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+  padding-bottom: var(--sp-3);
+  border-bottom: 2px solid var(--st-blue);
+}
+.titleBox {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.title {
+  margin: 0;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  font-size: var(--fs-2xl);
+  color: var(--st-blue);
+  line-height: 1.05;
+}
+.sub {
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+}
+.sub b {
+  color: var(--text);
+  font-weight: 600;
+}
+.headSpacer {
+  flex: 1 1 auto;
+}
+
+/* ---------- Panel impor ---------- */
+.importCard {
+  border: 1px solid var(--st-blue);
+  border-radius: var(--r-2xl);
+  background: var(--surface-2);
+  box-shadow: var(--card-shadow);
+  padding: var(--sp-5);
+}
+.importGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-4);
+  align-items: flex-end;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 160px;
+}
+.fieldLabel {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+.dropzone {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-width: 220px;
+  max-width: 280px;
+  padding: 10px var(--sp-3);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+  color: var(--text-dim);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color var(--t-fast), color var(--t-fast);
+}
+.dropzone:hover {
+  border-color: var(--st-blue);
+  color: var(--text);
+}
+.dropText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.yearInput {
+  width: 110px;
+  padding: 9px var(--sp-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+  color: var(--text);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+}
+.yearInput:focus {
+  outline: none;
+  border-color: var(--focus-border);
+  box-shadow: var(--focus-ring);
+}
+
+/* ---------- Kartu grafik ---------- */
+.chartCard {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2xl);
+  box-shadow: var(--card-shadow);
+  padding: var(--sp-5) var(--sp-6);
+}
+.chartHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.chartTitle {
+  margin: 0;
+  font-size: var(--fs-lg);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--st-blue);
+}
+.chartSpacer {
+  flex: 1 1 auto;
+}
+/* Area grafik tinggi tetap agar varian "fit" (gridline + pill %ACH) menskala
+   penuh — sama seperti di slide, tetapi pada tinggi baca yang nyaman. */
+.chartArea {
+  height: 320px;
+  min-height: 0;
+  display: flex;
+}
+.legend {
+  display: flex;
+  gap: 14px;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.legItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.sw {
+  width: 16px;
+  height: 12px;
+  border-radius: 2px;
+  display: inline-block;
+}
+.swRkap {
+  background: color-mix(in srgb, var(--st-blue) 45%, var(--surface-1));
+  border: 1px solid var(--st-blue);
+}
+.swReal {
+  background: var(--sem-red);
+}
+.dots {
+  display: inline-flex;
+  gap: 3px;
+}
+.d {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+}
+.note {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  margin-top: 10px;
+}
+
+/* ---------- State ---------- */
+.stateBox {
+  display: grid;
+  place-items: center;
+  min-height: 260px;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2xl);
+}

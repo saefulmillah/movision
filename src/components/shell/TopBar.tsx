@@ -30,7 +30,7 @@ export function TopBar({ openTickets }: TopBarProps) {
   const location = useLocation();
   const clock = useClock();
 
-  const title = findMenuName(menus, location.pathname) || "TollSentra";
+  const title = findMenuName(menus, location.pathname) || "Movision";
 
   const sseConnected = sseStatus === "open";
   const sseLabel = sseStatus === "open" ? "Realtime" : sseStatus === "connecting" ? "Menyambung…" : "Terputus";

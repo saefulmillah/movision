@@ -58,6 +58,17 @@
 .viewport {
   padding: 5px;
 }
+/* Tombol scroll Radix — muncul saat daftar opsi melebihi max-height (mis. 12
+   bulan). Tanpa ini, opsi di bawah "terpotong" dan tak terjangkau mouse. */
+.scrollBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 22px;
+  color: var(--text-muted);
+  background: var(--surface-1);
+  cursor: default;
+}
 .item {
   display: flex;
   align-items: center;

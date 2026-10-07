@@ -53,6 +53,21 @@ export interface ValidationResult {
   checks: ValidationCheck[];
 }
 
+/** Satu item detail breakdown sebuah uraian. */
+export interface BreakdownItem {
+  seq: number;
+  label: string;
+  rkap: number | null;
+  real: number | null;
+}
+/** parentAccountId → daftar item detail. */
+export type EntityBreakdown = Record<string, BreakdownItem[]>;
+/** Breakdown per entitas (ruas/regional/dll) & per kolom konsol. */
+export interface LrBreakdown {
+  entity: Record<string, EntityBreakdown>;
+  konsol: Record<string, EntityBreakdown>;
+}
+
 /** GET /api/laba-rugi/:periodKey → data. */
 export interface PeriodData {
   meta: {
@@ -69,6 +84,7 @@ export interface PeriodData {
   total_definition: string[];
   entities: Record<string, EntityData>;
   konsol: Record<string, EntityData>;
+  breakdown?: LrBreakdown;
   validation?: ValidationResult | null;
 }
 

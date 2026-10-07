@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Button, Icon, Input, Modal, Select, Switch, useToast } from "@/components/ui";
+import { Button, Icon, Input, Modal, Select, useToast } from "@/components/ui";
 import { backendAsset } from "@/lib/api";
 import { createNews, NEWS_CATEGORIES, updateNews, uploadNewsImageWithProgress } from "@/lib/news";
 import type { NewsFormValues, NewsItem } from "@/types/modules";
@@ -164,15 +164,9 @@ export function NewsFormModal({ open, mode, news, onClose, onSaved }: Props) {
         </div>
       </div>
 
-      <div className={styles.fieldRow}>
-        <div className={styles.field}>
-          <label className={styles.fieldLabel}>Penulis</label>
-          <Input value={v.author} onChange={(e) => set("author", e.target.value)} placeholder="Penulis" />
-        </div>
-        <div className={styles.field}>
-          <label className={styles.fieldLabel}>Tanggal & Waktu Terbit</label>
-          <Input type="datetime-local" value={v.published_at} onChange={(e) => set("published_at", e.target.value)} />
-        </div>
+      <div className={styles.field}>
+        <label className={styles.fieldLabel}>Penulis</label>
+        <Input value={v.author} onChange={(e) => set("author", e.target.value)} placeholder="Penulis" />
       </div>
 
       <div className={styles.field}>
@@ -213,10 +207,9 @@ export function NewsFormModal({ open, mode, news, onClose, onSaved }: Props) {
         </div>
       </div>
 
-      <div className={styles.checkRow}>
-        <Switch checked={v.status === 1} onCheckedChange={(c) => set("status", c ? 1 : 0)} />
-        <span>Terbitkan (tampil di aplikasi)</span>
-      </div>
+      <p className={styles.muted} style={{ marginTop: 4, fontSize: "var(--fs-sm)" }}>
+        Berita baru tersimpan sebagai <b>draft</b>. Agar tampil di aplikasi, ajukan untuk persetujuan lalu disetujui oleh pemeriksa.
+      </p>
     </Modal>
   );
 }

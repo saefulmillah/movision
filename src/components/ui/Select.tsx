@@ -36,6 +36,9 @@ export function Select({ value, onValueChange, options, placeholder, icon, class
 
       <RadixSelect.Portal>
         <RadixSelect.Content className={styles.content} position="popper" sideOffset={6}>
+          <RadixSelect.ScrollUpButton className={styles.scrollBtn}>
+            <Icon name="chevron-up" size={14} />
+          </RadixSelect.ScrollUpButton>
           <RadixSelect.Viewport className={styles.viewport}>
             {options.map((opt) => (
               <RadixSelect.Item key={opt.value} value={opt.value} className={styles.item}>
@@ -46,6 +49,9 @@ export function Select({ value, onValueChange, options, placeholder, icon, class
               </RadixSelect.Item>
             ))}
           </RadixSelect.Viewport>
+          <RadixSelect.ScrollDownButton className={styles.scrollBtn}>
+            <Icon name="chevron-down" size={14} />
+          </RadixSelect.ScrollDownButton>
         </RadixSelect.Content>
       </RadixSelect.Portal>
     </RadixSelect.Root>

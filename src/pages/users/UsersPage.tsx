@@ -4,6 +4,7 @@ import type { TabItem } from "@/components/ui";
 import { useBranch } from "@/context/BranchContext";
 import { usePolling } from "@/lib/usePolling";
 import { fetchAdminMenus, fetchUsers } from "@/lib/users";
+import { listRoles } from "@/lib/access";
 import { UsersTab } from "./UsersTab";
 import { RolesTab } from "./RolesTab";
 import { MenusTab } from "./MenusTab";
@@ -21,6 +22,7 @@ export function UsersPage() {
   const { branches } = useBranch();
   const usersQ = usePolling(fetchUsers, 0);
   const menusQ = usePolling(fetchAdminMenus, 0);
+  const rolesQ = usePolling(listRoles, 0);
 
   const [tab, setTab] = useState<TabKey>("users");
   const [query, setQuery] = useState("");
@@ -28,6 +30,10 @@ export function UsersPage() {
 
   const users = usersQ.data ?? [];
   const menus = menusQ.data ?? [];
+  const roleLabels = useMemo(
+    () => Object.fromEntries((rolesQ.data ?? []).map((r) => [r.role_code, r.role_name])),
+    [rolesQ.data]
+  );
 
   const filteredUsers = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -80,6 +86,7 @@ export function UsersPage() {
           onRefresh={usersQ.refresh}
           openCreate={createFor === "users"}
           onCreateHandled={() => setCreateFor(null)}
+          roleLabels={roleLabels}
         />
       )}
       {tab === "roles" && <RolesTab users={users} />}

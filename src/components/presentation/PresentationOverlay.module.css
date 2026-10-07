@@ -1,0 +1,260 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  background: var(--app-bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+}
+
+/* Logo korporat — di pojok kanan footer, tampil konsisten di setiap slide. */
+.brandLogo {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 5px 14px;
+  background: #ffffff;
+  border: 1px solid rgba(15, 30, 50, 0.08);
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(2, 10, 22, 0.16);
+  pointer-events: none;
+}
+.brandLogo img {
+  height: 100%;
+  width: auto;
+  display: block;
+  object-fit: contain;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: none;
+  height: 52px;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-1);
+}
+.mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid rgba(15, 30, 50, 0.08);
+}
+.mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.brand {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.sep {
+  width: 1px;
+  height: 18px;
+  background: var(--line);
+}
+.spacer {
+  flex: 1 1 auto;
+}
+.pageLabel {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+.iconBtn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.exitBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  color: var(--text-dim);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.periodWrap {
+  position: relative;
+}
+.periodBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 30px;
+  padding: 0 11px;
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  color: var(--text-dim);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.periodMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 6px;
+  z-index: 60;
+  min-width: 100%;
+  background: var(--surface-1);
+  border: 1px solid var(--line-strong);
+  border-radius: 9px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+  padding: 5px;
+}
+.periodOpt {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 12.5px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.periodOptActive {
+  color: var(--st-blue);
+  font-weight: 600;
+  background: var(--nav-active-bg);
+}
+
+.progressTrack {
+  height: 3px;
+  flex: none;
+  background: var(--track);
+}
+.progressBar {
+  height: 100%;
+  background: var(--st-blue);
+  transition: width 0.3s;
+}
+
+.stageWrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  padding: 28px 40px;
+  overflow: auto;
+}
+.stage {
+  margin: auto;
+  width: 100%;
+  max-width: 1180px;
+  min-height: 0;
+}
+
+/* Slide sampul: foto latar edge-to-edge (tanpa padding/kolom terbatas). */
+.stageWrapCover {
+  padding: 0;
+  overflow: hidden;
+}
+.stageCover {
+  margin: 0;
+  max-width: none;
+  min-height: 100%;
+  display: flex;
+}
+
+.footer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex: none;
+  height: 60px;
+  border-top: 1px solid var(--line);
+  background: var(--surface-1);
+}
+.navBtn {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  color: var(--text);
+  cursor: pointer;
+}
+.dots {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+}
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 99px;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s;
+  background: var(--line-strong);
+}
+.dotActive {
+  width: 22px;
+  background: var(--st-blue);
+}
+.footSep {
+  width: 1px;
+  height: 24px;
+  background: var(--line);
+  margin: 0 4px;
+}
+.autoBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface-2);
+  color: var(--text-dim);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.autoBtnOn {
+  border-color: var(--st-blue);
+  background: var(--nav-active-bg);
+  color: var(--nav-active-text);
+}

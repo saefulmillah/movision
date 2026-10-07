@@ -1,0 +1,85 @@
+/* Grafik batang pencapaian per ruas — token chart lokal diturunkan via
+   color-mix dari token semantik agar otomatis mengikuti tema. */
+
+.scroll,
+.fitWrap {
+  /* Palet chart lokal (auto-tema) */
+  --pd-rkap: color-mix(in srgb, var(--st-blue) 45%, var(--surface-1));
+  --pd-brand-2: var(--st-blue);
+  --pd-real: var(--sem-red);
+}
+
+/* Varian halaman: bisa scroll horizontal bila sempit. */
+.scroll {
+  overflow-x: auto;
+}
+.svg {
+  display: block;
+  min-width: 900px;
+  width: 100%;
+  height: auto;
+}
+
+/* Varian fit (slide): mengisi ruang tersedia, tanpa scroll. */
+.fitWrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+.svgFit {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.baseline {
+  stroke: var(--line-strong);
+}
+.grid {
+  stroke: var(--line);
+  stroke-width: 1;
+  stroke-dasharray: 2 4;
+}
+.sep {
+  stroke: var(--line-strong);
+  stroke-width: 1.2;
+  stroke-dasharray: 3 3;
+}
+
+.barRkap {
+  fill: var(--pd-rkap);
+  stroke: var(--pd-brand-2);
+  stroke-width: 0.8;
+}
+.barReal {
+  fill: var(--pd-real);
+}
+.cap {
+  fill: #fff;
+  opacity: 0.35;
+}
+
+.valRkap {
+  fill: var(--text-muted);
+}
+.valReal {
+  font-weight: 700;
+  fill: var(--pd-real);
+}
+.pct {
+  font-size: 12px;
+  font-weight: 800;
+  fill: var(--sem-green);
+}
+.ruas {
+  font-weight: 700;
+  fill: var(--text);
+}
+.region {
+  font-size: 10px;
+  font-weight: 800;
+  fill: var(--st-blue);
+  letter-spacing: 0.05em;
+}

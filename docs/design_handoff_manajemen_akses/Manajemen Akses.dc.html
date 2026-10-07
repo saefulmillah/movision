@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root,[data-theme="dark"]{--app-bg:#133A73;--surface-1:#1E4C87;--surface-2:rgba(39,84,143,.78);--surface-3:rgba(30,72,130,.62);--track:rgba(210,225,250,.16);--text:#EAF1FB;--text-dim:#C8D6EE;--text-muted:#93A8C9;--text-faint:#6F88AE;--line-soft:rgba(150,185,230,.10);--line:rgba(150,185,230,.16);--line-strong:rgba(150,185,230,.26);--sem-green:#34D399;--sem-amber:#FBBF24;--sem-red:#F43F5E;--sem-rose:#FB7185;--st-green:#34D399;--st-amber:#FBBF24;--st-red:#FB7185;--st-blue:#7EA6FF;--st-gray:#A4B5D2;--card-shadow:0 1px 2px rgba(0,0,0,.18);--nav-active-bg:rgba(90,141,255,.16);--nav-active-text:#EAF1FB;--overlay-bg:rgba(10,15,26,.85);--focus-ring:0 0 0 3px rgba(126,166,255,.35);}
+[data-theme="light"]{--app-bg:#EDF0F5;--surface-1:#F8FAFC;--surface-2:#FCFDFE;--surface-3:#F1F4F9;--track:#E3E8EF;--text:#2E3D4F;--text-dim:#586878;--text-muted:#76859A;--text-faint:#9AA8B9;--line-soft:rgba(45,65,95,.045);--line:#E4E9EF;--line-strong:#D8DFE7;--sem-green:#2E9C77;--sem-amber:#B8891C;--sem-red:#C4525F;--sem-rose:#C05C6C;--st-green:#2E9C77;--st-amber:#A8801F;--st-red:#C4525F;--st-blue:#3C63B4;--st-gray:#6B7A8D;--card-shadow:0 1px 3px rgba(40,60,90,.05);--nav-active-bg:#E8EEF9;--nav-active-text:#2E5794;--overlay-bg:rgba(252,253,254,.92);--focus-ring:0 0 0 3px rgba(60,99,180,.22);}
+*{box-sizing:border-box;margin:0}
+.ic{display:inline-block;flex:none;width:var(--s,17px);height:var(--s,17px);background-color:currentColor;-webkit-mask:var(--i) center/contain no-repeat;mask:var(--i) center/contain no-repeat}
+body{font-family:'IBM Plex Sans',system-ui,sans-serif}
+.scrolly{scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent}
+.scrolly::-webkit-scrollbar{width:9px;height:9px}
+.scrolly::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:999px}
+.scrolly::-webkit-scrollbar-track{background:transparent}
+a{color:var(--st-blue);text-decoration:none}a:hover{text-decoration:underline}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(244,63,94,.5)}50%{box-shadow:0 0 8px 2px rgba(244,63,94,.55)}}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(34px)}to{opacity:1;transform:none}}
+@keyframes overlayIn{from{opacity:0}}
+@keyframes contentIn{from{opacity:0;transform:translate(-50%,-46%) scale(.98)}}
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+.skl{border-radius:6px;background:linear-gradient(90deg,var(--surface-3) 25%,var(--surface-2) 37%,var(--surface-3) 63%);background-size:800px 100%;animation:shimmer 1.4s infinite linear}
+.navitem:hover{background:rgba(90,141,255,.10)!important}
+.rowh:hover{background:var(--nav-active-bg)!important}
+.btnp:hover{filter:brightness(1.08)}
+.btns:hover{background:var(--surface-3)!important}
+.btng:hover{background:var(--surface-2)!important;color:var(--text)!important}
+.btnd:hover{filter:brightness(1.08)}
+.shortcut:hover{border-color:var(--st-blue)!important;transform:translateY(-2px)}
+.iconbtn:hover{color:var(--text)!important}
+.navbar-on{position:absolute;left:6px;top:50%;transform:translateY(-50%);width:3px;height:19px;border-radius:2px;background:var(--st-blue)}
+.navbar-off{display:none}
+.lock-on{display:inline-block;flex:none;width:12px;height:12px;background-color:var(--text-faint);-webkit-mask:url(https://unpkg.com/lucide-static@0.469.0/icons/lock.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.469.0/icons/lock.svg) center/contain no-repeat}
+.lock-off{display:none}
+</style>
+</helmet>
+<div class="app scrolly" data-theme="{{ theme }}" style="display:flex;height:100vh;width:100%;overflow:hidden;background:var(--app-bg);color:var(--text);font-family:var(--font,'IBM Plex Sans'),system-ui,sans-serif;font-size:13px;line-height:1.45">
+
+  <aside style="display:flex;flex-direction:column;flex:none;width:236px;background:var(--surface-1);border-right:1px solid var(--line)">
+    <div style="display:flex;align-items:center;gap:12px;height:60px;padding:0 14px 0 18px;border-bottom:1px solid var(--line)">
+      <span style="display:grid;place-items:center;flex:none;width:30px;height:30px;border-radius:8px;background:var(--nav-active-bg);color:var(--st-blue)"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/radio-tower.svg);--s:18px"></span></span>
+      <span style="display:flex;flex-direction:column;line-height:1.15;min-width:0">
+        <span style="font-size:14px;font-weight:700;letter-spacing:.2px">TollSentra</span>
+        <span style="font-size:10.5px;color:var(--text-muted)">Control Center</span>
+      </span>
+      <button class="iconbtn" style="display:grid;place-items:center;flex:none;width:30px;height:30px;margin-left:auto;border-radius:8px;color:var(--text-muted);background:none;border:none;cursor:pointer"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/panel-left-close.svg);--s:18px"></span></button>
+    </div>
+    <nav class="scrolly" style="flex:1;min-height:0;overflow-y:auto;padding:8px 0;display:flex;flex-direction:column;gap:1px">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="7">
+        <div class="navitem" style="position:relative;display:flex;align-items:center;gap:12px;margin:2px 10px;padding:11px 14px 11px 20px;border-radius:9px;color:{{ n.color }};background:{{ n.bg }};font-size:13.5px;font-weight:500;white-space:nowrap;cursor:pointer">
+          <span class="{{ n.barClass }}"></span>
+          <span class="ic" style="--i:url('{{ n.iconUrl }}');--s:19px"></span>
+          <span style="min-width:0;overflow:hidden;text-overflow:ellipsis">{{ n.label }}</span>
+        </div>
+      </sc-for>
+    </nav>
+    <div style="flex:none;border-top:1px solid var(--line);padding:12px;display:flex;align-items:center;gap:10px">
+      <span style="display:grid;place-items:center;flex:none;width:34px;height:34px;border-radius:999px;background:var(--nav-active-bg);color:var(--nav-active-text);font-weight:600;font-size:12px">DS</span>
+      <span style="display:flex;flex-direction:column;min-width:0;line-height:1.25">
+        <span style="font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Dedi Supriadi</span>
+        <span style="font-size:10.5px;color:var(--text-muted)">Super Admin</span>
+      </span>
+      <button class="iconbtn" style="display:grid;place-items:center;flex:none;width:32px;height:32px;margin-left:auto;border-radius:8px;color:var(--text-muted);background:none;border:none;cursor:pointer"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/log-out.svg);--s:17px"></span></button>
+    </div>
+  </aside>
+
+  <div style="display:flex;flex-direction:column;flex:1;min-width:0;min-height:0">
+    <header style="display:flex;align-items:center;gap:18px;flex:none;height:60px;padding:0 22px;background:var(--surface-1);border-bottom:1px solid var(--line)">
+      <span style="font-size:16px;font-weight:600;color:var(--text);white-space:nowrap">Manajemen Akses</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:5px;background:var(--nav-active-bg);color:var(--st-blue);font-size:11px;font-weight:600"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/shield-check.svg);--s:13px"></span>access.manage</span>
+      <span style="flex:1"></span>
+      <span style="display:flex;align-items:center;gap:7px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text-muted)"><span style="width:8px;height:8px;border-radius:999px;background:var(--sem-green);animation:blink 1.6s infinite"></span>Realtime</span>
+      <span style="width:1px;height:22px;background:var(--line)"></span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:500;letter-spacing:.5px;color:var(--text-dim)">{{ clock }}</span>
+      <button class="iconbtn" onClick="{{ toggleTheme }}" title="Ganti tema" style="position:relative;display:grid;place-items:center;width:34px;height:34px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line-strong);color:var(--text-muted);cursor:pointer"><span class="ic" style="--i:url('{{ themeIconUrl }}');--s:17px"></span></button>
+      <button class="iconbtn" title="Notifikasi" style="position:relative;display:grid;place-items:center;width:34px;height:34px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line-strong);color:var(--text-muted);cursor:pointer"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/bell.svg);--s:17px"></span></button>
+    </header>
+
+    <div class="scrolly" style="flex:1;min-height:0;overflow:auto;padding:22px;position:relative">
+
+      <!-- ============ HUB ============ -->
+      <sc-if value="{{ isHub }}" hint-placeholder-val="{{ true }}">
+      <div style="max-width:1120px;margin:0 auto;animation:rise .32s ease both">
+        <div style="margin-bottom:22px">
+          <h1 style="font-size:20px;font-weight:600;color:var(--text);margin-bottom:5px">Manajemen Akses</h1>
+          <p style="font-size:13px;color:var(--text-muted);max-width:620px">Kelola siapa boleh melihat dan mengubah apa. Atur role, permission, modul, dan akses tiap pengguna dari satu tempat — tanpa perlu deploy ulang.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px">
+          <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+            <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:12px;color:var(--text-muted);font-weight:500">{{ s.label }}</span>
+                <span style="display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:var(--nav-active-bg);color:var(--st-blue)"><span class="ic" style="--i:url('{{ s.iconUrl }}');--s:16px"></span></span>
+              </div>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:27px;font-weight:600;color:var(--text);line-height:1">{{ s.value }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:22px">
+          <sc-for list="{{ shortcuts }}" as="c" hint-placeholder-count="4">
+            <div class="shortcut rowh" onClick="{{ c.onOpen }}" style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;align-items:flex-start;gap:14px;cursor:pointer;transition:border-color .15s ease,transform .15s ease">
+              <span style="display:grid;place-items:center;flex:none;width:42px;height:42px;border-radius:10px;background:var(--nav-active-bg);color:var(--st-blue)"><span class="ic" style="--i:url('{{ c.iconUrl }}');--s:21px"></span></span>
+              <span style="display:flex;flex-direction:column;gap:3px;min-width:0;flex:1">
+                <span style="font-size:14px;font-weight:600;color:var(--text)">{{ c.title }}</span>
+                <span style="font-size:12px;color:var(--text-muted);line-height:1.5">{{ c.desc }}</span>
+                <span style="font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--text-faint);margin-top:4px">{{ c.meta }}</span>
+              </span>
+              <span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/chevron-right.svg);--s:18px;color:var(--text-faint)"></span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:18px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+            <span style="display:grid;place-items:center;width:34px;height:34px;border-radius:999px;background:var(--nav-active-bg);color:var(--nav-active-text);font-weight:600;font-size:12px">DS</span>
+            <span style="display:flex;flex-direction:column;line-height:1.3"><span style="font-size:14px;font-weight:600;color:var(--text)">Akses efektif saya</span><span style="font-size:11px;color:var(--text-muted)">Dedi Supriadi · super_admin</span></span>
+            <span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:5px;background:rgba(52,211,153,.16);color:var(--st-green);font-size:11px;font-weight:600"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/shield-check.svg);--s:13px"></span>Bypass penuh</span>
+          </div>
+          <p style="font-size:12.5px;color:var(--text-dim);line-height:1.6">Sebagai super admin, Anda memiliki level <b style="color:var(--text)">Hapus</b> pada seluruh 20 modul dan seluruh permission secara otomatis. Branch scope tidak membatasi akun ini.</p>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ ROLES LIST ============ -->
+      <sc-if value="{{ isRoles }}" hint-placeholder-val="{{ true }}">
+      <div style="max-width:1120px;margin:0 auto;animation:rise .32s ease both;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted)">
+          <a onClick="{{ goHub }}" style="cursor:pointer;color:var(--text-muted)">Manajemen Akses</a>
+          <span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/chevron-right.svg);--s:14px"></span>
+          <span style="color:var(--text)">Role</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <h1 style="font-size:20px;font-weight:600;color:var(--text)">Role</h1>
+          <span style="flex:1"></span>
+          <div style="display:inline-flex;gap:3px;padding:3px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:10px">
+            <sc-for list="{{ statePreview }}" as="p" hint-placeholder-count="4">
+              <button onClick="{{ p.onClick }}" style="padding:7px 12px;border-radius:7px;border:none;background:{{ p.bg }};color:{{ p.color }};font-size:12px;font-weight:600;cursor:pointer">{{ p.label }}</button>
+            </sc-for>
+          </div>
+          <div style="display:flex;align-items:center;gap:9px;padding:9px 12px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:9px;width:260px">
+            <span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/search.svg);--s:16px;color:var(--text-faint)"></span>
+            <input placeholder="Cari role…" style="flex:1;min-width:0;border:none;background:none;outline:none;font-size:12.5px;color:var(--text);font-family:inherit">
+          </div>
+          <button class="btnp" onClick="{{ openCreateRole }}" style="display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:9px;background:var(--st-blue);color:#fff;border:1px solid transparent;font-size:13px;font-weight:600;cursor:pointer"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/plus.svg);--s:16px"></span>Buat Role</button>
+        </div>
+
+        <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;overflow:hidden">
+          <div style="display:grid;grid-template-columns:2fr 1.3fr .7fr .9fr .8fr 84px;align-items:center;gap:12px;padding:11px 18px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-faint);border-bottom:1px solid var(--line)">
+            <span>Role</span><span>Status</span><span>Pengguna</span><span>Permission</span><span>Modul</span><span></span>
+          </div>
+          <!-- normal -->
+          <sc-if value="{{ stateNormal }}" hint-placeholder-val="{{ true }}">
+            <sc-for list="{{ roles }}" as="r" hint-placeholder-count="7">
+              <div class="rowh" onClick="{{ r.onOpen }}" style="display:grid;grid-template-columns:2fr 1.3fr .7fr .9fr .8fr 84px;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--line-soft);cursor:pointer;font-size:12.5px;transition:background .15s ease">
+                <span style="display:flex;align-items:center;gap:11px;min-width:0">
+                  <span style="display:grid;place-items:center;width:36px;height:36px;border-radius:9px;background:var(--nav-active-bg);color:var(--st-blue);flex:none"><span class="ic" style="--i:url('{{ r.iconUrl }}');--s:18px"></span></span>
+                  <span style="display:flex;flex-direction:column;min-width:0">
+                    <span style="font-weight:600;color:var(--text);display:flex;align-items:center;gap:7px;white-space:nowrap">{{ r.name }}<span class="{{ r.lockClass }}" title="Role sistem — terkunci"></span></span>
+                    <span style="font-size:10.5px;font-family:'IBM Plex Mono',monospace;color:var(--text-muted)">{{ r.code }}</span>
+                  </span>
+                </span>
+                <span style="display:flex;gap:5px;flex-wrap:wrap">
+                  <span class="{{ r.sysBadgeClass }}" style="{{ r.sysBadgeStyle }}">{{ r.sysBadge }}</span>
+                  <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:5px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.2px;background:{{ r.statusBg }};color:{{ r.statusColor }}"><span style="width:6px;height:6px;border-radius:999px;background:currentColor"></span>{{ r.statusLabel }}</span>
+                </span>
+                <span style="font-family:'IBM Plex Mono',monospace;color:var(--text-dim)">{{ r.userCount }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;color:var(--text-dim)">{{ r.permCount }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;color:var(--text-dim)">{{ r.moduleCount }}</span>
+                <span style="display:flex;gap:4px;justify-content:flex-end" onClick="{{ stop }}">
+                  <button class="iconbtn" onClick="{{ r.onOpen }}" title="Ubah" style="display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:none;border:none;color:var(--text-muted);cursor:pointer"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/pencil.svg);--s:16px"></span></button>
+                  <button class="iconbtn" onClick="{{ r.onDelete }}" title="{{ r.deleteTitle }}" disabled="{{ r.deleteDisabled }}" style="display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:none;border:none;color:{{ r.deleteColor }};cursor:{{ r.deleteCursor }}"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/trash-2.svg);--s:16px"></span></button>
+                </span>
+              </div>
+            </sc-for>
+          </sc-if>
+          <!-- loading -->
+          <sc-if value="{{ stateLoading }}" hint-placeholder-val="{{ false }}">
+            <sc-for list="{{ sklRows }}" as="k" hint-placeholder-count="6">
+              <div style="display:grid;grid-template-columns:2fr 1.3fr .7fr .9fr .8fr 84px;align-items:center;gap:12px;padding:15px 18px;border-bottom:1px solid var(--line-soft)">
+                <span style="display:flex;align-items:center;gap:11px"><span class="skl" style="width:36px;height:36px;border-radius:9px"></span><span class="skl" style="width:120px;height:14px"></span></span>
+                <span class="skl" style="width:80px;height:20px;border-radius:5px"></span><span class="skl" style="width:24px;height:12px"></span><span class="skl" style="width:24px;height:12px"></span><span class="skl" style="width:24px;height:12px"></span><span></span>
+              </div>
+            </sc-for>
+          </sc-if>
+          <!-- empty -->
+          <sc-if value="{{ stateEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:320px;text-align:center;padding:40px">
+              <span style="display:grid;place-items:center;width:56px;height:56px;border-radius:12px;background:var(--surface-3);border:1px solid var(--line);color:var(--text-faint)"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/shield.svg);--s:26px"></span></span>
+              <span style="font-size:16px;font-weight:600;color:var(--text)">Belum ada role buatan</span>
+              <span style="font-size:12.5px;color:var(--text-muted);max-width:420px;line-height:1.55">Role sistem seperti <b style="color:var(--text-dim)">super_admin</b> selalu ada. Buat role baru untuk mengelompokkan izin sesuai kebutuhan tim Anda.</span>
+              <button class="btnp" onClick="{{ openCreateRole }}" style="margin-top:4px;display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:9px;background:var(--st-blue);color:#fff;border:1px solid transparent;font-size:13px;font-weight:600;cursor:pointer"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/plus.svg);--s:16px"></span>Buat Role</button>
+            </div>
+          </sc-if>
+          <!-- error -->
+          <sc-if value="{{ stateError }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:320px;text-align:center;padding:40px">
+              <span style="display:grid;place-items:center;width:56px;height:56px;border-radius:12px;background:rgba(244,63,94,.12);border:1px solid var(--line);color:var(--sem-red)"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/triangle-alert.svg);--s:26px"></span></span>
+              <span style="font-size:16px;font-weight:600;color:var(--text)">Gagal memuat role</span>
+              <span style="font-size:12.5px;color:var(--text-muted);max-width:420px;line-height:1.55">Sambungan ke server terputus. Periksa koneksi lalu coba lagi.</span>
+              <button class="btns" onClick="{{ stateToNormal }}" style="margin-top:4px;display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line-strong);color:var(--text);font-size:13px;font-weight:600;cursor:pointer"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/refresh-cw.svg);--s:16px"></span>Coba lagi</button>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ ROLE EDITOR ============ -->
+      <sc-if value="{{ isEditor }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:1120px;margin:0 auto;animation:rise .32s ease both;display:flex;flex-direction:column;gap:16px;padding-bottom:72px">
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted)">
+          <a onClick="{{ goHub }}" style="cursor:pointer;color:var(--text-muted)">Manajemen Akses</a>
+          <span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/chevron-right.svg);--s:14px"></span>
+          <a onClick="{{ goRoles }}" style="cursor:pointer;color:var(--text-muted)">Role</a>
+          <span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/chevron-right.svg);--s:14px"></span>
+          <span style="color:var(--text)">{{ ed.name }}</span>
+        </div>
+
+        <div style="display:flex;align-items:flex-start;gap:14px">
+          <span style="display:grid;place-items:center;width:46px;height:46px;border-radius:10px;background:var(--nav-active-bg);color:var(--st-blue);flex:none"><span class="ic" style="--i:url('{{ ed.iconUrl }}');--s:23px"></span></span>
+          <div style="min-width:0;flex:1">
+            <div style="display:flex;align-items:center;gap:10px">
+              <h1 style="font-size:20px;font-weight:600;color:var(--text)">{{ ed.name }}</h1>
+              <sc-if value="{{ ed.isSystem }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:5px;background:var(--surface-3);color:var(--text-dim);font-size:11px;font-weight:600"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/lock.svg);--s:12px"></span>Role sistem</span></sc-if>
+            </div>
+            <span style="font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--text-muted)">{{ ed.code }}</span>
+          </div>
+          <span style="display:flex;flex-direction:column;align-items:flex-end;gap:3px"><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:var(--text)">{{ ed.userCount }}</span><span style="font-size:10.5px;color:var(--text-muted)">pengguna memakai</span></span>
+        </div>
+
+        <sc-if value="{{ ed.isSystem }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:9px;background:var(--surface-3);border:1px solid var(--line);font-size:12.5px;color:var(--text-dim)">
+            <span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/lock.svg);--s:16px;color:var(--st-amber);flex:none"></span>
+            <span>Role sistem tak bisa dinonaktifkan atau dihapus, dan permission-nya tak bisa dikurangi. Anda masih boleh <b style="color:var(--text)">menambah</b> akses.</span>
+          </div>
+        </sc-if>
+
+        <!-- INFO -->
+        <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:16px">
+          <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-faint)">Informasi</span>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div>
+              <label style="display:block;font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px">Nama Role</label>
+              <input value="{{ ed.name }}" onInput="{{ ed.onName }}" disabled="{{ ed.infoLocked }}" style="width:100%;padding:9px 12px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:9px;color:var(--text);font-size:12.5px;font-family:inherit;outline:none">
+            </div>
+            <div>
+              <label style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px">Kode <span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/lock.svg);--s:12px"></span><span style="font-weight:500;text-transform:none;color:var(--text-faint)">permanen</span></label>
+              <input value="{{ ed.code }}" disabled="true" style="width:100%;padding:9px 12px;background:var(--surface-3);border:1px solid var(--line);border-radius:9px;color:var(--text-muted);font-size:12.5px;font-family:'IBM Plex Mono',monospace;outline:none;cursor:not-allowed">
+            </div>
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px">Deskripsi</label>
+            <textarea value="{{ ed.desc }}" onInput="{{ ed.onDesc }}" disabled="{{ ed.infoLocked }}" style="width:100%;min-height:60px;padding:9px 12px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:9px;color:var(--text);font-size:12.5px;font-family:inherit;outline:none;resize:vertical"></textarea>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--text-dim)">
+            <button onClick="{{ ed.onToggleActive }}" disabled="{{ ed.isSystem }}" style="position:relative;width:36px;height:20px;border-radius:999px;background:{{ ed.activeTrack }};border:1px solid {{ ed.activeBorder }};cursor:{{ ed.activeCursor }};flex:none"><span style="position:absolute;top:50%;left:2px;width:14px;height:14px;border-radius:999px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.35);transform:{{ ed.activeThumb }}"></span></button>
+            Role aktif
+            <sc-if value="{{ ed.isSystem }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;color:var(--text-faint)">— terkunci untuk role sistem</span></sc-if>
+          </div>
+        </div>
+
+        <!-- MATRIX -->
+        <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;overflow:hidden">
+          <div style="display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line)">
+            <span style="font-size:14px;font-weight:600;color:var(--text)">Akses Modul</span>
+            <span style="font-size:12px;color:var(--text-muted)">Tetapkan level akses role ini per modul.</span>
+            <span style="flex:1"></span>
+            <div style="display:flex;align-items:center;gap:12px">
+              <sc-for list="{{ levelLegend }}" as="l" hint-placeholder-count="4">
+                <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--text-muted)"><span style="width:10px;height:10px;border-radius:3px;background:{{ l.swatch }}"></span>{{ l.label }}</span>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 440px;align-items:center;gap:12px;padding:10px 18px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-faint);border-bottom:1px solid var(--line)">
+            <span>Modul</span>
+            <span style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center">
+              <span>Tidak ada</span><span>Lihat</span><span>Ubah</span><span>Hapus</span>
+            </span>
+          </div>
+          <div class="scrolly" style="max-height:440px;overflow-y:auto">
+          <sc-for list="{{ ed.matrix }}" as="g" hint-placeholder-count="6">
+            <div>
+              <div style="display:flex;align-items:center;gap:10px;padding:9px 18px;background:var(--surface-3);border-bottom:1px solid var(--line-soft)">
+                <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--text-dim)">{{ g.group }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--text-faint)">{{ g.count }}</span>
+              </div>
+              <sc-for list="{{ g.modules }}" as="m" hint-placeholder-count="3">
+                <div style="display:grid;grid-template-columns:1fr 440px;align-items:center;gap:12px;padding:10px 18px;border-bottom:1px solid var(--line-soft)">
+                  <span style="display:flex;flex-direction:column;min-width:0">
+                    <span style="font-size:12.5px;font-weight:500;color:var(--text)">{{ m.name }}</span>
+                    <span style="font-size:10.5px;font-family:'IBM Plex Mono',monospace;color:var(--text-muted)">{{ m.code }}</span>
+                  </span>
+                  <span style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
+                    <sc-for list="{{ m.cells }}" as="c" hint-placeholder-count="4">
+                      <button onClick="{{ c.onClick }}" title="{{ c.title }}" style="display:flex;align-items:center;justify-content:center;gap:5px;padding:7px 4px;border-radius:7px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }};font-size:11.5px;font-weight:{{ c.weight }};cursor:{{ c.cursor }}">
+                        <span class="ic" style="--i:url('{{ c.iconUrl }}');--s:14px"></span>{{ c.label }}
+                      </button>
+                    </sc-for>
+                  </span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+          </div>
+        </div>
+
+        <!-- PERMISSIONS -->
+        <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;overflow:hidden">
+          <div style="display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line)">
+            <span style="font-size:14px;font-weight:600;color:var(--text)">Permission</span>
+            <span style="font-size:12px;color:var(--text-muted)">Izin aksi granular di luar level modul.</span>
+            <span style="flex:1"></span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text-dim)">{{ ed.permSelected }} dipilih</span>
+          </div>
+          <div class="scrolly" style="max-height:360px;overflow-y:auto;padding:6px 0">
+          <sc-for list="{{ ed.permGroups }}" as="pg" hint-placeholder-count="6">
+            <div style="padding:8px 18px">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+                <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--text-faint)">{{ pg.group }}</span>
+                <span style="flex:1;height:1px;background:var(--line-soft)"></span>
+                <button onClick="{{ pg.onAll }}" style="font-size:11px;font-weight:600;color:var(--st-blue);background:none;border:none;cursor:pointer">{{ pg.allLabel }}</button>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px">
+                <sc-for list="{{ pg.perms }}" as="p" hint-placeholder-count="4">
+                  <button onClick="{{ p.onToggle }}" title="{{ p.title }}" style="display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:8px;border:1px solid {{ p.border }};background:{{ p.bg }};cursor:{{ p.cursor }};text-align:left">
+                    <span style="display:grid;place-items:center;width:17px;height:17px;border-radius:5px;border:1px solid {{ p.boxBorder }};background:{{ p.boxBg }};flex:none"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/check.svg);--s:12px;color:#fff;opacity:{{ p.checkOpacity }}"></span></span>
+                    <span style="display:flex;flex-direction:column;min-width:0">
+                      <span style="font-size:12px;font-weight:500;color:var(--text)">{{ p.name }}</span>
+                      <span style="font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.code }}</span>
+                    </span>
+                    <sc-if value="{{ p.locked }}" hint-placeholder-val="{{ false }}"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/lock.svg);--s:13px;color:var(--text-faint);margin-left:auto;flex:none"></span></sc-if>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <!-- UNSAVED BAR -->
+      <sc-if value="{{ dirty }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:14px;padding:14px 22px;background:var(--surface-1);border-top:1px solid var(--line-strong);box-shadow:0 -6px 24px rgba(0,0,0,.14);animation:slideUp .2s ease both;z-index:40">
+          <span style="display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-dim)"><span style="width:8px;height:8px;border-radius:999px;background:var(--sem-amber)"></span>Perubahan belum disimpan</span>
+          <span style="flex:1"></span>
+          <button class="btng" onClick="{{ cancelEdit }}" style="padding:9px 16px;border-radius:9px;background:transparent;border:1px solid transparent;color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer">Batalkan</button>
+          <button class="btnp" onClick="{{ saveEdit }}" style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;background:var(--st-blue);color:#fff;border:1px solid transparent;font-size:13px;font-weight:600;cursor:pointer"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/check.svg);--s:16px"></span>Simpan Perubahan</button>
+        </div>
+      </sc-if>
+      </sc-if>
+
+      <!-- ============ PERMISSION CATALOG ============ -->
+      <sc-if value="{{ isPerms }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:1120px;margin:0 auto;animation:rise .32s ease both;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted)">
+          <a onClick="{{ goHub }}" style="cursor:pointer;color:var(--text-muted)">Manajemen Akses</a>
+          <span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/chevron-right.svg);--s:14px"></span>
+          <span style="color:var(--text)">Permission</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <h1 style="font-size:20px;font-weight:600;color:var(--text)">Katalog Permission</h1>
+          <span style="flex:1"></span>
+          <button class="btnp" onClick="{{ noop }}" style="display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:9px;background:var(--st-blue);color:#fff;border:1px solid transparent;font-size:13px;font-weight:600;cursor:pointer"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/plus.svg);--s:16px"></span>Tambah Permission</button>
+        </div>
+        <sc-for list="{{ permCatalog }}" as="pg" hint-placeholder-count="5">
+          <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;overflow:hidden">
+            <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--line)">
+              <span style="font-size:12.5px;font-weight:600;color:var(--text);text-transform:capitalize">{{ pg.group }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--text-faint)">{{ pg.count }} permission</span>
+            </div>
+            <sc-for list="{{ pg.perms }}" as="p" hint-placeholder-count="3">
+              <div class="rowh" style="display:grid;grid-template-columns:1.4fr 2fr .9fr 72px;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid var(--line-soft);font-size:12.5px;transition:background .15s ease">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--text-dim)">{{ p.code }}</span>
+                <span style="color:var(--text)">{{ p.name }}</span>
+                <span><span style="display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:600;background:{{ p.countBg }};color:{{ p.countColor }}">{{ p.roleCount }} role</span></span>
+                <span style="display:flex;gap:4px;justify-content:flex-end">
+                  <button class="iconbtn" onClick="{{ noop }}" title="Ubah" style="display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:none;border:none;color:var(--text-muted);cursor:pointer"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/pencil.svg);--s:15px"></span></button>
+                  <button class="iconbtn" onClick="{{ p.onDelete }}" title="{{ p.deleteTitle }}" style="display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:none;border:none;color:{{ p.deleteColor }};cursor:pointer"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/trash-2.svg);--s:15px"></span></button>
+                </span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+      </sc-if>
+
+      <!-- ============ MODULE CATALOG ============ -->
+      <sc-if value="{{ isModules }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:1120px;margin:0 auto;animation:rise .32s ease both;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted)">
+          <a onClick="{{ goHub }}" style="cursor:pointer;color:var(--text-muted)">Manajemen Akses</a>
+          <span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/chevron-right.svg);--s:14px"></span>
+          <span style="color:var(--text)">Modul</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <h1 style="font-size:20px;font-weight:600;color:var(--text)">Katalog Modul</h1>
+          <span style="flex:1"></span>
+          <button class="btnp" onClick="{{ noop }}" style="display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:9px;background:var(--st-blue);color:#fff;border:1px solid transparent;font-size:13px;font-weight:600;cursor:pointer"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/plus.svg);--s:16px"></span>Tambah Modul</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:9px;background:var(--surface-3);border:1px solid var(--line);font-size:12.5px;color:var(--text-dim)">
+          <span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/info.svg);--s:16px;color:var(--st-blue);flex:none"></span>
+          <span>Modul baru hanya terdaftar di katalog. Agar aktif, hubungkan ke menu dan beri level akses pada role terkait.</span>
+        </div>
+        <sc-for list="{{ moduleCatalog }}" as="mg" hint-placeholder-count="6">
+          <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:12px;overflow:hidden">
+            <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--line)">
+              <span style="font-size:12.5px;font-weight:600;color:var(--text)">{{ mg.group }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--text-faint)">{{ mg.count }} modul</span>
+            </div>
+            <sc-for list="{{ mg.modules }}" as="m" hint-placeholder-count="3">
+              <div class="rowh" style="display:grid;grid-template-columns:1.6fr 1.4fr .6fr .9fr 72px;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid var(--line-soft);font-size:12.5px;transition:background .15s ease">
+                <span style="display:flex;flex-direction:column"><span style="font-weight:500;color:var(--text)">{{ m.name }}</span><span style="font-size:10.5px;font-family:'IBM Plex Mono',monospace;color:var(--text-muted)">{{ m.code }}</span></span>
+                <span><span style="display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:600;background:{{ m.countBg }};color:{{ m.countColor }}">{{ m.roleCount }} role</span></span>
+                <span style="font-family:'IBM Plex Mono',monospace;color:var(--text-muted)">#{{ m.order }}</span>
+                <span style="display:flex;align-items:center;gap:8px">
+                  <button onClick="{{ m.onToggle }}" style="position:relative;width:36px;height:20px;border-radius:999px;background:{{ m.track }};border:1px solid {{ m.trackBorder }};cursor:pointer;flex:none"><span style="position:absolute;top:50%;left:2px;width:14px;height:14px;border-radius:999px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.35);transform:{{ m.thumb }}"></span></button>
+                  <span style="font-size:11px;color:var(--text-muted)">{{ m.activeLabel }}</span>
+                </span>
+                <span style="display:flex;gap:4px;justify-content:flex-end">
+                  <button class="iconbtn" onClick="{{ noop }}" title="Ubah" style="display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:none;border:none;color:var(--text-muted);cursor:pointer"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/pencil.svg);--s:15px"></span></button>
+                  <button class="iconbtn" onClick="{{ m.onDelete }}" title="{{ m.deleteTitle }}" style="display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:none;border:none;color:{{ m.deleteColor }};cursor:pointer"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/trash-2.svg);--s:15px"></span></button>
+                </span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+      </sc-if>
+
+      <!-- ============ USERS ============ -->
+      <sc-if value="{{ isUsers }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:1120px;margin:0 auto;animation:rise .32s ease both;display:flex;flex-direction:column;gap:16px;height:100%;min-height:0">
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted)">
+          <a onClick="{{ goHub }}" style="cursor:pointer;color:var(--text-muted)">Manajemen Akses</a>
+          <span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/chevron-right.svg);--s:14px"></span>
+          <span style="color:var(--text)">Pengguna</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <h1 style="font-size:20px;font-weight:600;color:var(--text)">Pengguna &amp; Akses Efektif</h1>
+          <span style="flex:1"></span>
+          <button class="btnp" onClick="{{ noop }}" style="display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:9px;background:var(--st-blue);color:#fff;border:1px solid transparent;font-size:13px;font-weight:600;cursor:pointer"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/plus.svg);--s:16px"></span>Tambah Pengguna</button>
+        </div>
+        <div style="display:flex;gap:16px;flex:1;min-height:0">
+          <div style="flex:1;min-width:0;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column">
+            <div style="display:grid;grid-template-columns:1.8fr 1.6fr .9fr .9fr;align-items:center;gap:12px;padding:11px 18px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-faint);border-bottom:1px solid var(--line)"><span>Pengguna</span><span>Role</span><span>Ruas</span><span>Status</span></div>
+            <div class="scrolly" style="flex:1;overflow-y:auto">
+              <sc-for list="{{ users }}" as="u" hint-placeholder-count="6">
+                <div class="rowh" onClick="{{ u.onSelect }}" style="display:grid;grid-template-columns:1.8fr 1.6fr .9fr .9fr;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line-soft);cursor:pointer;background:{{ u.rowBg }};font-size:12.5px;transition:background .15s ease">
+                  <span style="display:flex;align-items:center;gap:10px;min-width:0"><span style="display:grid;place-items:center;width:34px;height:34px;border-radius:999px;background:var(--nav-active-bg);color:var(--nav-active-text);font-weight:600;font-size:12px;flex:none">{{ u.initials }}</span><span style="display:flex;flex-direction:column;min-width:0"><span style="font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ u.name }}</span><span style="font-size:10.5px;font-family:'IBM Plex Mono',monospace;color:var(--text-muted)">{{ u.username }}</span></span></span>
+                  <span style="display:flex;gap:5px;flex-wrap:wrap"><sc-for list="{{ u.roleChips }}" as="rc" hint-placeholder-count="2"><span style="padding:2px 8px;border-radius:5px;font-size:11px;font-weight:600;background:var(--nav-active-bg);color:var(--nav-active-text)">{{ rc.label }}</span></sc-for></span>
+                  <span style="color:var(--text-muted)">{{ u.ruas }}</span>
+                  <span><span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:5px;font-size:11px;font-weight:600;text-transform:uppercase;background:{{ u.statusBg }};color:{{ u.statusColor }}"><span style="width:6px;height:6px;border-radius:999px;background:currentColor"></span>{{ u.statusLabel }}</span></span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <aside style="flex:none;width:340px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;min-height:0;overflow:hidden;animation:slideInRight .3s cubic-bezier(.22,1,.36,1) both">
+            <div style="display:flex;align-items:center;gap:12px;padding:16px;border-bottom:1px solid var(--line)">
+              <span style="display:grid;place-items:center;width:38px;height:38px;border-radius:999px;background:var(--nav-active-bg);color:var(--nav-active-text);font-weight:600;font-size:13px;flex:none">{{ su.initials }}</span>
+              <span style="display:flex;flex-direction:column;min-width:0"><span style="font-weight:600;color:var(--text)">{{ su.name }}</span><span style="font-size:10.5px;font-family:'IBM Plex Mono',monospace;color:var(--text-muted)">{{ su.username }}</span></span>
+            </div>
+            <div class="scrolly" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:16px">
+              <div style="display:flex;flex-direction:column;gap:7px">
+                <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-faint)">Role</span>
+                <div style="display:flex;gap:5px;flex-wrap:wrap"><sc-for list="{{ su.roleChips }}" as="rc" hint-placeholder-count="2"><span style="padding:2px 8px;border-radius:5px;font-size:11px;font-weight:600;background:var(--nav-active-bg);color:var(--nav-active-text)">{{ rc.label }}</span></sc-for></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:7px">
+                <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-faint)">Akses Modul Efektif</span>
+                <span style="font-size:11px;color:var(--text-muted);line-height:1.5">Level tertinggi dari gabungan role, lalu ditimpa override user.</span>
+                <sc-for list="{{ su.modules }}" as="m" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;background:var(--surface-3);border:1px solid {{ m.rowBorder }}">
+                    <span style="display:flex;flex-direction:column;min-width:0;flex:1"><span style="font-size:12px;color:var(--text)">{{ m.name }}</span><span style="font-size:10px;color:var(--text-muted)">{{ m.source }}</span></span>
+                    <span style="display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:5px;font-size:10.5px;font-weight:600;background:{{ m.bg }};color:{{ m.color }}"><span class="ic" style="--i:url('{{ m.iconUrl }}');--s:12px"></span>{{ m.level }}</span>
+                    <sc-if value="{{ m.override }}" hint-placeholder-val="{{ false }}"><span style="padding:2px 6px;border-radius:5px;font-size:9.5px;font-weight:600;background:rgba(251,191,36,.16);color:var(--st-amber)">OVERRIDE</span></sc-if>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:7px">
+                <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-faint)">Branch Scope</span>
+                <div style="display:flex;gap:5px;flex-wrap:wrap"><sc-for list="{{ su.branches }}" as="b" hint-placeholder-count="2"><span style="padding:2px 8px;border-radius:5px;font-size:11px;font-weight:600;font-family:'IBM Plex Mono',monospace;background:rgba(52,211,153,.16);color:var(--st-green)">{{ b.label }}</span></sc-for></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:7px">
+                <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-faint)">Permission Efektif ({{ su.permCount }})</span>
+                <div style="display:flex;gap:5px;flex-wrap:wrap"><sc-for list="{{ su.perms }}" as="p" hint-placeholder-count="6"><span style="padding:2px 8px;border-radius:5px;font-size:10px;font-family:'IBM Plex Mono',monospace;font-weight:500;background:var(--surface-3);color:var(--text-dim)">{{ p.code }}</span></sc-for></div>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;padding:14px 16px;border-top:1px solid var(--line)">
+              <button class="btns" onClick="{{ noop }}" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 16px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line-strong);color:var(--text);font-size:13px;font-weight:600;cursor:pointer"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/user.svg);--s:16px"></span>Ubah</button>
+            </div>
+          </aside>
+        </div>
+      </div>
+      </sc-if>
+
+    </div>
+  </div>
+
+  <!-- ============ MODALS ============ -->
+  <sc-if value="{{ modalCreate }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeModal }}" style="position:fixed;inset:0;z-index:100;background:rgba(9,16,30,.55);backdrop-filter:blur(2px);animation:overlayIn .25s"></div>
+    <div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:101;width:min(92vw,480px);background:var(--surface-1);border:1px solid var(--line-strong);border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.4);overflow:hidden;animation:contentIn .18s">
+      <div style="display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line)"><span style="font-size:16px;font-weight:600;color:var(--text)">Buat Role Baru</span><button class="iconbtn" onClick="{{ closeModal }}" style="margin-left:auto;display:grid;place-items:center;width:30px;height:30px;border-radius:8px;color:var(--text-muted);background:none;border:none;cursor:pointer"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/x.svg);--s:17px"></span></button></div>
+      <div style="padding:18px;display:flex;flex-direction:column;gap:14px">
+        <div><label style="display:block;font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px">Nama Role *</label><input value="{{ nr.name }}" onInput="{{ nr.onName }}" placeholder="mis. Operator Gerbang" style="width:100%;padding:9px 12px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:9px;color:var(--text);font-size:12.5px;font-family:inherit;outline:none"></div>
+        <div>
+          <label style="display:block;font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px">Kode *</label>
+          <input value="{{ nr.code }}" onInput="{{ nr.onCode }}" placeholder="operator_gerbang" style="width:100%;padding:9px 12px;background:var(--surface-2);border:1px solid {{ nr.codeBorder }};border-radius:9px;color:var(--text);font-size:12.5px;font-family:'IBM Plex Mono',monospace;outline:none">
+          <div style="font-size:11px;color:{{ nr.hintColor }};margin-top:5px">{{ nr.codeHint }}</div>
+        </div>
+        <div><label style="display:block;font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px">Deskripsi</label><textarea value="{{ nr.desc }}" onInput="{{ nr.onDesc }}" placeholder="Jelaskan singkat tujuan role ini" style="width:100%;min-height:56px;padding:9px 12px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:9px;color:var(--text);font-size:12.5px;font-family:inherit;outline:none;resize:vertical"></textarea></div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--text-muted);padding:10px 12px;border-radius:8px;background:var(--surface-3)"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/info.svg);--s:14px;flex:none"></span>Kode bersifat permanen. Setelah dibuat, Anda hanya bisa mengubah nama dan deskripsi.</div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;padding:14px 18px;border-top:1px solid var(--line)"><button class="btng" onClick="{{ closeModal }}" style="padding:9px 16px;border-radius:9px;background:transparent;border:1px solid transparent;color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer">Batal</button><button class="btnp" onClick="{{ nr.onCreate }}" disabled="{{ nr.disabled }}" style="padding:9px 16px;border-radius:9px;background:var(--st-blue);color:#fff;border:1px solid transparent;font-size:13px;font-weight:600;cursor:{{ nr.cursor }};opacity:{{ nr.opacity }}">Buat &amp; Atur Akses</button></div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ modalReassign }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeModal }}" style="position:fixed;inset:0;z-index:100;background:rgba(9,16,30,.55);backdrop-filter:blur(2px);animation:overlayIn .25s"></div>
+    <div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:101;width:min(92vw,500px);background:var(--surface-1);border:1px solid var(--line-strong);border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.4);overflow:hidden;animation:contentIn .18s">
+      <div style="display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line)"><span style="display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:rgba(251,191,36,.16);color:var(--st-amber)"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/triangle-alert.svg);--s:17px"></span></span><span style="font-size:16px;font-weight:600;color:var(--text)">Role masih dipakai</span><button class="iconbtn" onClick="{{ closeModal }}" style="margin-left:auto;display:grid;place-items:center;width:30px;height:30px;border-radius:8px;color:var(--text-muted);background:none;border:none;cursor:pointer"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/x.svg);--s:17px"></span></button></div>
+      <div style="padding:18px;display:flex;flex-direction:column;gap:14px">
+        <p style="font-size:13px;color:var(--text-dim);line-height:1.6">Role <b style="color:var(--text)">{{ ra.roleName }}</b> dipakai oleh <b style="color:var(--text)">{{ ra.count }} pengguna</b>. Pindahkan dulu mereka ke role lain sebelum menghapus.</p>
+        <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-faint)">Pengguna terdampak</span>
+          <sc-for list="{{ ra.users }}" as="u" hint-placeholder-count="3"><div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;background:var(--surface-3)"><span style="display:grid;place-items:center;width:28px;height:28px;border-radius:999px;background:var(--nav-active-bg);color:var(--nav-active-text);font-size:11px;font-weight:600">{{ u.initials }}</span><span style="font-size:12px;color:var(--text)">{{ u.name }}</span><span style="font-size:10.5px;font-family:'IBM Plex Mono',monospace;color:var(--text-muted);margin-left:auto">{{ u.username }}</span></div></sc-for>
+        </div>
+        <div><label style="display:block;font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px">Pindahkan ke role</label><div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:9px;color:var(--text);font-size:12.5px;cursor:pointer">Pemantau Ruas<span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/chevron-down.svg);--s:16px;color:var(--text-faint)"></span></div></div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;padding:14px 18px;border-top:1px solid var(--line)"><button class="btng" onClick="{{ closeModal }}" style="padding:9px 16px;border-radius:9px;background:transparent;border:1px solid transparent;color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer">Batal</button><button class="btnp" onClick="{{ closeModal }}" style="display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:9px;background:var(--st-blue);color:#fff;border:1px solid transparent;font-size:13px;font-weight:600;cursor:pointer"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/users.svg);--s:16px"></span>Pindahkan &amp; Hapus Role</button></div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ modalBlocked }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeModal }}" style="position:fixed;inset:0;z-index:100;background:rgba(9,16,30,.55);backdrop-filter:blur(2px);animation:overlayIn .25s"></div>
+    <div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:101;width:min(92vw,460px);background:var(--surface-1);border:1px solid var(--line-strong);border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.4);overflow:hidden;animation:contentIn .18s">
+      <div style="display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line)"><span style="display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:rgba(244,63,94,.14);color:var(--sem-red)"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/ban.svg);--s:17px"></span></span><span style="font-size:16px;font-weight:600;color:var(--text)">Tidak dapat dihapus</span><button class="iconbtn" onClick="{{ closeModal }}" style="margin-left:auto;display:grid;place-items:center;width:30px;height:30px;border-radius:8px;color:var(--text-muted);background:none;border:none;cursor:pointer"><span class="ic" style="--i:url(https://unpkg.com/lucide-static@0.469.0/icons/x.svg);--s:17px"></span></button></div>
+      <div style="padding:18px;display:flex;flex-direction:column;gap:12px">
+        <p style="font-size:13px;color:var(--text-dim);line-height:1.6"><b style="color:var(--text)">{{ bl.name }}</b> masih direferensikan dan tak bisa dihapus sampai semua tautannya dilepas.</p>
+        <div style="display:flex;flex-direction:column;gap:6px"><sc-for list="{{ bl.refs }}" as="r" hint-placeholder-count="3"><div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;background:var(--surface-3);font-size:12.5px;color:var(--text-dim)"><span class="ic" style="--i:url('{{ r.iconUrl }}');--s:15px;color:var(--text-faint)"></span>{{ r.label }}<span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--text)">{{ r.count }}</span></div></sc-for></div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;padding:14px 18px;border-top:1px solid var(--line)"><button class="btns" onClick="{{ closeModal }}" style="padding:9px 16px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line-strong);color:var(--text);font-size:13px;font-weight:600;cursor:pointer">Mengerti</button></div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ modalDeleteRole }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeModal }}" style="position:fixed;inset:0;z-index:100;background:rgba(9,16,30,.55);backdrop-filter:blur(2px);animation:overlayIn .25s"></div>
+    <div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:101;width:min(92vw,440px);background:var(--surface-1);border:1px solid var(--line-strong);border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.4);overflow:hidden;animation:contentIn .18s">
+      <div style="display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line)"><span style="font-size:16px;font-weight:600;color:var(--text)">Hapus Role</span></div>
+      <div style="padding:18px"><p style="font-size:13px;color:var(--text-dim);line-height:1.6">Hapus role <b style="color:var(--text)">{{ dr.name }}</b> (<span style="font-family:'IBM Plex Mono',monospace">{{ dr.code }}</span>)?<br><span style="color:var(--sem-red)">Tindakan ini permanen dan tidak dapat dibatalkan.</span></p></div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;padding:14px 18px;border-top:1px solid var(--line)"><button class="btng" onClick="{{ closeModal }}" style="padding:9px 16px;border-radius:9px;background:transparent;border:1px solid transparent;color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer">Batal</button><button class="btnd" onClick="{{ dr.onConfirm }}" style="padding:9px 16px;border-radius:9px;background:var(--sem-red);color:#fff;border:1px solid transparent;font-size:13px;font-weight:600;cursor:pointer">Hapus</button></div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ modalCancel }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeModal }}" style="position:fixed;inset:0;z-index:100;background:rgba(9,16,30,.55);backdrop-filter:blur(2px);animation:overlayIn .25s"></div>
+    <div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:101;width:min(92vw,420px);background:var(--surface-1);border:1px solid var(--line-strong);border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.4);overflow:hidden;animation:contentIn .18s">
+      <div style="display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line)"><span style="font-size:16px;font-weight:600;color:var(--text)">Buang perubahan?</span></div>
+      <div style="padding:18px"><p style="font-size:13px;color:var(--text-dim);line-height:1.6">Ada perubahan yang belum disimpan pada role ini. Jika keluar sekarang, perubahan tersebut akan hilang.</p></div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;padding:14px 18px;border-top:1px solid var(--line)"><button class="btng" onClick="{{ closeModal }}" style="padding:9px 16px;border-radius:9px;background:transparent;border:1px solid transparent;color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer">Tetap di sini</button><button class="btnd" onClick="{{ confirmCancel }}" style="padding:9px 16px;border-radius:9px;background:var(--sem-red);color:#fff;border:1px solid transparent;font-size:13px;font-weight:600;cursor:pointer">Buang perubahan</button></div>
+    </div>
+  </sc-if>
+
+  <!-- TOAST -->
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;right:22px;bottom:22px;z-index:200;display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--surface-1);border:1px solid var(--line-strong);border-left:3px solid {{ toastAccent }};border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.28);animation:slideUp .22s ease both;max-width:360px">
+      <span class="ic" style="--i:url('{{ toastIconUrl }}');--s:18px;color:{{ toastAccent }};flex:none"></span>
+      <span style="font-size:12.5px;color:var(--text);font-weight:500">{{ toastMsg }}</span>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+const LUCIDE_MAP = {"radio-tower":"data:image/svg+xml,%3C!--%20%40license%20lucide-static%20v0.469.0%20-%20ISC%20--%3E%0A%3Csvg%0A%20%20class%3D%22lucide%20lucide-radio-tower%22%0A%20%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%0A%20%20width%3D%2224%22%0A%20%20height%3D%2224%22%0A%20%20viewBox%3D%220%200%2024%2024%22%0A%20%20fill%3D%22none%22%0A%20%20stroke%3D%22currentColor%22%0A%20%20stroke-width%3D%222%22%0A%20%20stroke-linecap%3D%22round%22%0A%20%20stroke-linejoin%3D%22round%22%0A%3E%0A%20%20%3Cpath%20d%3D%22M4.9%2016.1C1%2012.2%201%205.8%204.9%201.9%22%20%2F%3E%0A%20%20%3Cpath%20d%3D%22M7.8%204.7a6.14%206.14%200%200%200-.8%207.5%22%20%2F%3E%0A%20%20%3Ccircle%20cx%3D%2212%22%20cy%3D%229%22%20r%3D%222%22%20%2F%3E%0A%20%20%3Cpath%20d%3D%22M16.2%204.8c2%202%202.26%205.11.8%207.47%22%20%2F%3E%0A%20%20%3Cpath%20d%3D%22M19.1%201.9a9.96%209.96%200%200%201%200%2014.1%22%20%2F%3E%0A%20%20%3Cpath%20d%3D%22M9.5%2018h5%22%20%2F%3E%0A%20%20%3Cpath%20d%3D%22m8%2022%204-11%204%2011%22%20%2F%3E%0A%3C%2Fsvg%3E%0A","panel-left-close":"data:image/svg+xml,%3C!--%20%40license%20lucide-static%20v0.469.0%20-%20ISC%20--%3E%0A%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20width%3D%2218%22%20height%3D%2218%22%20x%3D%223%22%20y%3D%223%22%20rx%3D%222%22%2F%3E%3Cpath%20d%3D%22M9%203v18%22%2F%3E%3Cpath%20d%3D%22m16%2015-3-3%203-3%22%2F%3E%3C%2Fsvg%3E","log-out":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M9%2021H5a2%202%200%200%201-2-2V5a2%202%200%200%201%202-2h4%22%2F%3E%3Cpolyline%20points%3D%2216%2017%2021%2012%2016%207%22%2F%3E%3Cline%20x1%3D%2221%22%20x2%3D%229%22%20y1%3D%2212%22%20y2%3D%2212%22%2F%3E%3C%2Fsvg%3E","shield-check":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M20%2013c0%205-3.5%207.5-7.66%208.95a1%201%200%200%201-.67-.01C7.5%2020.5%204%2018%204%2013V6a1%201%200%200%201%201-1c2%200%204.5-1.2%206.24-2.72a1.17%201.17%200%200%201%201.52%200C14.51%203.81%2017%205%2019%205a1%201%200%200%201%201%201z%22%2F%3E%3Cpath%20d%3D%22m9%2012%202%202%204-4%22%2F%3E%3C%2Fsvg%3E","bell":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M10.268%2021a2%202%200%200%200%203.464%200%22%2F%3E%3Cpath%20d%3D%22M3.262%2015.326A1%201%200%200%200%204%2017h16a1%201%200%200%200%20.74-1.673C19.41%2013.956%2018%2012.499%2018%208A6%206%200%200%200%206%208c0%204.499-1.411%205.956-2.738%207.326%22%2F%3E%3C%2Fsvg%3E","sun":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%224%22%2F%3E%3Cpath%20d%3D%22M12%202v2%22%2F%3E%3Cpath%20d%3D%22M12%2020v2%22%2F%3E%3Cpath%20d%3D%22m4.93%204.93%201.41%201.41%22%2F%3E%3Cpath%20d%3D%22m17.66%2017.66%201.41%201.41%22%2F%3E%3Cpath%20d%3D%22M2%2012h2%22%2F%3E%3Cpath%20d%3D%22M20%2012h2%22%2F%3E%3Cpath%20d%3D%22m6.34%2017.66-1.41%201.41%22%2F%3E%3Cpath%20d%3D%22m19.07%204.93-1.41%201.41%22%2F%3E%3C%2Fsvg%3E","moon":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%203a6%206%200%200%200%209%209%209%209%200%201%201-9-9Z%22%2F%3E%3C%2Fsvg%3E","layout-dashboard":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20width%3D%227%22%20height%3D%229%22%20x%3D%223%22%20y%3D%223%22%20rx%3D%221%22%2F%3E%3Crect%20width%3D%227%22%20height%3D%225%22%20x%3D%2214%22%20y%3D%223%22%20rx%3D%221%22%2F%3E%3Crect%20width%3D%227%22%20height%3D%229%22%20x%3D%2214%22%20y%3D%2212%22%20rx%3D%221%22%2F%3E%3Crect%20width%3D%227%22%20height%3D%225%22%20x%3D%223%22%20y%3D%2216%22%20rx%3D%221%22%2F%3E%3C%2Fsvg%3E","map":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M14.106%205.553a2%202%200%200%200%201.788%200l3.659-1.83A1%201%200%200%201%2021%204.619v12.764a1%201%200%200%201-.553.894l-4.553%202.277a2%202%200%200%201-1.788%200l-4.212-2.106a2%202%200%200%200-1.788%200l-3.659%201.83A1%201%200%200%201%203%2019.381V6.618a1%201%200%200%201%20.553-.894l4.553-2.277a2%202%200%200%201%201.788%200z%22%2F%3E%3Cpath%20d%3D%22M15%205.764v15%22%2F%3E%3Cpath%20d%3D%22M9%203.236v15%22%2F%3E%3C%2Fsvg%3E","cctv":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M16.75%2012h3.632a1%201%200%200%201%20.894%201.447l-2.034%204.069a1%201%200%200%201-1.708.134l-2.124-2.97%22%2F%3E%3Cpath%20d%3D%22M17.106%209.053a1%201%200%200%201%20.447%201.341l-3.106%206.211a1%201%200%200%201-1.342.447L3.61%2012.3a2.92%202.92%200%200%201-1.3-3.91L3.69%205.6a2.92%202.92%200%200%201%203.92-1.3z%22%2F%3E%3Cpath%20d%3D%22M2%2019h3.76a2%202%200%200%200%201.8-1.1L9%2015%22%2F%3E%3Cpath%20d%3D%22M2%2021v-4%22%2F%3E%3Cpath%20d%3D%22M7%209h.01%22%2F%3E%3C%2Fsvg%3E","siren":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M7%2018v-6a5%205%200%201%201%2010%200v6%22%2F%3E%3Cpath%20d%3D%22M5%2021a1%201%200%200%200%201%201h12a1%201%200%200%200%201-1v-1a2%202%200%200%200-2-2H7a2%202%200%200%200-2%202z%22%2F%3E%3Cpath%20d%3D%22M21%2012h1%22%2F%3E%3Cpath%20d%3D%22M18.5%204.5%2018%205%22%2F%3E%3Cpath%20d%3D%22M2%2012h1%22%2F%3E%3Cpath%20d%3D%22M12%202v1%22%2F%3E%3Cpath%20d%3D%22m4.929%204.929.707.707%22%2F%3E%3Cpath%20d%3D%22M12%2012v6%22%2F%3E%3C%2Fsvg%3E","chart-column":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%203v16a2%202%200%200%200%202%202h16%22%2F%3E%3Cpath%20d%3D%22M18%2017V9%22%2F%3E%3Cpath%20d%3D%22M13%2017V5%22%2F%3E%3Cpath%20d%3D%22M8%2017v-3%22%2F%3E%3C%2Fsvg%3E","settings":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12.22%202h-.44a2%202%200%200%200-2%202v.18a2%202%200%200%201-1%201.73l-.43.25a2%202%200%200%201-2%200l-.15-.08a2%202%200%200%200-2.73.73l-.22.38a2%202%200%200%200%20.73%202.73l.15.1a2%202%200%200%201%201%201.72v.51a2%202%200%200%201-1%201.74l-.15.09a2%202%200%200%200-.73%202.73l.22.38a2%202%200%200%200%202.73.73l.15-.08a2%202%200%200%201%202%200l.43.25a2%202%200%200%201%201%201.73V20a2%202%200%200%200%202%202h.44a2%202%200%200%200%202-2v-.18a2%202%200%200%201%201-1.73l.43-.25a2%202%200%200%201%202%200l.15.08a2%202%200%200%200%202.73-.73l.22-.39a2%202%200%200%200-.73-2.73l-.15-.08a2%202%200%200%201-1-1.74v-.5a2%202%200%200%201%201-1.74l.15-.09a2%202%200%200%200%20.73-2.73l-.22-.38a2%202%200%200%200-2.73-.73l-.15.08a2%202%200%200%201-2%200l-.43-.25a2%202%200%200%201-1-1.73V4a2%202%200%200%200-2-2z%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%223%22%2F%3E%3C%2Fsvg%3E","shield":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M20%2013c0%205-3.5%207.5-7.66%208.95a1%201%200%200%201-.67-.01C7.5%2020.5%204%2018%204%2013V6a1%201%200%200%201%201-1c2%200%204.5-1.2%206.24-2.72a1.17%201.17%200%200%201%201.52%200C14.51%203.81%2017%205%2019%205a1%201%200%200%201%201%201z%22%2F%3E%3C%2Fsvg%3E","users":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M16%2021v-2a4%204%200%200%200-4-4H6a4%204%200%200%200-4%204v2%22%2F%3E%3Ccircle%20cx%3D%229%22%20cy%3D%227%22%20r%3D%224%22%2F%3E%3Cpath%20d%3D%22M22%2021v-2a4%204%200%200%200-3-3.87%22%2F%3E%3Cpath%20d%3D%22M16%203.13a4%204%200%200%201%200%207.75%22%2F%3E%3C%2Fsvg%3E","key-round":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M2.586%2017.414A2%202%200%200%200%202%2018.828V21a1%201%200%200%200%201%201h3a1%201%200%200%200%201-1v-1a1%201%200%200%201%201-1h1a1%201%200%200%200%201-1v-1a1%201%200%200%201%201-1h.172a2%202%200%200%200%201.414-.586l.814-.814a6.5%206.5%200%201%200-4-4z%22%2F%3E%3Ccircle%20cx%3D%2216.5%22%20cy%3D%227.5%22%20r%3D%22.5%22%20fill%3D%22currentColor%22%2F%3E%3C%2Fsvg%3E","box":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M21%208a2%202%200%200%200-1-1.73l-7-4a2%202%200%200%200-2%200l-7%204A2%202%200%200%200%203%208v8a2%202%200%200%200%201%201.73l7%204a2%202%200%200%200%202%200l7-4A2%202%200%200%200%2021%2016Z%22%2F%3E%3Cpath%20d%3D%22m3.3%207%208.7%205%208.7-5%22%2F%3E%3Cpath%20d%3D%22M12%2022V12%22%2F%3E%3C%2Fsvg%3E","chevron-right":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m9%2018%206-6-6-6%22%2F%3E%3C%2Fsvg%3E","chevron-down":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E","search":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2211%22%20cy%3D%2211%22%20r%3D%228%22%2F%3E%3Cpath%20d%3D%22m21%2021-4.3-4.3%22%2F%3E%3C%2Fsvg%3E","plus":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M5%2012h14%22%2F%3E%3Cpath%20d%3D%22M12%205v14%22%2F%3E%3C%2Fsvg%3E","pencil":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M21.174%206.812a1%201%200%200%200-3.986-3.987L3.842%2016.174a2%202%200%200%200-.5.83l-1.321%204.352a.5.5%200%200%200%20.623.622l4.353-1.32a2%202%200%200%200%20.83-.497z%22%2F%3E%3Cpath%20d%3D%22m15%205%204%204%22%2F%3E%3C%2Fsvg%3E","trash-2":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%206h18%22%2F%3E%3Cpath%20d%3D%22M19%206v14c0%201-1%202-2%202H7c-1%200-2-1-2-2V6%22%2F%3E%3Cpath%20d%3D%22M8%206V4c0-1%201-2%202-2h4c1%200%202%201%202%202v2%22%2F%3E%3Cline%20x1%3D%2210%22%20x2%3D%2210%22%20y1%3D%2211%22%20y2%3D%2217%22%2F%3E%3Cline%20x1%3D%2214%22%20x2%3D%2214%22%20y1%3D%2211%22%20y2%3D%2217%22%2F%3E%3C%2Fsvg%3E","lock":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20width%3D%2218%22%20height%3D%2211%22%20x%3D%223%22%20y%3D%2211%22%20rx%3D%222%22%20ry%3D%222%22%2F%3E%3Cpath%20d%3D%22M7%2011V7a5%205%200%200%201%2010%200v4%22%2F%3E%3C%2Fsvg%3E","minus":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M5%2012h14%22%2F%3E%3C%2Fsvg%3E","eye":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M2.062%2012.348a1%201%200%200%201%200-.696%2010.75%2010.75%200%200%201%2019.876%200%201%201%200%200%201%200%20.696%2010.75%2010.75%200%200%201-19.876%200%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%223%22%2F%3E%3C%2Fsvg%3E","boxes":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M2.97%2012.92A2%202%200%200%200%202%2014.63v3.24a2%202%200%200%200%20.97%201.71l3%201.8a2%202%200%200%200%202.06%200L12%2019v-5.5l-5-3-4.03%202.42Z%22%2F%3E%3Cpath%20d%3D%22m7%2016.5-4.74-2.85%22%2F%3E%3Cpath%20d%3D%22m7%2016.5%205-3%22%2F%3E%3Cpath%20d%3D%22M7%2016.5v5.17%22%2F%3E%3Cpath%20d%3D%22M12%2013.5V19l3.97%202.38a2%202%200%200%200%202.06%200l3-1.8a2%202%200%200%200%20.97-1.71v-3.24a2%202%200%200%200-.97-1.71L17%2010.5l-5%203Z%22%2F%3E%3Cpath%20d%3D%22m17%2016.5-5-3%22%2F%3E%3Cpath%20d%3D%22m17%2016.5%204.74-2.85%22%2F%3E%3Cpath%20d%3D%22M17%2016.5v5.17%22%2F%3E%3Cpath%20d%3D%22M7.97%204.42A2%202%200%200%200%207%206.13v4.37l5%203%205-3V6.13a2%202%200%200%200-.97-1.71l-3-1.8a2%202%200%200%200-2.06%200l-3%201.8Z%22%2F%3E%3Cpath%20d%3D%22M12%208%207.26%205.15%22%2F%3E%3Cpath%20d%3D%22m12%208%204.74-2.85%22%2F%3E%3Cpath%20d%3D%22M12%2013.5V8%22%2F%3E%3C%2Fsvg%3E","x":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M18%206%206%2018%22%2F%3E%3Cpath%20d%3D%22m6%206%2012%2012%22%2F%3E%3C%2Fsvg%3E","user":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M19%2021v-2a4%204%200%200%200-4-4H9a4%204%200%200%200-4%204v2%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%227%22%20r%3D%224%22%2F%3E%3C%2Fsvg%3E","circle-check":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%2210%22%2F%3E%3Cpath%20d%3D%22m9%2012%202%202%204-4%22%2F%3E%3C%2Fsvg%3E","triangle-alert":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m21.73%2018-8-14a2%202%200%200%200-3.48%200l-8%2014A2%202%200%200%200%204%2021h16a2%202%200%200%200%201.73-3%22%2F%3E%3Cpath%20d%3D%22M12%209v4%22%2F%3E%3Cpath%20d%3D%22M12%2017h.01%22%2F%3E%3C%2Fsvg%3E","refresh-cw":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%2012a9%209%200%200%201%209-9%209.75%209.75%200%200%201%206.74%202.74L21%208%22%2F%3E%3Cpath%20d%3D%22M21%203v5h-5%22%2F%3E%3Cpath%20d%3D%22M21%2012a9%209%200%200%201-9%209%209.75%209.75%200%200%201-6.74-2.74L3%2016%22%2F%3E%3Cpath%20d%3D%22M8%2016H3v5%22%2F%3E%3C%2Fsvg%3E","ban":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%2210%22%2F%3E%3Cpath%20d%3D%22m4.9%204.9%2014.2%2014.2%22%2F%3E%3C%2Fsvg%3E","info":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%2210%22%2F%3E%3Cpath%20d%3D%22M12%2016v-4%22%2F%3E%3Cpath%20d%3D%22M12%208h.01%22%2F%3E%3C%2Fsvg%3E","check":"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M20%206%209%2017l-5-5%22%2F%3E%3C%2Fsvg%3E"};
+const IC = (n) => LUCIDE_MAP[n] || `https://unpkg.com/lucide-static@0.469.0/icons/${n}.svg`;
+
+const LEVELS = [
+  { key: "none",   label: "Tidak ada", icon: "minus",    tone: "gray"  },
+  { key: "read",   label: "Lihat",     icon: "eye",      tone: "blue"  },
+  { key: "write",  label: "Ubah",      icon: "pencil",   tone: "amber" },
+  { key: "delete", label: "Hapus",     icon: "trash-2",  tone: "red"   },
+];
+const RANK = { none: 0, read: 1, write: 2, delete: 3 };
+const TONE_BG = { gray: "var(--surface-3)", blue: "rgba(91,141,255,.16)", amber: "rgba(217,160,20,.16)", red: "rgba(244,63,94,.16)" };
+const TONE_FG = { gray: "var(--text-muted)", blue: "var(--st-blue)", amber: "var(--st-amber)", red: "var(--st-red)" };
+const TONE_SW = { gray: "var(--st-gray)", blue: "var(--st-blue)", amber: "var(--st-amber)", red: "var(--st-rose)" };
+
+const PERM_GROUPS = [
+  { group: "feature", perms: [
+    ["feature.cctv.view","Lihat fitur CCTV"],["feature.asset.view","Lihat fitur Aset"],["feature.sos.view","Lihat fitur SOS"],
+    ["feature.laba_rugi.view","Lihat Laba Rugi"],["feature.manajemen_risiko.view","Lihat Manajemen Risiko"],["feature.pendapatan.view","Lihat Pendapatan"] ] },
+  { group: "branch", perms: [ ["branch.select","Pilih ruas"],["branch.view.all","Lihat semua ruas"],["branch.view.assigned","Lihat ruas ditugaskan"] ] },
+  { group: "camera", perms: [ ["camera.view","Lihat kamera"] ] },
+  { group: "asset", perms: [ ["asset.view","Lihat aset"],["vehicle.view","Lihat kendaraan"],["gate.view","Lihat gerbang"] ] },
+  { group: "sos", perms: [
+    ["sos.alert.view","Lihat alert SOS"],["sos.ticket.view","Lihat tiket SOS"],["sos.response.view","Lihat response"],
+    ["sos.ticket.dispatch","Kirim unit penanganan"],["sos.ticket.complete","Selesaikan tiket"],["sos.response.confirm","Konfirmasi response"] ] },
+  { group: "news", perms: [ ["news.view","Lihat berita"],["news.submit","Ajukan berita"],["news.publish","Terbitkan berita"] ] },
+  { group: "incident", perms: [ ["incident.view","Lihat incident"],["incident.manage","Kelola incident"] ] },
+  { group: "feedback", perms: [ ["feedback.view","Lihat feedback"],["feedback.respond","Tanggapi feedback"] ] },
+  { group: "user", perms: [ ["user.view","Lihat pengguna"],["user.manage","Kelola pengguna"] ] },
+  { group: "access", perms: [ ["access.manage","Kelola hak akses"] ] },
+];
+const ALL_PERMS = PERM_GROUPS.flatMap((g) => g.perms.map((p) => p[0]));
+const PERM_NAME = Object.fromEntries(PERM_GROUPS.flatMap((g) => g.perms.map((p) => [p[0], p[1]])));
+
+const MODULE_GROUPS = [
+  { group: "Master Data", mods: [ ["ruas","Ruas Tol"],["gerbang","Gerbang Tol"],["gerbang_alias","Alias Gerbang"],["segmen_gerbang","Segmen Gerbang"],["od_gerbang","OD Gerbang"] ] },
+  { group: "Kendaraan & Kecepatan", mods: [ ["vehicle","Kendaraan"],["vehicle_type","Golongan Kendaraan"],["speed_analytics","Analitik Kecepatan"] ] },
+  { group: "Tarif", mods: [ ["tariff","Tarif Tol"],["tariff_import","Impor Tarif"] ] },
+  { group: "WIM", mods: [ ["wim","Weigh-in-Motion"] ] },
+  { group: "Monitoring", mods: [ ["kamera","Kamera CCTV"],["vms","VMS"],["fo","Jaringan FO"],["rakom","Radio Komunikasi"],["cuaca","Cuaca"],["monitoring_rekonsiliasi","Rekonsiliasi"] ] },
+  { group: "Rapat Direktorat", mods: [ ["laba_rugi","Laba Rugi"],["manajemen_risiko","Manajemen Risiko"],["pendapatan","Pendapatan"] ] },
+];
+const ALL_MODULES = MODULE_GROUPS.flatMap((g) => g.mods.map((m) => m[0]));
+const MOD_NAME = Object.fromEntries(MODULE_GROUPS.flatMap((g) => g.mods.map((m) => [m[0], m[1]])));
+
+function mkModAccess(pairs) { const o = {}; for (const [c, l] of pairs) o[c] = l; return o; }
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.roles = [
+      { id: 1, code: "super_admin", name: "Super Admin", icon: "shield-check", isSystem: true, isActive: true, userCount: 2,
+        desc: "Akses penuh seluruh modul, seluruh ruas, dan manajemen pengguna.",
+        perms: [...ALL_PERMS], modules: mkModAccess(ALL_MODULES.map((c) => [c, "delete"])) },
+      { id: 2, code: "branch_admin", name: "Admin Ruas", icon: "shield", isSystem: false, isActive: true, userCount: 4,
+        desc: "Kelola aset dan data pada ruas yang ditugaskan.",
+        perms: ["feature.cctv.view","feature.asset.view","feature.sos.view","branch.select","branch.view.assigned","camera.view","asset.view","vehicle.view","gate.view","sos.alert.view","sos.response.view","sos.ticket.view","sos.ticket.dispatch","sos.ticket.complete","sos.response.confirm"],
+        modules: mkModAccess([["ruas","read"],["gerbang","read"],["kamera","write"],["vms","read"],["fo","read"],["cuaca","read"],["vehicle","read"]]) },
+      { id: 3, code: "operator_cctv", name: "Operator CCTV", icon: "cctv", isSystem: false, isActive: true, userCount: 6,
+        desc: "Pemantauan dinding kamera per ruas.",
+        perms: ["feature.cctv.view","branch.select","branch.view.assigned","camera.view"], modules: mkModAccess([["kamera","read"]]) },
+      { id: 4, code: "operator_asset", name: "Operator Aset", icon: "boxes", isSystem: false, isActive: true, userCount: 3,
+        desc: "Pemantauan peta aset dan status perangkat.",
+        perms: ["feature.asset.view","branch.select","branch.view.assigned","asset.view","vehicle.view","gate.view"], modules: mkModAccess([["kamera","read"],["vms","read"],["fo","read"],["rakom","read"],["cuaca","read"]]) },
+      { id: 5, code: "operator_sos", name: "Operator SOS", icon: "siren", isSystem: false, isActive: true, userCount: 5,
+        desc: "Penanganan tiket SOS dan smart response.",
+        perms: ["feature.sos.view","branch.select","branch.view.assigned","vehicle.view","sos.alert.view","sos.response.view","sos.ticket.view","sos.ticket.dispatch","sos.ticket.complete","sos.response.confirm"], modules: mkModAccess([["kamera","read"],["vehicle","read"]]) },
+      { id: 6, code: "viewer_branch", name: "Pemantau Ruas", icon: "eye", isSystem: false, isActive: false, userCount: 0,
+        desc: "Akses baca ringkasan operasi ruas.",
+        perms: ["branch.select","branch.view.assigned"], modules: mkModAccess([["ruas","read"]]) },
+      { id: 7, code: "manajemen", name: "Manajemen", icon: "chart-column", isSystem: false, isActive: true, userCount: 5,
+        desc: "Akses baca dashboard Rapat Direktorat (Laba Rugi, Manajemen Risiko & Pendapatan).",
+        perms: ["feature.laba_rugi.view","feature.manajemen_risiko.view","feature.pendapatan.view"], modules: mkModAccess([["laba_rugi","read"],["manajemen_risiko","read"],["pendapatan","read"]]) },
+    ];
+    this.moduleActive = Object.fromEntries(ALL_MODULES.map((c) => [c, true]));
+    this.moduleActive["gerbang_alias"] = false;
+    this.users = [
+      { id: 1, name: "Dedi Supriadi", username: "dedi.s", roles: ["super_admin"], branches: ["JAGORAWI","JORR-S"], active: true, override: {} },
+      { id: 2, name: "Rina Hartati", username: "rina.h", roles: ["branch_admin","operator_sos"], branches: ["JAGORAWI","CIKAMPEK"], active: true, override: { kamera: "delete" } },
+      { id: 3, name: "Agus Pratama", username: "agus.p", roles: ["operator_cctv"], branches: ["JAGORAWI"], active: true, override: {} },
+      { id: 4, name: "Siti Nurhaliza", username: "siti.n", roles: ["manajemen"], branches: [], active: true, override: {} },
+      { id: 5, name: "Budi Santoso", username: "budi.s", roles: ["operator_asset"], branches: ["JORR-S","CIKAMPEK"], active: true, override: {} },
+      { id: 6, name: "Lestari Wulandari", username: "lestari.w", roles: ["viewer_branch"], branches: ["JAGORAWI"], active: false, override: {} },
+    ];
+    this.permRoleCount = Object.fromEntries(ALL_PERMS.map((p) => [p, this.roles.filter((r) => r.perms.includes(p)).length]));
+    this.moduleRoleCount = Object.fromEntries(ALL_MODULES.map((m) => [m, this.roles.filter((r) => r.modules[m]).length]));
+    this.state = { theme: "dark", screen: "hub", roleId: null, listState: "normal",
+      edit: null, dirty: false, modal: null, modalData: null, selectedUserId: 2, toast: null, clock: this._now(), nr: { name: "", code: "", desc: "" } };
+  }
+
+  componentDidMount() { this._t = setInterval(() => this.setState({ clock: this._now() }), 1000); this._patchIcons(); }
+  componentDidUpdate() { this._patchIcons(); }
+  componentWillUnmount() { clearInterval(this._t); if (this._tt) clearTimeout(this._tt); }
+  _patchIcons() { const map = LUCIDE_MAP; if (!map) return; document.querySelectorAll(".ic").forEach((el) => { const v = el.style.getPropertyValue("--i"); const m = v && v.match(/icons\/([a-z0-9-]+)\.svg/); if (m && map[m[1]]) el.style.setProperty("--i", `url("${map[m[1]]}")`); }); if (map.lock) { const u = `url("${map.lock}") center/contain no-repeat`; document.querySelectorAll(".lock-on").forEach((el) => { el.style.webkitMask = u; el.style.mask = u; }); } }
+  _now() { const d = new Date(); const p = (n) => String(n).padStart(2, "0"); return `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`; }
+
+  showToast(msg, kind) { if (this._tt) clearTimeout(this._tt); this.setState({ toast: { msg, kind: kind || "success" } }); this._tt = setTimeout(() => this.setState({ toast: null }), 2600); }
+
+  goHub = () => { if (this.state.dirty) return this.setState({ modal: "cancel", modalData: { to: "hub" } }); this.setState({ screen: "hub", edit: null, roleId: null }); };
+  goRoles = () => { if (this.state.dirty) return this.setState({ modal: "cancel", modalData: { to: "roles" } }); this.setState({ screen: "roles", edit: null, roleId: null }); };
+  nav = (s) => this.setState({ screen: s });
+  toggleTheme = () => this.setState({ theme: this.state.theme === "dark" ? "light" : "dark" });
+  noop = () => {};
+  stop = (e) => { e && e.stopPropagation && e.stopPropagation(); };
+  closeModal = () => this.setState({ modal: null, modalData: null });
+
+  openRole = (id) => { const r = this.roles.find((x) => x.id === id); this.setState({ screen: "editor", roleId: id, dirty: false,
+    edit: { name: r.name, code: r.code, desc: r.desc, isActive: r.isActive, isSystem: r.isSystem, perms: new Set(r.perms), modules: { ...r.modules } } }); };
+
+  setLevel = (code, lvl) => { const e = this.state.edit; if (e.isSystem) return; const m = { ...e.modules }; if (lvl === "none") delete m[code]; else m[code] = lvl; this.setState({ edit: { ...e, modules: m }, dirty: true }); };
+  togglePerm = (code) => { const e = this.state.edit; if (e.isSystem && e.perms.has(code)) return; const s = new Set(e.perms); if (s.has(code)) s.delete(code); else s.add(code); this.setState({ edit: { ...e, perms: s }, dirty: true }); };
+  togglePermGroup = (grp) => { const e = this.state.edit; const codes = PERM_GROUPS.find((g) => g.group === grp).perms.map((p) => p[0]); const all = codes.every((c) => e.perms.has(c)); const s = new Set(e.perms); for (const c of codes) { if (all) { if (!(e.isSystem && this._orig().perms.includes(c))) s.delete(c); } else s.add(c); } this.setState({ edit: { ...e, perms: s }, dirty: true }); };
+  _orig() { return this.roles.find((r) => r.id === this.state.roleId) || { perms: [] }; }
+  setName = (e) => this.setState({ edit: { ...this.state.edit, name: e.target.value }, dirty: true });
+  setDesc = (e) => this.setState({ edit: { ...this.state.edit, desc: e.target.value }, dirty: true });
+  toggleActive = () => { const e = this.state.edit; if (e.isSystem) return; this.setState({ edit: { ...e, isActive: !e.isActive }, dirty: true }); };
+  saveEdit = () => { const r = this.roles.find((x) => x.id === this.state.roleId); const e = this.state.edit; r.name = e.name; r.desc = e.desc; r.isActive = e.isActive; r.perms = [...e.perms]; r.modules = { ...e.modules }; this.moduleRoleCount = Object.fromEntries(ALL_MODULES.map((m) => [m, this.roles.filter((x) => x.modules[m]).length])); this.permRoleCount = Object.fromEntries(ALL_PERMS.map((p) => [p, this.roles.filter((x) => x.perms.includes(p)).length])); this.setState({ dirty: false }); this.showToast("Perubahan role disimpan"); };
+  cancelEdit = () => this.setState({ modal: "cancel", modalData: { to: "roles" } });
+  confirmCancel = () => { const to = this.state.modalData && this.state.modalData.to || "roles"; this.setState({ modal: null, modalData: null, dirty: false, edit: null, roleId: null, screen: to }); };
+
+  deleteRole = (id) => { const r = this.roles.find((x) => x.id === id); if (r.isSystem) return; if (r.userCount > 0) { this.setState({ modal: "reassign", modalData: { role: r } }); } else { this.setState({ modal: "deleteRole", modalData: { role: r } }); } };
+  confirmDeleteRole = () => { const r = this.state.modalData.role; this.roles = this.roles.filter((x) => x.id !== r.id); this.setState({ modal: null, modalData: null }); this.showToast(`Role ${r.name} dihapus`); };
+
+  deletePerm = (code) => { const n = this.permRoleCount[code] || 0; if (n > 0) this.setState({ modal: "blocked", modalData: { kind: "perm", name: code, refs: [{ icon: "shield", label: "Dipakai role", count: n }, { icon: "list-tree", label: "Terikat menu", count: code === "access.manage" ? 1 : 0 }] } }); else this.showToast(`Permission ${code} dihapus`); };
+  deleteModule = (code) => { const n = this.moduleRoleCount[code] || 0; if (n > 0) this.setState({ modal: "blocked", modalData: { kind: "module", name: MOD_NAME[code], refs: [{ icon: "shield", label: "Dipakai role", count: n }, { icon: "users", label: "Override user", count: code === "kamera" ? 1 : 0 }, { icon: "list-tree", label: "Terikat menu", count: 1 }] } }); else this.showToast(`Modul ${MOD_NAME[code]} dihapus`); };
+  toggleModuleActive = (code) => { this.moduleActive[code] = !this.moduleActive[code]; this.forceUpdate(); };
+
+  openCreateRole = () => this.setState({ modal: "create", nr: { name: "", code: "", desc: "" } });
+  setNr = (k, v) => this.setState({ nr: { ...this.state.nr, [k]: v } });
+  createRole = () => { const nr = this.state.nr; if (!nr.name.trim() || !/^[a-z0-9_.]+$/.test(nr.code)) return; const id = Math.max(...this.roles.map((r) => r.id)) + 1; const role = { id, code: nr.code, name: nr.name, icon: "shield", isSystem: false, isActive: true, userCount: 0, desc: nr.desc, perms: [], modules: {} }; this.roles.push(role); this.setState({ modal: null }); this.openRole(id); this.showToast(`Role ${nr.name} dibuat`); };
+  setListState = (s) => this.setState({ listState: s });
+
+  _effective(u) {
+    const mods = {}; const src = {};
+    for (const rc of u.roles) { const role = this.roles.find((r) => r.code === rc); if (!role) continue; if (rc === "super_admin") { for (const m of ALL_MODULES) { mods[m] = "delete"; src[m] = "super_admin"; } continue; } for (const [m, l] of Object.entries(role.modules)) { if (!mods[m] || RANK[l] > RANK[mods[m]]) { mods[m] = l; src[m] = role.name; } } }
+    for (const [m, l] of Object.entries(u.override || {})) { mods[m] = l; src[m] = "override"; }
+    let perms; if (u.roles.includes("super_admin")) perms = ["(semua *)"]; else { const s = new Set(); for (const rc of u.roles) { const role = this.roles.find((r) => r.code === rc); if (role) role.perms.forEach((p) => s.add(p)); } perms = [...s]; }
+    return { mods, src, perms };
+  }
+
+  renderVals() {
+    const S = this.state;
+    const initials = (n) => n.trim().split(/\s+/).slice(0, 2).map((p) => p[0]).join("").toUpperCase();
+    const navDef = [
+      ["Dashboard", "layout-dashboard"], ["Peta Aset", "map"], ["CCTV", "cctv"], ["SOS", "siren"],
+      ["Rapat Direktorat", "chart-column"], ["Manajemen Akses", "shield-check"], ["Pengaturan", "settings"],
+    ];
+    const nav = navDef.map(([label, icon]) => { const active = label === "Manajemen Akses"; return {
+      label, iconUrl: IC(icon), color: active ? "var(--nav-active-text)" : "var(--text-muted)",
+      bg: active ? "var(--nav-active-bg)" : "transparent",
+      barClass: active ? "navbar-on" : "navbar-off" }; });
+
+    const out = {
+      theme: S.theme, clock: S.clock, themeIconUrl: IC(S.theme === "dark" ? "sun" : "moon"),
+      nav, toggleTheme: this.toggleTheme, noop: this.noop, stop: this.stop,
+      goHub: this.goHub, goRoles: this.goRoles, openCreateRole: this.openCreateRole, closeModal: this.closeModal,
+      isHub: S.screen === "hub", isRoles: S.screen === "roles", isEditor: S.screen === "editor",
+      isPerms: S.screen === "perms", isModules: S.screen === "modules", isUsers: S.screen === "users",
+      dirty: S.dirty, saveEdit: this.saveEdit, cancelEdit: this.cancelEdit, confirmCancel: this.confirmCancel,
+    };
+
+    // Hub
+    out.stats = [
+      { label: "Role", value: this.roles.length, iconUrl: IC("shield") },
+      { label: "Pengguna", value: this.users.length, iconUrl: IC("users") },
+      { label: "Permission", value: ALL_PERMS.length, iconUrl: IC("key-round") },
+      { label: "Modul", value: ALL_MODULES.length, iconUrl: IC("box") },
+    ];
+    out.shortcuts = [
+      { title: "Role", desc: "Buat dan atur kapabilitas tiap role.", meta: `${this.roles.length} role · 1 sistem`, iconUrl: IC("shield"), onOpen: () => this.nav("roles") },
+      { title: "Pengguna", desc: "Assign role, ruas, dan lihat akses efektif.", meta: `${this.users.length} pengguna`, iconUrl: IC("users"), onOpen: () => this.nav("users") },
+      { title: "Permission", desc: "Katalog izin aksi granular.", meta: `${ALL_PERMS.length} permission · 10 grup`, iconUrl: IC("key-round"), onOpen: () => this.nav("perms") },
+      { title: "Modul", desc: "Area fitur dan level aksesnya.", meta: `${ALL_MODULES.length} modul · 6 grup`, iconUrl: IC("box"), onOpen: () => this.nav("modules") },
+    ];
+
+    // Roles list
+    out.statePreview = [["normal","Normal"],["loading","Memuat"],["empty","Kosong"],["error","Galat"]].map(([k, label]) => ({
+      label, onClick: () => this.setListState(k),
+      bg: S.listState === k ? "var(--st-blue)" : "transparent", color: S.listState === k ? "#fff" : "var(--text-muted)" }));
+    out.stateNormal = S.listState === "normal"; out.stateLoading = S.listState === "loading"; out.stateEmpty = S.listState === "empty"; out.stateError = S.listState === "error";
+    out.stateToNormal = () => this.setListState("normal");
+    out.sklRows = [1,2,3,4,5,6];
+    out.roles = this.roles.map((r) => ({
+      name: r.name, code: r.code, iconUrl: IC(r.icon), userCount: r.userCount, permCount: r.perms.length, moduleCount: Object.keys(r.modules).length,
+      onOpen: () => this.openRole(r.id), onDelete: (e) => { this.stop(e); this.deleteRole(r.id); },
+      lockClass: r.isSystem ? "lock-on" : "lock-off",
+      sysBadge: r.isSystem ? "Sistem" : "Buatan", sysBadgeClass: "",
+      sysBadgeStyle: r.isSystem ? "display:inline-flex;align-items:center;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:600;background:var(--surface-3);color:var(--text-dim)" : "display:inline-flex;align-items:center;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:600;background:rgba(91,141,255,.16);color:var(--st-blue)",
+      statusLabel: r.isActive ? "Aktif" : "Nonaktif", statusBg: r.isActive ? "rgba(52,211,153,.16)" : "rgba(120,140,170,.18)", statusColor: r.isActive ? "var(--st-green)" : "var(--st-gray)",
+      deleteDisabled: r.isSystem ? "true" : undefined, deleteColor: r.isSystem ? "var(--text-faint)" : "var(--text-muted)", deleteCursor: r.isSystem ? "not-allowed" : "pointer",
+      deleteTitle: r.isSystem ? "Role sistem tak bisa dihapus" : "Hapus role",
+    }));
+
+    // Editor
+    if (S.edit) {
+      const e = S.edit; const orig = this._orig();
+      out.ed = {
+        name: e.name, code: e.code, desc: e.desc, isSystem: e.isSystem, iconUrl: IC(this.roles.find((r) => r.id === S.roleId).icon),
+        userCount: this.roles.find((r) => r.id === S.roleId).userCount,
+        onName: this.setName, onDesc: this.setDesc, onToggleActive: this.toggleActive,
+        infoLocked: e.isSystem ? "true" : undefined,
+        activeTrack: e.isActive ? "var(--st-blue)" : "var(--track)", activeBorder: e.isActive ? "var(--st-blue)" : "var(--line-strong)",
+        activeThumb: e.isActive ? "translateY(-50%) translateX(16px)" : "translateY(-50%)", activeCursor: e.isSystem ? "not-allowed" : "pointer",
+        permSelected: e.perms.size,
+        matrix: MODULE_GROUPS.map((g) => ({ group: g.group, count: g.mods.length, modules: g.mods.map(([code, name]) => {
+          const cur = e.modules[code] || "none";
+          return { name, code, cells: LEVELS.map((lv) => {
+            const active = cur === lv.key; const locked = e.isSystem;
+            return { label: lv.label, iconUrl: IC(lv.icon), onClick: () => this.setLevel(code, lv.key),
+              title: locked ? "Terkunci (role sistem)" : `Set ${name} → ${lv.label}`,
+              bg: active ? TONE_BG[lv.tone] : "transparent", color: active ? TONE_FG[lv.tone] : "var(--text-faint)",
+              border: active ? TONE_SW[lv.tone] : "var(--line)", weight: active ? "600" : "500", cursor: locked ? "not-allowed" : "pointer" };
+          }) };
+        }) })),
+        permGroups: PERM_GROUPS.map((g) => { const codes = g.perms.map((p) => p[0]); const all = codes.every((c) => e.perms.has(c)); return {
+          group: g.group, allLabel: all ? "Hapus semua" : "Pilih semua", onAll: () => this.togglePermGroup(g.group),
+          perms: g.perms.map(([code, name]) => { const checked = e.perms.has(code); const locked = e.isSystem && orig.perms.includes(code); return {
+            code, name, onToggle: () => this.togglePerm(code),
+            title: locked ? "Permission sistem tak bisa dikurangi" : name, locked,
+            cursor: locked ? "not-allowed" : "pointer",
+            border: checked ? "var(--st-blue)" : "var(--line-strong)", bg: checked ? "var(--nav-active-bg)" : "var(--surface-2)",
+            boxBorder: checked ? "var(--st-blue)" : "var(--line-strong)", boxBg: checked ? "var(--st-blue)" : "transparent", checkOpacity: checked ? "1" : "0" };
+          }) };
+        }),
+      };
+    } else { out.ed = { name: "", code: "", desc: "", isSystem: false, iconUrl: IC("shield"), userCount: 0, matrix: [], permGroups: [], permSelected: 0, activeTrack: "var(--track)", activeBorder: "var(--line-strong)", activeThumb: "translateY(-50%)", activeCursor: "pointer", onName: this.noop, onDesc: this.noop, onToggleActive: this.noop }; }
+
+    out.levelLegend = LEVELS.map((lv) => ({ label: lv.label, swatch: TONE_SW[lv.tone] }));
+
+    // Permission catalog
+    out.permCatalog = PERM_GROUPS.map((g) => ({ group: g.group, count: g.perms.length, perms: g.perms.map(([code, name]) => { const n = this.permRoleCount[code] || 0; return {
+      code, name, roleCount: n, onDelete: () => this.deletePerm(code),
+      countBg: n > 0 ? "var(--nav-active-bg)" : "var(--surface-3)", countColor: n > 0 ? "var(--st-blue)" : "var(--text-muted)",
+      deleteColor: n > 0 ? "var(--text-faint)" : "var(--text-muted)", deleteTitle: n > 0 ? `Dipakai ${n} role — tak bisa dihapus` : "Hapus permission" };
+    }) }));
+
+    // Module catalog
+    out.moduleCatalog = MODULE_GROUPS.map((g) => ({ group: g.group, count: g.mods.length, modules: g.mods.map(([code, name], i) => { const n = this.moduleRoleCount[code] || 0; const act = this.moduleActive[code]; return {
+      name, code, roleCount: n, order: i + 1, onToggle: () => this.toggleModuleActive(code), onDelete: () => this.deleteModule(code),
+      countBg: n > 0 ? "var(--nav-active-bg)" : "var(--surface-3)", countColor: n > 0 ? "var(--st-blue)" : "var(--text-muted)",
+      track: act ? "var(--st-blue)" : "var(--track)", trackBorder: act ? "var(--st-blue)" : "var(--line-strong)", thumb: act ? "translateY(-50%) translateX(16px)" : "translateY(-50%)",
+      activeLabel: act ? "Aktif" : "Nonaktif",
+      deleteColor: n > 0 ? "var(--text-faint)" : "var(--text-muted)", deleteTitle: n > 0 ? `Dipakai ${n} role — tak bisa dihapus` : "Hapus modul" };
+    }) }));
+
+    // Users
+    out.users = this.users.map((u) => ({
+      initials: initials(u.name), name: u.name, username: u.username, onSelect: () => this.setState({ selectedUserId: u.id }),
+      rowBg: u.id === S.selectedUserId ? "var(--nav-active-bg)" : "transparent",
+      roleChips: u.roles.map((rc) => ({ label: this.roles.find((r) => r.code === rc) ? this.roles.find((r) => r.code === rc).name : rc })),
+      ruas: u.branches.length ? `${u.branches.length} ruas` : "Semua / —",
+      statusLabel: u.active ? "Aktif" : "Nonaktif", statusBg: u.active ? "rgba(52,211,153,.16)" : "rgba(120,140,170,.18)", statusColor: u.active ? "var(--st-green)" : "var(--st-gray)",
+    }));
+    const su = this.users.find((u) => u.id === S.selectedUserId) || this.users[0];
+    const eff = this._effective(su);
+    out.su = {
+      initials: initials(su.name), name: su.name, username: su.username,
+      roleChips: su.roles.map((rc) => ({ label: this.roles.find((r) => r.code === rc) ? this.roles.find((r) => r.code === rc).name : rc })),
+      branches: su.branches.length ? su.branches.map((b) => ({ label: b })) : [{ label: "Semua ruas" }],
+      permCount: su.roles.includes("super_admin") ? "semua" : eff.perms.length,
+      perms: su.roles.includes("super_admin") ? [{ code: "(semua *)" }] : eff.perms.map((p) => ({ code: p })),
+      modules: Object.keys(eff.mods).sort((a, b) => RANK[eff.mods[b]] - RANK[eff.mods[a]]).slice(0, 10).map((m) => {
+        const lvl = eff.mods[m]; const meta = LEVELS.find((l) => l.key === lvl); const ov = eff.src[m] === "override";
+        return { name: MOD_NAME[m] || m, level: meta.label, iconUrl: IC(meta.icon), bg: TONE_BG[meta.tone], color: TONE_FG[meta.tone],
+          source: ov ? "override khusus user ini" : `dari role ${eff.src[m]}`, override: ov, rowBorder: ov ? "var(--st-amber)" : "var(--line-soft)" };
+      }),
+    };
+
+    // Modals
+    out.modalCreate = S.modal === "create"; out.modalReassign = S.modal === "reassign"; out.modalBlocked = S.modal === "blocked";
+    out.modalDeleteRole = S.modal === "deleteRole"; out.modalCancel = S.modal === "cancel";
+    const codeOk = /^[a-z0-9_.]+$/.test(S.nr.code); const codeEmpty = !S.nr.code;
+    out.nr = { name: S.nr.name, code: S.nr.code, desc: S.nr.desc,
+      onName: (ev) => this.setNr("name", ev.target.value), onCode: (ev) => this.setNr("code", ev.target.value), onDesc: (ev) => this.setNr("desc", ev.target.value),
+      onCreate: this.createRole, codeBorder: codeEmpty ? "var(--line-strong)" : (codeOk ? "var(--st-green)" : "var(--sem-red)"),
+      codeHint: codeEmpty ? "Pola: huruf kecil, angka, titik, garis bawah. Contoh: operator_gerbang" : (codeOk ? "Kode valid." : "Hanya a–z, 0–9, titik, dan garis bawah."),
+      hintColor: codeEmpty ? "var(--text-faint)" : (codeOk ? "var(--st-green)" : "var(--sem-red)"),
+      disabled: (!S.nr.name.trim() || !codeOk) ? "true" : undefined, cursor: (!S.nr.name.trim() || !codeOk) ? "not-allowed" : "pointer", opacity: (!S.nr.name.trim() || !codeOk) ? ".55" : "1" };
+    if (S.modal === "reassign") { const r = S.modalData.role; const sample = this.users.filter((u) => u.roles.includes(r.code)).slice(0, 3); out.ra = { roleName: r.name, count: r.userCount, users: (sample.length ? sample : this.users.slice(0, 2)).map((u) => ({ initials: initials(u.name), name: u.name, username: u.username })) }; }
+    else out.ra = { roleName: "", count: 0, users: [] };
+    out.bl = S.modal === "blocked" ? S.modalData : { name: "", refs: [] };
+    if (out.bl.refs) out.bl = { name: out.bl.name, refs: out.bl.refs.map((r) => ({ iconUrl: IC(r.icon), label: r.label, count: r.count })) };
+    out.dr = S.modal === "deleteRole" ? { name: S.modalData.role.name, code: S.modalData.role.code, onConfirm: this.confirmDeleteRole } : { name: "", code: "", onConfirm: this.noop };
+
+    // Toast
+    out.toast = !!S.toast;
+    out.toastMsg = S.toast ? S.toast.msg : "";
+    out.toastAccent = S.toast && S.toast.kind === "error" ? "var(--sem-red)" : "var(--sem-green)";
+    out.toastIconUrl = IC(S.toast && S.toast.kind === "error" ? "triangle-alert" : "circle-check");
+    return out;
+  }
+}
+</script>
+</body>
+</html>

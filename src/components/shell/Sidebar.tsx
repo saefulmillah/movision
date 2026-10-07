@@ -43,7 +43,7 @@ export function Sidebar({ open, onToggle, openTickets }: SidebarProps) {
             <Icon name="radio-tower" size={18} />
           </span>
           <span className={styles.brandText}>
-            <span className={styles.brandName}>TollSentra</span>
+            <span className={styles.brandName}>Movision</span>
             <span className={styles.brandSub}>Control Center</span>
           </span>
         </div>

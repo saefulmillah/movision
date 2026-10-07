@@ -1,0 +1,187 @@
+<title>Pendapatan Tol</title>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#eef1f5;--surface:#fff;--surface-2:#f4f6f9;--ink:#182231;--muted:#647287;
+  --line:#d5dbe4;--line-strong:#b9c3d1;--brand:#16386b;--brand-2:#1e4b8f;--brand-soft:#dbe6f5;
+  --pos:#1f9d55;--neg:#c0392b;--warn:#d98a1f;--rkap:#b9c9e6;--real:#b32d2d;
+  --shadow:0 1px 3px rgba(20,35,60,.08),0 10px 30px rgba(20,35,60,.06);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;--bg:#0e131b;--surface:#161d28;--surface-2:#1b2430;--ink:#e7edf5;--muted:#94a2b6;
+  --line:#28323f;--line-strong:#3a4757;--brand:#2f5ea8;--brand-2:#3a6bb5;--brand-soft:#22344c;
+  --pos:#43c184;--neg:#f0705f;--rkap:#3a4d6e;--real:#d0433c;--shadow:0 1px 3px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0e131b;--surface:#161d28;--surface-2:#1b2430;--ink:#e7edf5;--muted:#94a2b6;--line:#28323f;--line-strong:#3a4757;--brand:#2f5ea8;--brand-2:#3a6bb5;--brand-soft:#22344c;--pos:#43c184;--neg:#f0705f;--rkap:#3a4d6e;--real:#d0433c;--shadow:0 1px 3px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1280px;margin:0 auto;padding:0 16px;padding-block:20px 40px}
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;gap:8px 20px;border-bottom:2px solid var(--brand);padding-bottom:12px}
+.top h1{margin:0;font-size:clamp(20px,2.4vw,27px);font-weight:800;letter-spacing:-.01em;color:var(--brand)}
+.top .sub{color:var(--muted);font-size:13px;font-weight:600;margin-top:3px}
+.brand{margin-left:auto;text-align:right;font-size:11px;color:var(--muted)}
+.brand b{color:var(--brand);font-weight:800;font-size:14px;letter-spacing:.04em}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:18px}
+@media (max-width:760px){.kpis{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:18px 20px}
+.kpi-h{text-align:center;font-weight:800;font-size:16px;letter-spacing:.02em;color:var(--ink);margin-bottom:14px}
+.kpi-grid{display:grid;grid-template-columns:1.15fr 1fr 1fr .7fr;gap:0 6px;align-items:center}
+.kpi-col{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:center;padding-bottom:8px}
+.kpi-col.l{text-align:left}
+.kpi-row{display:contents}
+.kpi-name{grid-column:1/-1;background:var(--brand-soft);color:var(--brand);font-weight:700;font-size:12.5px;padding:5px 10px;border-radius:6px;margin:10px 0 6px}
+.kpi-name.total{background:var(--brand);color:#fff}
+.kpi-v{text-align:center;font-weight:700;font-size:clamp(14px,1.5vw,17px);font-variant-numeric:tabular-nums;padding:2px 0 8px;border-bottom:1px solid var(--line)}
+.kpi-v.rkap{color:var(--muted);font-weight:600}
+.kpi-ach{text-align:center;font-weight:800;font-size:15px}
+.ach-pos{color:var(--pos)}.ach-mid{color:var(--warn)}.ach-neg{color:var(--neg)}
+.chartcard{margin-top:20px}
+.chartcard h2{margin:0 0 4px;font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;color:var(--brand)}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--muted);font-weight:600;margin-bottom:6px}
+.legend .it{display:inline-flex;align-items:center;gap:7px}
+.sw{width:16px;height:12px;border-radius:2px;display:inline-block}
+.sw.rkap{background:var(--rkap);border:1px solid var(--brand-2)}.sw.real{background:var(--real)}
+.scroll{overflow-x:auto}
+svg{display:block;min-width:900px;width:100%;height:auto}
+.note{font-size:11px;color:var(--muted);margin-top:10px}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>Pendapatan Tol dan Lainnya</h1>
+      <div class="sub">Agustus dan SD Agustus 2026 · Nilai dalam Rp miliar</div>
+    </div>
+    <div class="brand"><b>HK · Danantara Indonesia</b><div>Rapat Direktorat · Pendapatan</div></div>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="card chartcard">
+    <h2>Pencapaian LHR terhadap RKAP</h2>
+    <div class="legend">
+      <span class="it"><span class="sw rkap"></span>RKAP</span>
+      <span class="it"><span class="sw real"></span>Realisasi</span>
+      <span class="it" style="color:var(--pos)">▲ % Pencapaian</span>
+    </div>
+    <div class="scroll"><svg id="lhr" viewBox="0 0 1000 340" role="img" aria-label="Grafik pencapaian LHR"></svg></div>
+    <div class="note">LHR = Lalu lintas Harian Rata-rata (rata-rata). % = Realisasi ÷ RKAP. Sumber: Evaluasi LHR &amp; Pend terhadap RKAP 2026.</div>
+  </div>
+
+  <div class="card chartcard">
+    <h2>Pencapaian Pendapatan terhadap RKAP</h2>
+    <div class="legend">
+      <span class="it"><span class="sw rkap"></span>RKAP</span>
+      <span class="it"><span class="sw real"></span>Realisasi</span>
+      <span class="it" style="color:var(--pos)">▲ % Pencapaian</span>
+    </div>
+    <div class="scroll"><svg id="pend" viewBox="0 0 1000 340" role="img" aria-label="Grafik pencapaian pendapatan"></svg></div>
+    <div class="note">Pendapatan tol per ruas, SD Agustus 2026 (Rp juta). % = Realisasi ÷ RKAP.</div>
+  </div>
+</div>
+
+<script>
+const fmt=(v)=>v.toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2});
+const KPI={
+ agustus:{title:"Agustus 2026",rows:[
+   {n:"Pendapatan Tol",rkap:330.80,real:331.69,ach:100},
+   {n:"Pendapatan Usaha Lainnya",rkap:33.50,real:29.86,ach:89},
+   {n:"Total Pendapatan",rkap:364.29,real:361.54,ach:99,total:true},
+ ]},
+ sd:{title:"SD Agustus 2026",rows:[
+   {n:"Pendapatan Tol",rkap:2449.51,real:2612.71,ach:107},
+   {n:"Pendapatan Usaha Lainnya",rkap:262.75,real:257.63,ach:98},
+   {n:"Total Pendapatan",rkap:2712.26,real:2870.34,ach:106,total:true},
+ ]},
+};
+const LHR=[
+ {ruas:"JORR S",reg:"JKT",rkap:144558,real:150469,ach:104},
+ {ruas:"ATP",reg:"JKT",rkap:22790,real:25281,ach:111},
+ {ruas:"TERPEKA",reg:"SUMBAGSEL",rkap:8376,real:9133,ach:109},
+ {ruas:"PALINDRA",reg:"SUMBAGSEL",rkap:8836,real:9568,ach:108},
+ {ruas:"INPRABU",reg:"SUMBAGSEL",rkap:4059,real:4407,ach:109},
+ {ruas:"BENGTABA",reg:"SUMBAGSEL",rkap:1785,real:1836,ach:103},
+ {ruas:"PERMAI",reg:"SUMBAGTENG",rkap:7277,real:8256,ach:113},
+ {ruas:"PEKBANGPAR",reg:"SUMBAGTENG",rkap:5063,real:5449,ach:108},
+ {ruas:"PACIN",reg:"SUMBAGTENG",rkap:2528,real:2671,ach:106},
+ {ruas:"SIBANCEH",reg:"SUMBAGUT",rkap:1894,real:4714,ach:249},
+ {ruas:"BINTAN",reg:"SUMBAGUT",rkap:5258,real:6364,ach:121},
+ {ruas:"INKIS",reg:"SUMBAGUT",rkap:7106,real:7919,ach:111},
+];
+const PEND=[
+ {ruas:"JORR S",reg:"JKT",rkap:571839,real:585346,ach:102},
+ {ruas:"ATP",reg:"JKT",rkap:309638,real:316952,ach:102},
+ {ruas:"TERPEKA",reg:"SUMBAGSEL",rkap:643438,real:688290,ach:107},
+ {ruas:"PALINDRA",reg:"SUMBAGSEL",rkap:59973,real:63592,ach:106},
+ {ruas:"INPRABU",reg:"SUMBAGSEL",rkap:87626,real:92962,ach:106},
+ {ruas:"BENGTABA",reg:"SUMBAGSEL",rkap:11125,real:10933,ach:98},
+ {ruas:"PERMAI",reg:"SUMBAGTENG",rkap:367484,real:392308,ach:107},
+ {ruas:"PEKBANGPAR",reg:"SUMBAGTENG",rkap:101462,real:103551,ach:102},
+ {ruas:"PACIN",reg:"SUMBAGTENG",rkap:30982,real:32497,ach:105},
+ {ruas:"SIBANCEH",reg:"SUMBAGUT",rkap:29879,real:60220,ach:202},
+ {ruas:"BINTAN",reg:"SUMBAGUT",rkap:109409,real:131539,ach:120},
+ {ruas:"INKIS",reg:"SUMBAGUT",rkap:119324,real:134522,ach:113},
+];
+
+function achCls(a){return a>=100?'ach-pos':a>=90?'ach-mid':'ach-neg';}
+
+function renderKPI(){
+  const box=document.getElementById('kpis');
+  box.innerHTML=Object.values(KPI).map(blk=>`
+    <div class="card">
+      <div class="kpi-h">${blk.title.toUpperCase()}</div>
+      <div class="kpi-grid">
+        <div class="kpi-col l"></div><div class="kpi-col">RKAP</div><div class="kpi-col">Realisasi</div><div class="kpi-col">% ACH</div>
+        ${blk.rows.map(r=>`
+          <div class="kpi-name ${r.total?'total':''}">${r.n}</div>
+          <div class="kpi-v" style="border:0"></div>
+          <div class="kpi-v rkap">Rp ${fmt(r.rkap)} M</div>
+          <div class="kpi-v">Rp ${fmt(r.real)} M</div>
+          <div class="kpi-ach ${achCls(r.ach)}">${r.ach}%</div>
+        `).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function drawBars(svgId,DATA){
+  const ns="http://www.w3.org/2000/svg";const svg=document.getElementById(svgId);svg.innerHTML='';
+  const W=1000,H=340, padL=20,padR=10,padT=44,padB=64;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const n=DATA.length, groupW=plotW/n, barW=Math.min(20,groupW*0.3), gap=4;
+  const max=Math.max(...DATA.map(d=>Math.max(d.rkap,d.real)))*1.12;
+  const y=v=>padT+plotH-(v/max)*plotH;
+  const add=(t,at,txt)=>{const e=document.createElementNS(ns,t);for(const k in at)e.setAttribute(k,at[k]);if(txt!=null)e.textContent=txt;svg.appendChild(e);return e;};
+  // baseline
+  add('line',{x1:padL,y1:padT+plotH,x2:W-padR,y2:padT+plotH,stroke:'var(--line-strong)','stroke-width':1});
+  // region separators + labels
+  let prev=null;
+  DATA.forEach((d,i)=>{
+    const cx=padL+groupW*i+groupW/2;
+    if(prev!==null && d.reg!==DATA[i-1].reg){
+      const x=padL+groupW*i;
+      add('line',{x1:x,y1:padT-6,x2:x,y2:padT+plotH+30,stroke:'var(--line-strong)','stroke-width':1.2,'stroke-dasharray':'3 3'});
+    }
+    prev=d.reg;
+    // bars
+    const xr=cx-barW-gap/2, xv=cx+gap/2;
+    add('rect',{x:xr,y:y(d.rkap),width:barW,height:padT+plotH-y(d.rkap),rx:2,fill:'var(--rkap)',stroke:'var(--brand-2)','stroke-width':.8});
+    add('rect',{x:xv,y:y(d.real),width:barW,height:padT+plotH-y(d.real),rx:2,fill:'var(--real)'});
+    // value labels
+    add('text',{x:xr+barW/2,y:y(d.rkap)-4,'text-anchor':'middle','font-size':8.5,fill:'var(--muted)'},d.rkap.toLocaleString('id-ID'));
+    add('text',{x:xv+barW/2,y:y(d.real)-4,'text-anchor':'middle','font-size':8.5,'font-weight':700,fill:'var(--real)'},d.real.toLocaleString('id-ID'));
+    // % pencapaian
+    const yt=Math.min(y(d.rkap),y(d.real))-16;
+    add('text',{x:cx,y:Math.max(yt,padT-8),'text-anchor':'middle','font-size':12,'font-weight':800,fill:'var(--pos)'},d.ach+'%');
+    // ruas label
+    add('text',{x:cx,y:padT+plotH+16,'text-anchor':'middle','font-size':9,'font-weight':700,fill:'var(--ink)'},d.ruas);
+  });
+  // region labels bottom
+  const regs=[...new Set(DATA.map(d=>d.reg))];
+  regs.forEach(rg=>{
+    const idx=DATA.map((d,i)=>d.reg===rg?i:-1).filter(i=>i>=0);
+    const cx=padL+groupW*((idx[0]+idx[idx.length-1])/2)+groupW/2;
+    add('text',{x:cx,y:padT+plotH+40,'text-anchor':'middle','font-size':10,'font-weight':800,fill:'var(--brand)',letter:'.05em'},rg==='JKT'?'JKT':'REG '+rg);
+  });
+}
+renderKPI();drawBars('lhr',LHR);drawBars('pend',PEND);
+</script>

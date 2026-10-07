@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AppShell } from "@/components/shell/AppShell";
-import { RequireAuth, RequireModule, RequireRole } from "@/components/RouteGuards";
+import { RequireAuth, RequireModule, RequirePermission, RequireRole } from "@/components/RouteGuards";
 import { LoginPage } from "@/pages/LoginPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { PetaPage } from "@/pages/peta/PetaPage";
@@ -11,7 +11,11 @@ import { IncidentPage } from "@/pages/incident/IncidentPage";
 import { FeedbackPage } from "@/pages/feedback/FeedbackPage";
 import { LabaRugiPage } from "@/pages/laba-rugi/LabaRugiPage";
 import { ManajemenRisikoPage } from "@/pages/rapat-direktorat/manajemen-risiko/ManajemenRisikoPage";
+import { PendapatanPage } from "@/pages/rapat-direktorat/pendapatan/PendapatanPage";
+import { PresentasiPage } from "@/pages/presentasi/PresentasiPage";
+import { PresentationOverlay } from "@/components/presentation/PresentationOverlay";
 import { UsersPage } from "@/pages/users/UsersPage";
+import { AksesPage } from "@/pages/admin/akses/AksesPage";
 import { SettingsPage } from "@/pages/settings/SettingsPage";
 import { PlaceholderPage } from "@/pages/PlaceholderPage";
 import { ForbiddenPage } from "@/pages/ForbiddenPage";
@@ -26,6 +30,7 @@ function LoginRoute() {
 
 export default function App() {
   return (
+    <>
     <Routes>
       <Route path="/login" element={<LoginRoute />} />
 
@@ -62,6 +67,15 @@ export default function App() {
           }
         />
         <Route
+          path="/rapat-direktorat/pendapatan"
+          element={
+            <RequireModule module="pendapatan">
+              <PendapatanPage />
+            </RequireModule>
+          }
+        />
+        <Route path="/presentasi" element={<PresentasiPage />} />
+        <Route
           path="/wim"
           element={
             <PlaceholderPage
@@ -79,10 +93,20 @@ export default function App() {
             </RequireRole>
           }
         />
+        <Route
+          path="/admin/akses"
+          element={
+            <RequirePermission permission="access.manage">
+              <AksesPage />
+            </RequirePermission>
+          }
+        />
         <Route path="/pengaturan" element={<SettingsPage />} />
         <Route path="/403" element={<ForbiddenPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
+    <PresentationOverlay />
+    </>
   );
 }

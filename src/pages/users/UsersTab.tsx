@@ -25,9 +25,13 @@ interface UsersTabProps {
   onRefresh: () => void;
   openCreate: boolean;
   onCreateHandled: () => void;
+  /** Peta role_code → role_name dari katalog dinamis (/api/admin/roles). */
+  roleLabels?: Record<string, string>;
 }
 
-export function UsersTab({ users, branches, loading, onRefresh, openCreate, onCreateHandled }: UsersTabProps) {
+export function UsersTab({ users, branches, loading, onRefresh, openCreate, onCreateHandled, roleLabels }: UsersTabProps) {
+  // Nama role dari katalog dinamis; fallback ke katalog lama lalu ke kode mentah.
+  const resolveRole = (code: string) => roleLabels?.[code] ?? roleLabel(code);
   const toast = useToast();
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [formMode, setFormMode] = useState<"create" | "edit" | null>(null);
@@ -99,7 +103,7 @@ export function UsersTab({ users, branches, loading, onRefresh, openCreate, onCr
                   {u.roles.length ? (
                     u.roles.map((r) => (
                       <span key={r} className={styles.chip}>
-                        {roleLabel(r)}
+                        {resolveRole(r)}
                       </span>
                     ))
                   ) : (
@@ -152,7 +156,7 @@ export function UsersTab({ users, branches, loading, onRefresh, openCreate, onCr
             <div className={styles.section}>
               <span className={styles.sectionLabel}>Role Efektif</span>
               <div className={styles.chips}>
-                {selected.roles.length ? selected.roles.map((r) => <span key={r} className={styles.chip}>{roleLabel(r)}</span>) : <span className={styles.muted}>—</span>}
+                {selected.roles.length ? selected.roles.map((r) => <span key={r} className={styles.chip}>{resolveRole(r)}</span>) : <span className={styles.muted}>—</span>}
               </div>
             </div>
 

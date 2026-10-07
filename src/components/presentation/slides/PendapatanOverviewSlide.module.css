@@ -1,0 +1,126 @@
+/* Slide overview Pendapatan: 6 compact KPI card (komponen bersama) + 2 grafik
+   bertumpuk yang fit ke tinggi (tanpa scroll). Mengikuti token TollSentra. */
+
+.slide {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  /* Isi tinggi panggung yang tersedia (viewport dikurangi chrome overlay:
+     header + progress + footer + padding stageWrap) agar dua grafik menskala
+     ke ruang tersisa tanpa scroll — panggung memakai margin:auto sehingga tidak
+     memberi tinggi definit sendiri. */
+  height: calc(100vh - 172px);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.head {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  flex: none;
+  border-bottom: 2px solid var(--st-blue);
+  padding-bottom: 8px;
+}
+.title {
+  margin: 0;
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--st-blue);
+}
+.sub {
+  color: var(--text-muted);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+.sub b {
+  color: var(--text);
+}
+
+.kpiWrap {
+  flex: none;
+}
+
+/* ---------- 2 grafik ---------- */
+.charts {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.chartPanel {
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--card-shadow);
+  padding: 10px 16px;
+}
+.chartHead {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.chartTitle {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--st-blue);
+}
+.chartSpacer {
+  flex: 1 1 auto;
+}
+.legend {
+  display: flex;
+  gap: 14px;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.legItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.sw {
+  width: 14px;
+  height: 11px;
+  border-radius: 2px;
+  display: inline-block;
+}
+.swRkap {
+  background: color-mix(in srgb, var(--st-blue) 45%, var(--surface-1));
+  border: 1px solid var(--st-blue);
+}
+.swReal {
+  background: var(--sem-red);
+}
+.dots {
+  display: inline-flex;
+  gap: 3px;
+}
+.d {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.stateBox {
+  display: grid;
+  place-items: center;
+  min-height: 50vh;
+}

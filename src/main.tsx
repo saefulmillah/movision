@@ -7,6 +7,7 @@ import { SseProvider } from "@/context/SseContext";
 import { TicketsProvider } from "@/context/TicketsContext";
 import { BranchProvider } from "@/context/BranchContext";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { PresentationProvider } from "@/context/PresentationContext";
 import { TooltipProvider, ToastProvider } from "@/components/ui";
 
 import { applySettings, loadSettings } from "@/lib/settings";
@@ -28,7 +29,9 @@ createRoot(document.getElementById("root")!).render(
               <SseProvider>
                 <BranchProvider>
                   <TicketsProvider>
-                    <App />
+                    <PresentationProvider>
+                      <App />
+                    </PresentationProvider>
                   </TicketsProvider>
                 </BranchProvider>
               </SseProvider>

@@ -55,7 +55,7 @@ export function LoginPage() {
             <Icon name="radio-tower" size={22} />
           </span>
           <span>
-            <div className={styles.brandName}>TollSentra</div>
+            <div className={styles.brandName}>Movision</div>
             <div className={styles.brandSub}>Control Center</div>
           </span>
         </div>

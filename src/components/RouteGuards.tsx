@@ -51,3 +51,13 @@ export function RequireModule({ module, children }: { module: string; children: 
   }
   return <>{children}</>;
 }
+
+/** Butuh permission tertentu (mis. `access.manage`); super_admin lolos otomatis
+ *  karena permission tersebut sudah ada di capability-nya. */
+export function RequirePermission({ permission, children }: { permission: string; children: ReactNode }) {
+  const { hasPermission } = useAuth();
+  if (!hasPermission(permission)) {
+    return <Navigate to="/403" replace />;
+  }
+  return <>{children}</>;
+}

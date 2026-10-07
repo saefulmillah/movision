@@ -19,7 +19,7 @@ export const ROLE_CATALOG: RoleMeta[] = [
       "feature.cctv.view", "feature.asset.view", "feature.sos.view", "branch.select", "branch.view.all",
       "branch.view.assigned", "camera.view", "asset.view", "vehicle.view", "gate.view", "sos.alert.view",
       "sos.ticket.view", "sos.response.view", "sos.ticket.dispatch", "sos.ticket.complete", "sos.response.confirm",
-      "feature.laba_rugi.view", "feature.manajemen_risiko.view"
+      "feature.laba_rugi.view", "feature.manajemen_risiko.view", "feature.pendapatan.view"
     ]
   },
   {
@@ -68,8 +68,8 @@ export const ROLE_CATALOG: RoleMeta[] = [
     code: "manajemen",
     label: "Manajemen",
     icon: "chart-column",
-    description: "Akses baca dashboard Rapat Direktorat (Laba Rugi & Manajemen Risiko).",
-    permissions: ["feature.laba_rugi.view", "feature.manajemen_risiko.view"]
+    description: "Akses baca dashboard Rapat Direktorat (Laba Rugi, Manajemen Risiko & Pendapatan).",
+    permissions: ["feature.laba_rugi.view", "feature.manajemen_risiko.view", "feature.pendapatan.view"]
   }
 ];
 
@@ -80,14 +80,14 @@ export function roleLabel(code: string): string {
 export const MODULE_CODES = [
   "ruas", "gerbang", "gerbang_alias", "segmen_gerbang", "od_gerbang", "tariff", "speed_analytics", "kamera",
   "vehicle", "vehicle_type", "wim", "vms", "fo", "rakom", "cuaca", "tariff_import", "monitoring_rekonsiliasi",
-  "laba_rugi", "manajemen_risiko"
+  "laba_rugi", "manajemen_risiko", "pendapatan"
 ];
 
 export const PERMISSION_CODES = [
   "feature.cctv.view", "feature.asset.view", "feature.sos.view", "branch.select", "branch.view.all",
   "branch.view.assigned", "camera.view", "asset.view", "vehicle.view", "gate.view", "sos.alert.view",
   "sos.ticket.view", "sos.response.view", "sos.ticket.dispatch", "sos.ticket.complete", "sos.response.confirm",
-  "feature.laba_rugi.view", "feature.manajemen_risiko.view"
+  "feature.laba_rugi.view", "feature.manajemen_risiko.view", "feature.pendapatan.view"
 ];
 
 export const ACCESS_LEVELS = ["none", "read", "write", "delete"] as const;
