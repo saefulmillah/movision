@@ -1,4 +1,5 @@
-import { NavLink } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { NavLink, useLocation } from "react-router-dom";
 import { Icon } from "@/components/ui/Icon";
 import { useAuth } from "@/context/AuthContext";
 import type { MenuNode } from "@/types/api";
@@ -10,15 +11,24 @@ interface SidebarProps {
   openTickets: number;
 }
 
-/** Menu → daftar item nav yang bisa diklik (punya route_path). Kategori tanpa
- *  route ikut menyumbang anak-anaknya. Tidak memfilter ulang (handoff). */
-function flattenNav(nodes: MenuNode[]): MenuNode[] {
-  const out: MenuNode[] = [];
-  for (const node of nodes) {
-    if (node.route_path) out.push(node);
-    if (node.children?.length) out.push(...flattenNav(node.children));
-  }
-  return out;
+const STORAGE_KEY = "tollsentra.sidebar.groups";
+
+/** Grup = node yang punya anak. Node lain dirender sebagai item nav tunggal. */
+function isGroup(node: MenuNode): boolean {
+  return Boolean(node.children && node.children.length > 0);
+}
+
+/** Cocokkan pathname dgn route item (sama persis, atau prefix segmen). */
+function routeIsActive(pathname: string, route: string | null): boolean {
+  if (!route) return false;
+  if (route === "/") return pathname === "/";
+  return pathname === route || pathname.startsWith(`${route}/`);
+}
+
+/** Jumlah badge yang disumbang anak-anak grup (saat ini hanya tiket SOS). */
+function groupBadge(node: MenuNode, openTickets: number): number {
+  if (openTickets <= 0) return 0;
+  return node.children?.some((child) => child.route_path === "/sos") ? openTickets : 0;
 }
 
 function initials(name: string | null | undefined): string {
@@ -27,13 +37,103 @@ function initials(name: string | null | undefined): string {
   return parts.map((p) => p[0]).join("").toUpperCase();
 }
 
+function readStoredGroups(): Record<string, boolean> {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw) as Record<string, boolean>;
+  } catch {
+    /* localStorage tak tersedia / rusak → mulai kosong */
+  }
+  return {};
+}
+
 export function Sidebar({ open, onToggle, openTickets }: SidebarProps) {
   const { menus, capability, logout } = useAuth();
-  const items = flattenNav(menus);
+  const location = useLocation();
+
+  // State buka/tutup per grup (multi-buka), dipersist di localStorage.
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(readStoredGroups);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(openGroups));
+    } catch {
+      /* abaikan bila localStorage diblokir */
+    }
+  }, [openGroups]);
+
+  // Auto-buka grup yang memuat halaman aktif (tanpa menutup grup lain).
+  useEffect(() => {
+    const active = menus.find(
+      (node) => isGroup(node) && node.children!.some((child) => routeIsActive(location.pathname, child.route_path))
+    );
+    if (active) {
+      setOpenGroups((prev) => (prev[active.menu_code] ? prev : { ...prev, [active.menu_code]: true }));
+    }
+  }, [location.pathname, menus]);
+
+  const toggleGroup = (code: string) =>
+    setOpenGroups((prev) => ({ ...prev, [code]: !prev[code] }));
 
   const displayName =
     capability?.user.display_name || capability?.user.username || "Pengguna";
   const roleLabel = capability?.roles?.[0] ?? "";
+
+  const renderLeaf = (item: MenuNode, sub: boolean) => {
+    const isSos = item.route_path === "/sos";
+    const badge = isSos && openTickets > 0 ? openTickets : 0;
+    return (
+      <NavLink
+        key={item.id}
+        to={item.route_path as string}
+        end={item.route_path === "/"}
+        className={({ isActive }) =>
+          `${sub ? styles.subItem : styles.navItem} ${isActive ? styles.active : ""}`
+        }
+        title={item.menu_name}
+      >
+        <Icon name={item.icon || "circle"} size={sub ? 16 : 19} />
+        <span className={styles.navLabel}>{item.menu_name}</span>
+        {badge > 0 && <span className={styles.navBadge}>{badge}</span>}
+      </NavLink>
+    );
+  };
+
+  const renderGroup = (node: MenuNode) => {
+    const code = node.menu_code;
+    const isOpen = Boolean(openGroups[code]);
+    const hasActiveChild = node.children!.some((child) => routeIsActive(location.pathname, child.route_path));
+    const badge = groupBadge(node, openTickets);
+
+    return (
+      <div key={node.id} className={styles.group} data-open={isOpen}>
+        <button
+          type="button"
+          className={`${styles.groupHeader} ${hasActiveChild ? styles.groupActive : ""}`}
+          onClick={() => toggleGroup(code)}
+          aria-expanded={isOpen}
+          title={node.menu_name}
+        >
+          <Icon name={node.icon || "folder"} size={19} />
+          <span className={styles.navLabel}>{node.menu_name}</span>
+          {badge > 0 && <span className={`${styles.navBadge} ${styles.groupBadge}`}>{badge}</span>}
+          <Icon name="chevron-right" size={16} className={styles.chevron} />
+        </button>
+
+        {isOpen && (
+          <div className={styles.submenu}>
+            {node.children!.map((child) => renderLeaf(child, true))}
+          </div>
+        )}
+
+        {/* Flyout saat sidebar terlipat: hover ikon grup → daftar submenu. */}
+        <div className={styles.flyout} role="menu">
+          <span className={styles.flyoutTitle}>{node.menu_name}</span>
+          {node.children!.map((child) => renderLeaf(child, true))}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <aside className={`${styles.sidebar} ${open ? "" : styles.collapsed}`} data-collapsed={!open}>
@@ -53,23 +153,7 @@ export function Sidebar({ open, onToggle, openTickets }: SidebarProps) {
       </div>
 
       <nav className={styles.nav}>
-        {items.map((item) => {
-          const isSos = item.route_path === "/sos";
-          const badge = isSos && openTickets > 0 ? openTickets : 0;
-          return (
-            <NavLink
-              key={item.id}
-              to={item.route_path as string}
-              end={item.route_path === "/"}
-              className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ""}`}
-              title={item.menu_name}
-            >
-              <Icon name={item.icon || "circle"} size={19} />
-              <span className={styles.navLabel}>{item.menu_name}</span>
-              {badge > 0 && <span className={styles.navBadge}>{badge}</span>}
-            </NavLink>
-          );
-        })}
+        {menus.map((node) => (isGroup(node) ? renderGroup(node) : renderLeaf(node, false)))}
       </nav>
 
       <div className={styles.footer}>
