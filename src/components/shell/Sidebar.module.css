@@ -333,10 +333,15 @@
 }
 
 /* ---- Perilaku terlipat (collapsed): grup jadi ikon + flyout saat hover ---- */
+/* Ikon menu dibuat tile seragam & terpusat agar rapi saat sidebar dilipat. */
+.collapsed .navItem,
 .collapsed .groupHeader {
   justify-content: center;
-  padding: 11px 0;
-  margin: 2px 8px;
+  gap: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  margin: 3px auto;
 }
 .collapsed .chevron,
 .collapsed .groupHeader .navLabel {
@@ -357,9 +362,12 @@
 }
 
 /* Flyout hanya muncul saat sidebar terlipat & grup di-hover. Sidebar/nav
-   dibuat overflow:visible saat collapsed agar flyout tidak terpotong. */
+   dibuat overflow:visible saat collapsed agar flyout tidak terpotong, dan
+   sidebar diangkat (z-index) agar flyout menimpa konten di sebelahnya. */
 .collapsed {
   overflow: visible;
+  position: relative;
+  z-index: 30;
 }
 .collapsed .nav {
   overflow: visible;
@@ -368,9 +376,9 @@
 .flyout {
   display: none;
   position: absolute;
-  left: calc(100% + 6px);
+  left: 100%;
   top: 0;
-  z-index: 50;
+  z-index: 200;
   min-width: 192px;
   padding: 6px;
   flex-direction: column;
@@ -395,6 +403,11 @@
 .flyout .subItem {
   margin: 0;
   padding: 8px 12px;
+}
+/* Label item di dalam flyout harus tetap terlihat meski sidebar terlipat
+   (aturan .collapsed .navLabel{display:none} ikut mengenai item flyout). */
+.flyout .navLabel {
+  display: block;
 }
 .flyout .subItem.active::before {
   display: none;
