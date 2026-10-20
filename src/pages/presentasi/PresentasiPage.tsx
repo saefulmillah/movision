@@ -6,8 +6,38 @@ import { useAuth } from "@/context/AuthContext";
 import { usePresentation } from "@/context/PresentationContext";
 import { SLIDES } from "@/components/presentation/slideRegistry";
 import { parsePdfSlide, pdfSlideLabel } from "@/components/presentation/pdfSlides";
+import { isCustomCover } from "@/components/presentation/customCover";
 import { countPagesOfFile, deletePdf, uploadPdf, type PdfDoc } from "@/lib/presentationPdf";
 import styles from "./PresentasiPage.module.css";
+
+/** Kelompok warna/ikon kartu slide berdasarkan fitur. */
+function featKey(feature: string): string {
+  if (feature.startsWith("Laba")) return "lr";
+  if (feature.startsWith("Manajemen")) return "risk";
+  if (feature.startsWith("Pendapatan")) return "pend";
+  if (feature === "Pembuka") return "open";
+  if (feature === "Penutup") return "close";
+  if (feature === "Sampul Kustom") return "cover";
+  return "pdf";
+}
+function featIcon(key: string): string {
+  switch (key) {
+    case "lr":
+      return "chart-column";
+    case "risk":
+      return "shield-alert";
+    case "pend":
+      return "trending-up";
+    case "open":
+      return "presentation";
+    case "close":
+      return "flag";
+    case "cover":
+      return "bookmark";
+    default:
+      return "file-text";
+  }
+}
 
 export function PresentasiPage() {
   const p = usePresentation();
@@ -22,12 +52,17 @@ export function PresentasiPage() {
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
 
-  // Segarkan daftar periode & dokumen PDF tiap builder dibuka.
-  const { refreshPeriods, refreshPdfs } = p;
+  // Drag-and-drop urutan slide.
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
+  const [overIdx, setOverIdx] = useState<number | null>(null);
+
+  // Segarkan periode, dokumen PDF, & agenda bersama tiap builder dibuka.
+  const { refreshPeriods, refreshPdfs, refreshAgenda } = p;
   useEffect(() => {
     void refreshPeriods();
     void refreshPdfs();
-  }, [refreshPeriods, refreshPdfs]);
+    void refreshAgenda();
+  }, [refreshPeriods, refreshPdfs, refreshAgenda]);
 
   const periodOptions: SelectOption[] = useMemo(
     () => p.periods.map((opt) => ({ value: opt.key, label: opt.label })),
@@ -73,215 +108,336 @@ export function PresentasiPage() {
     }
   }
 
+  function onDrop(targetIdx: number) {
+    if (dragIdx !== null && dragIdx !== targetIdx) p.reorder(dragIdx, targetIdx);
+    setDragIdx(null);
+    setOverIdx(null);
+  }
+
   return (
     <div className={styles.page}>
       <div className={styles.wrap}>
-        {/* Header */}
+        {/* Header + CTA */}
         <div className={styles.header}>
-          <h1 className={styles.title}>Susun Agenda Presentasi</h1>
-          <div className={styles.sub}>
-            Pilih, urutkan, dan mulai. Slide memakai data <b>snapshot</b> periode terpilih agar angka beku selama rapat.
-          </div>
-        </div>
-
-        {/* Slide pembuka (editable) */}
-        <div className={styles.config}>
-          <div className={styles.field}>
-            <span className={styles.fieldLabel}>Judul Rapat</span>
-            <Input
-              value={p.meetingTitle}
-              onChange={(e) => p.setMeetingTitle(e.target.value)}
-              placeholder="Rapat Direktorat"
-              wrapClassName={styles.inputMd}
-            />
-          </div>
-          <div className={styles.field}>
-            <span className={styles.fieldLabel}>Tanggal Rapat</span>
-            <Input
-              type="date"
-              value={p.meetingDate}
-              onChange={(e) => p.setMeetingDate(e.target.value)}
-              icon="calendar"
-              wrapClassName={styles.inputMd}
-            />
-          </div>
-          <div className={`${styles.field} ${styles.grow}`}>
-            <span className={styles.fieldLabel}>Subjudul</span>
-            <Input
-              value={p.meetingSubtitle}
-              onChange={(e) => p.setMeetingSubtitle(e.target.value)}
-              placeholder="Deskripsi singkat rapat"
-              wrapClassName={styles.fill}
-            />
-          </div>
-        </div>
-
-        {/* Konfigurasi periode & otomatis */}
-        <div className={styles.config}>
-          <div className={styles.field}>
-            <span className={styles.fieldLabel}>Snapshot Periode</span>
-            <Select
-              value={p.period}
-              onValueChange={p.setPeriod}
-              options={periodOptions}
-              placeholder="Pilih periode"
-              icon="calendar"
-              ariaLabel="Snapshot periode"
-            />
-          </div>
-          <span className={styles.spacer} />
-          <div className={styles.field}>
-            <span className={styles.fieldLabel}>Otomatis</span>
-            <div className={styles.autoBox}>
-              <label className={styles.autoLabel}>
-                <Switch checked={p.auto} onCheckedChange={p.toggleAuto} ariaLabel="Putar otomatis" />
-                Putar otomatis
-              </label>
-              {p.auto && (
-                <span className={styles.stepper}>
-                  <button
-                    type="button"
-                    className={styles.stepBtn}
-                    onClick={() => p.setAutoSec(p.autoSec - 2)}
-                    disabled={p.autoSec <= 4}
-                    aria-label="Kurangi interval"
-                  >
-                    −
-                  </button>
-                  <b className={styles.stepVal}>{p.autoSec}s</b>
-                  <button
-                    type="button"
-                    className={styles.stepBtn}
-                    onClick={() => p.setAutoSec(p.autoSec + 2)}
-                    disabled={p.autoSec >= 30}
-                    aria-label="Tambah interval"
-                  >
-                    +
-                  </button>
-                </span>
-              )}
+          <div className={styles.headText}>
+            <h1 className={styles.title}>Susun Agenda Presentasi</h1>
+            <div className={styles.sub}>
+              Seret kartu untuk mengurutkan, klik judul untuk mengubah. Slide memakai data <b>snapshot</b> periode terpilih.
             </div>
           </div>
-        </div>
-
-        {/* Dokumen PDF */}
-        <div className={styles.pdfPanel}>
-          <div className={styles.pdfHead}>
-            <span className={styles.pdfHeadTitle}>
-              <Icon name="file-text" size={15} /> Dokumen PDF
-            </span>
-            {canUpload && (
-              <>
-                <input ref={fileRef} type="file" accept="application/pdf,.pdf" hidden onChange={handleFile} />
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  icon="upload"
-                  disabled={uploading}
-                  onClick={() => fileRef.current?.click()}
-                >
-                  {uploading ? "Mengunggah…" : "Unggah PDF"}
-                </Button>
-              </>
-            )}
-          </div>
-          {p.pdfs.length === 0 ? (
-            <div className={styles.pdfEmpty}>
-              Belum ada dokumen PDF.{canUpload ? " Unggah PDF — tiap halaman menjadi satu slide." : ""}
-            </div>
-          ) : (
-            <div className={styles.pdfList}>
-              {p.pdfs.map((doc) => {
-                const inAgenda = pdfInAgenda(doc.id);
-                return (
-                  <div key={doc.id} className={styles.pdfRow}>
-                    <Icon name="file-text" size={16} />
-                    <span className={styles.pdfTitle}>{doc.title}</span>
-                    <span className={styles.pdfMeta}>{doc.page_count ?? "?"} hal</span>
-                    <span className={styles.spacer} />
-                    {inAgenda ? (
-                      <Button size="sm" variant="ghost" icon="minus" onClick={() => p.removePdfFromAgenda(doc.id)}>
-                        Keluarkan
-                      </Button>
-                    ) : (
-                      <Button size="sm" variant="secondary" icon="plus" onClick={() => p.addPdf(doc)}>
-                        Tambah ke agenda
-                      </Button>
-                    )}
-                    {canDelete && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        iconOnly
-                        icon="trash-2"
-                        title="Hapus dokumen"
-                        onClick={() => handleDelete(doc)}
-                      />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Agenda */}
-        <div className={styles.agenda}>
-          <div className={styles.agendaHead}>
-            <span>Agenda · {p.activeSlides.length} slide aktif</span>
-            <span>Urutan tayang</span>
-          </div>
-          {p.order.map((id, idx) => {
-            const staticDef = SLIDES[id];
-            const pdfLabel = staticDef ? null : pdfSlideLabel(id, p.pdfs);
-            const def = staticDef
-              ? { title: staticDef.title, feature: staticDef.feature, badge: staticDef.badge }
-              : pdfLabel
-                ? { title: pdfLabel.title, feature: pdfLabel.feature, badge: "PDF" }
-                : null;
-            if (!def) return null;
-            const on = !!p.enabled[id];
-            return (
-              <div key={id} className={`${styles.row} ${on ? "" : styles.rowOff}`}>
-                <span className={styles.grip} aria-hidden="true">
-                  <Icon name="grip-vertical" size={16} />
-                </span>
-                <Switch checked={on} onCheckedChange={() => p.toggleEnabled(id)} ariaLabel={`Aktifkan ${def.title}`} />
-                <span className={styles.num}>{idx + 1}</span>
-                <span className={styles.rowText}>
-                  <span className={`${styles.rowTitle} ${on ? "" : styles.strike}`}>{def.title}</span>
-                  <span className={styles.rowFeat}>{def.feature}</span>
-                </span>
-                <span className={styles.badge}>{def.badge}</span>
-                <span className={styles.reorder}>
-                  <Button
-                    size="sm"
-                    iconOnly
-                    icon="chevron-up"
-                    title="Naik"
-                    disabled={idx === 0}
-                    onClick={() => p.move(id, -1)}
-                  />
-                  <Button
-                    size="sm"
-                    iconOnly
-                    icon="chevron-down"
-                    title="Turun"
-                    disabled={idx === p.order.length - 1}
-                    onClick={() => p.move(id, 1)}
-                  />
-                </span>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* CTA */}
-        <div className={styles.cta}>
-          <Button variant="primary" icon="play" disabled={!p.activeSlides.length} onClick={p.start} className={styles.startBtn}>
+          <Button
+            variant="primary"
+            icon="play"
+            disabled={!p.activeSlides.length}
+            onClick={p.start}
+            className={styles.startBtn}
+          >
             Mulai Presentasi
           </Button>
-          <span className={styles.hint}>Layar penuh · panah ◄ ► untuk navigasi · Esc keluar</span>
+        </div>
+
+        <div className={styles.layout}>
+          {/* Kolom kiri — pengaturan rapat */}
+          <aside className={styles.settings}>
+            <div className={styles.settingsHead}>
+              <Icon name="sliders-horizontal" size={15} />
+              <span className={styles.settingsTitle}>Pengaturan Rapat</span>
+            </div>
+
+            <div className={styles.settingsBody}>
+              <div className={styles.field}>
+                <span className={styles.fieldLabel}>Judul Rapat</span>
+                <Input
+                  value={p.meetingTitle}
+                  onChange={(e) => p.setMeetingTitle(e.target.value)}
+                  placeholder="Rapat Direktorat"
+                  wrapClassName={styles.fill}
+                />
+              </div>
+              <div className={styles.field}>
+                <span className={styles.fieldLabel}>Tanggal Rapat</span>
+                <Input
+                  type="date"
+                  value={p.meetingDate}
+                  onChange={(e) => p.setMeetingDate(e.target.value)}
+                  icon="calendar"
+                  wrapClassName={styles.fill}
+                />
+              </div>
+              <div className={styles.field}>
+                <span className={styles.fieldLabel}>Snapshot Periode</span>
+                <Select
+                  value={p.period}
+                  onValueChange={p.setPeriod}
+                  options={periodOptions}
+                  placeholder="Pilih periode"
+                  icon="calendar"
+                  ariaLabel="Snapshot periode"
+                />
+              </div>
+              <div className={styles.field}>
+                <span className={styles.fieldLabel}>Subjudul</span>
+                <Input
+                  value={p.meetingSubtitle}
+                  onChange={(e) => p.setMeetingSubtitle(e.target.value)}
+                  placeholder="Deskripsi singkat rapat"
+                  wrapClassName={styles.fill}
+                />
+              </div>
+
+              <div className={styles.field}>
+                <span className={styles.fieldLabel}>Putar Otomatis</span>
+                <div className={styles.autoBox}>
+                  <label className={styles.autoLabel}>
+                    <Switch checked={p.auto} onCheckedChange={p.toggleAuto} ariaLabel="Putar otomatis" />
+                    Aktif
+                  </label>
+                  {p.auto && (
+                    <span className={styles.stepper}>
+                      <button
+                        type="button"
+                        className={styles.stepBtn}
+                        onClick={() => p.setAutoSec(p.autoSec - 2)}
+                        disabled={p.autoSec <= 4}
+                        aria-label="Kurangi interval"
+                      >
+                        −
+                      </button>
+                      <b className={styles.stepVal}>{p.autoSec}s</b>
+                      <button
+                        type="button"
+                        className={styles.stepBtn}
+                        onClick={() => p.setAutoSec(p.autoSec + 2)}
+                        disabled={p.autoSec >= 30}
+                        aria-label="Tambah interval"
+                      >
+                        +
+                      </button>
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Dokumen PDF */}
+              <div className={styles.field}>
+                <span className={styles.fieldLabel}>Dokumen PDF</span>
+                {canUpload && (
+                  <>
+                    <input ref={fileRef} type="file" accept="application/pdf,.pdf" hidden onChange={handleFile} />
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      icon="upload"
+                      disabled={uploading}
+                      onClick={() => fileRef.current?.click()}
+                      className={styles.fill}
+                    >
+                      {uploading ? "Mengunggah…" : "Unggah PDF"}
+                    </Button>
+                  </>
+                )}
+                {p.pdfs.length === 0 ? (
+                  <span className={styles.pdfEmpty}>Belum ada dokumen.</span>
+                ) : (
+                  <div className={styles.pdfList}>
+                    {p.pdfs.map((doc) => {
+                      const inAgenda = pdfInAgenda(doc.id);
+                      return (
+                        <div key={doc.id} className={styles.pdfRow}>
+                          <Icon name="file-text" size={15} />
+                          <span className={styles.pdfTitle}>{doc.title}</span>
+                          <span className={styles.spacer} />
+                          {inAgenda ? (
+                            <Button size="sm" variant="ghost" iconOnly icon="minus" title="Keluarkan dari agenda" onClick={() => p.removePdfFromAgenda(doc.id)} />
+                          ) : (
+                            <Button size="sm" variant="secondary" iconOnly icon="plus" title="Tambah ke agenda" onClick={() => p.addPdf(doc)} />
+                          )}
+                          {canDelete && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              iconOnly
+                              icon="trash-2"
+                              title="Hapus dokumen"
+                              onClick={() => handleDelete(doc)}
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          </aside>
+
+          {/* Kolom kanan — pengaturan agenda (porsi lebih besar) */}
+          <section className={styles.agendaCol}>
+            <div className={styles.gridHead}>
+              <span className={styles.gridHeadTitle}>Agenda</span>
+              <span className={styles.spacer} />
+              <span className={styles.gridHeadCount}>
+                {p.activeSlides.length} dari {p.order.length} slide aktif
+              </span>
+            </div>
+
+            {/* Grid kartu slide — drag untuk urut, klik judul untuk ubah */}
+            <div className={styles.grid}>
+              {p.order.map((id, idx) => {
+            const staticDef = SLIDES[id];
+            const isCustom = isCustomCover(id);
+            const pdfLabel = staticDef || isCustom ? null : pdfSlideLabel(id, p.pdfs);
+            const def = staticDef
+              ? { title: staticDef.title, feature: staticDef.feature, badge: staticDef.badge }
+              : isCustom
+                ? { title: "Sampul", feature: "Sampul Kustom", badge: "Sampul" }
+                : pdfLabel
+                  ? { title: pdfLabel.title, feature: pdfLabel.feature, badge: "PDF" }
+                  : null;
+            if (!def) return null;
+            const on = !!p.enabled[id];
+            const fk = featKey(def.feature);
+            const effTitle = p.titles[id] ?? def.title;
+            const isPdf = !staticDef && !isCustom;
+            const isCover = def.badge === "Sampul";
+            return (
+              <div
+                key={id}
+                className={`${styles.card} ${isCover ? styles.cardCover : ""} ${on ? "" : styles.cardOff} ${
+                  overIdx === idx ? styles.cardOver : ""
+                } ${dragIdx === idx ? styles.cardDrag : ""}`}
+                draggable
+                onDragStart={(e) => {
+                  setDragIdx(idx);
+                  e.dataTransfer.effectAllowed = "move";
+                  e.dataTransfer.setData("text/plain", String(idx));
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.dataTransfer.dropEffect = "move";
+                  if (overIdx !== idx) setOverIdx(idx);
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  onDrop(idx);
+                }}
+                onDragEnd={() => {
+                  setDragIdx(null);
+                  setOverIdx(null);
+                }}
+              >
+                <div className={styles.cardTop}>
+                  <span className={styles.cardNum}>{idx + 1}</span>
+                  <span className={styles.cardBadge}>{def.badge}</span>
+                  <span className={styles.spacer} />
+                  <button
+                    type="button"
+                    className={styles.cardAdd}
+                    title="Sisipkan slide sampul setelah ini"
+                    aria-label="Sisipkan slide sampul setelah ini"
+                    draggable={false}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onClick={() => p.addCoverSlide(id)}
+                  >
+                    <Icon name="circle-plus" size={17} />
+                  </button>
+                </div>
+
+                <div className={styles.cardThumb}>
+                  <Icon name={featIcon(fk)} size={26} />
+                </div>
+
+                <textarea
+                  className={styles.cardTitle}
+                  defaultValue={effTitle}
+                  key={`${id}:${p.titles[id] ?? ""}`}
+                  rows={1}
+                  draggable={false}
+                  ref={(el) => {
+                    if (el) {
+                      el.style.height = "auto";
+                      el.style.height = `${el.scrollHeight}px`;
+                    }
+                  }}
+                  onInput={(e) => {
+                    const el = e.currentTarget;
+                    el.style.height = "auto";
+                    el.style.height = `${el.scrollHeight}px`;
+                  }}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onBlur={(e) => p.setSlideTitle(id, e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      (e.target as HTMLTextAreaElement).blur();
+                    }
+                  }}
+                  aria-label={`Judul slide ${idx + 1}`}
+                  title="Klik untuk mengubah judul"
+                />
+                {isCustom ? (
+                  <textarea
+                    className={styles.cardSub}
+                    defaultValue={p.subtitles[id] ?? ""}
+                    key={`sub:${id}:${p.subtitles[id] ?? ""}`}
+                    rows={1}
+                    placeholder="Subjudul (opsional)"
+                    draggable={false}
+                    ref={(el) => {
+                      if (el) {
+                        el.style.height = "auto";
+                        el.style.height = `${el.scrollHeight}px`;
+                      }
+                    }}
+                    onInput={(e) => {
+                      const el = e.currentTarget;
+                      el.style.height = "auto";
+                      el.style.height = `${el.scrollHeight}px`;
+                    }}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onBlur={(e) => p.setSlideSubtitle(id, e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        (e.target as HTMLTextAreaElement).blur();
+                      }
+                    }}
+                    aria-label={`Subjudul slide ${idx + 1}`}
+                  />
+                ) : (
+                  <span className={styles.cardFeat}>{def.feature}</span>
+                )}
+
+                <div className={styles.cardFoot}>
+                  <label className={styles.cardToggle}>
+                    <Switch checked={on} onCheckedChange={() => p.toggleEnabled(id)} ariaLabel={`Aktifkan ${effTitle}`} />
+                    <span>{on ? "Aktif" : "Nonaktif"}</span>
+                  </label>
+                  {(isPdf || isCustom) && (
+                    <button
+                      type="button"
+                      className={styles.cardRemove}
+                      title={isCustom ? "Hapus sampul" : "Keluarkan dari agenda"}
+                      onClick={() => {
+                        if (isCustom) {
+                          p.removeCoverSlide(id);
+                        } else {
+                          const meta = parsePdfSlide(id);
+                          if (meta) p.removePdfFromAgenda(meta.pdfId);
+                        }
+                      }}
+                    >
+                      <Icon name="x" size={15} />
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+              })}
+            </div>
+
+            <span className={styles.hint}>Layar penuh · panah ◄ ► untuk navigasi · Esc keluar</span>
+          </section>
         </div>
       </div>
     </div>

@@ -10,6 +10,7 @@ import { RiskMapSlide } from "./slides/RiskMapSlide";
 import { PendapatanOverviewSlide } from "./slides/PendapatanOverviewSlide";
 import { PdfPageSlide } from "./slides/PdfPageSlide";
 import { parsePdfSlide, pdfSlideLabel } from "./pdfSlides";
+import { isCustomCover } from "./customCover";
 import type { LrView } from "@/lib/labaRugiView";
 import brandLogos from "@/assets/presentation/brand-logos.png";
 import movisionMark from "@/assets/presentation/movision-mark.webp";
@@ -40,7 +41,7 @@ export function PresentationOverlay() {
   const total = p.activeSlides.length;
   const cur = Math.min(p.cur, Math.max(0, total - 1));
   const key = p.activeSlides[cur] || "title";
-  const isCover = SLIDES[key]?.badge === "Sampul";
+  const isCover = SLIDES[key]?.badge === "Sampul" || isCustomCover(key);
 
   // Aksi stabil (useCallback di context) — dipakai di efek tanpa memicu re-run tiap render.
   const { mode, auto, autoSec, next, prev, exit: ctxExit } = p;
@@ -187,6 +188,9 @@ export function PresentationOverlay() {
       if (p.snapshot.loading) return <StageLoader />;
       return <PendapatanOverviewSlide data={p.snapshot.data?.pend ?? null} periodLabel={p.periodLabel} />;
     }
+    if (isCustomCover(key)) {
+      return <CoverSlide kicker="Sampul" title={p.titles[key] || "Sampul"} sub={p.subtitles[key] || ""} facts={[]} />;
+    }
     const pdfMeta = parsePdfSlide(key);
     if (pdfMeta) {
       return <PdfPageSlide pdfId={pdfMeta.pdfId} page={pdfMeta.page} />;
@@ -194,8 +198,9 @@ export function PresentationOverlay() {
     return null;
   };
 
-  // Label slide untuk dots (judul statis atau label PDF).
-  const dotLabel = (id: string): string => SLIDES[id]?.title || pdfSlideLabel(id, p.pdfs)?.title || id;
+  // Label slide untuk dots (override judul builder → judul statis → label PDF).
+  const dotLabel = (id: string): string =>
+    p.titles[id] || SLIDES[id]?.title || pdfSlideLabel(id, p.pdfs)?.title || id;
 
   return (
     <div className={styles.overlay} ref={rootRef}>

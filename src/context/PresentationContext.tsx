@@ -9,6 +9,8 @@ import type { PeriodData as RiskPeriodData, RiskMatrix } from "@/types/risk";
 import type { PeriodData as PendPeriodData } from "@/types/pendapatan";
 import { DEFAULT_ORDER, SLIDES } from "@/components/presentation/slideRegistry";
 import { isPdfSlide, makePdfSlideId, parsePdfSlide, prunePdfSlides } from "@/components/presentation/pdfSlides";
+import { isCustomCover, makeCustomCoverId } from "@/components/presentation/customCover";
+import { getAgenda, saveAgenda, type PresentationConfig } from "@/lib/presentationConfig";
 import { listPdfs, type PdfDoc } from "@/lib/presentationPdf";
 
 export type PresentationMode = "builder" | "present";
@@ -47,12 +49,20 @@ interface PresentationContextValue {
   // Dokumen PDF (tiap halaman jadi slide).
   pdfs: PdfDoc[];
   refreshPdfs: () => Promise<void>;
+  /** Muat ulang agenda bersama dari server (dipanggil saat builder dibuka). */
+  refreshAgenda: () => Promise<void>;
   addPdf: (pdf: PdfDoc) => void;
   removePdfFromAgenda: (pdfId: number) => void;
   // Konten slide pembuka (editable di builder).
   meetingTitle: string;
   meetingSubtitle: string;
   meetingDate: string;
+  // Override judul per-item slide (builder). Kosong → pakai judul default registry.
+  titles: Record<string, string>;
+  setSlideTitle: (id: string, title: string) => void;
+  // Override subjudul per-slide (dipakai slide sampul kustom). Kosong → tanpa subjudul.
+  subtitles: Record<string, string>;
+  setSlideSubtitle: (id: string, subtitle: string) => void;
   setMeetingTitle: (v: string) => void;
   setMeetingSubtitle: (v: string) => void;
   setMeetingDate: (v: string) => void;
@@ -60,6 +70,13 @@ interface PresentationContextValue {
   refreshPeriods: () => Promise<void>;
   toggleEnabled: (id: string) => void;
   move: (id: string, dir: number) => void;
+  /** Pindahkan slide dari posisi `from` ke `to` (untuk drag-and-drop). */
+  reorder: (from: number, to: number) => void;
+  /** Tambah slide sampul kustom (pembatas). Bila `afterId` diisi, sisipkan tepat
+   *  setelah slide tersebut; jika tidak, sebelum "closing". */
+  addCoverSlide: (afterId?: string) => void;
+  /** Hapus slide sampul kustom dari agenda. */
+  removeCoverSlide: (id: string) => void;
   toggleAuto: () => void;
   setAutoSec: (sec: number) => void;
   start: () => void;
@@ -81,6 +98,8 @@ interface PersistState {
   meetingTitle: string;
   meetingSubtitle: string;
   meetingDate: string;
+  titles: Record<string, string>;
+  subtitles: Record<string, string>;
   auto: boolean;
   autoSec: number;
 }
@@ -98,7 +117,7 @@ function loadPersisted(): Partial<PersistState> {
  *  lagi, dan sisipkan slide baru (mis. Pendapatan) sebelum "closing" agar penutup
  *  tetap terakhir. Tanpa data tersimpan → pakai DEFAULT_ORDER apa adanya. */
 function reconcileOrder(saved?: string[]): string[] {
-  const valid = Array.isArray(saved) ? saved.filter((id) => id in SLIDES || isPdfSlide(id)) : [];
+  const valid = Array.isArray(saved) ? saved.filter((id) => id in SLIDES || isPdfSlide(id) || isCustomCover(id)) : [];
   if (valid.length === 0) return [...DEFAULT_ORDER];
   const merged = [...valid];
   for (const id of DEFAULT_ORDER) {
@@ -138,22 +157,56 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
       "Kinerja Laba Rugi, Manajemen Risiko, dan Pendapatan Divisi Operasi & Pemeliharaan Jalan Tol."
   );
   const [meetingDate, setMeetingDate] = useState(persisted.meetingDate ?? new Date().toISOString().slice(0, 10));
+  const [titles, setTitles] = useState<Record<string, string>>(persisted.titles ?? {});
+  const [subtitles, setSubtitles] = useState<Record<string, string>>(persisted.subtitles ?? {});
 
   // Cache snapshot per periode agar tidak fetch ulang saat bolak-balik.
   const snapCache = useRef<Map<string, PeriodSnapshot>>(new Map());
 
-  // Simpan pengaturan builder (urutan, slide aktif, periode, konten pembuka,
-  // auto-play) agar bertahan antar-sesi / reload.
+  // Sinkronisasi agenda bersama (server). agendaLoadedRef menjadi true setelah
+  // GET awal selesai, agar perubahan belum dimuat tidak menimpa server dengan
+  // default. saveTimerRef men-debounce PUT agar tidak spam saat drag/ketik.
+  const agendaLoadedRef = useRef(false);
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Lewati satu kali penyimpanan ke server tepat setelah menerapkan konfig dari
+  // server (hindari menulis balik data yang baru saja dimuat).
+  const skipServerSaveRef = useRef(false);
+
+  // Simpan pengaturan builder: localStorage (cache per-browser) + server (agenda
+  // bersama, di-debounce) agar semua user melihat deck yang sama.
   useEffect(() => {
+    const cfg: PresentationConfig = {
+      order,
+      enabled,
+      period,
+      meetingTitle,
+      meetingSubtitle,
+      meetingDate,
+      titles,
+      subtitles,
+      auto,
+      autoSec
+    };
     try {
-      localStorage.setItem(
-        STORE_KEY,
-        JSON.stringify({ order, enabled, period, meetingTitle, meetingSubtitle, meetingDate, auto, autoSec })
-      );
+      localStorage.setItem(STORE_KEY, JSON.stringify(cfg));
     } catch {
       /* abaikan kuota / mode privasi localStorage */
     }
-  }, [order, enabled, period, meetingTitle, meetingSubtitle, meetingDate, auto, autoSec]);
+    // Hanya simpan ke server setelah agenda awal termuat (hindari menimpa
+    // konfigurasi bersama dengan default saat mount).
+    if (!agendaLoadedRef.current) return;
+    // Lewati echo tepat setelah applyConfig (data baru saja dimuat dari server).
+    if (skipServerSaveRef.current) {
+      skipServerSaveRef.current = false;
+      return;
+    }
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      void saveAgenda(cfg).catch(() => {
+        /* biarkan localStorage sbg cadangan bila server gagal */
+      });
+    }, 800);
+  }, [order, enabled, period, meetingTitle, meetingSubtitle, meetingDate, titles, subtitles, auto, autoSec]);
 
   const activeSlides = useMemo(() => order.filter((id) => enabled[id]), [order, enabled]);
   const periodLabel = useMemo(
@@ -215,6 +268,40 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     void refreshPdfs();
   }, [refreshPdfs]);
+
+  // Terapkan konfigurasi agenda bersama dari server ke state builder.
+  const applyConfig = useCallback((cfg: Partial<PresentationConfig>) => {
+    skipServerSaveRef.current = true;
+    const ord = reconcileOrder(Array.isArray(cfg.order) ? cfg.order : undefined);
+    setOrder(ord);
+    setEnabled(initialEnabled(ord, cfg.enabled));
+    if (typeof cfg.period === "string") setPeriodState(cfg.period);
+    if (typeof cfg.meetingTitle === "string") setMeetingTitle(cfg.meetingTitle);
+    if (typeof cfg.meetingSubtitle === "string") setMeetingSubtitle(cfg.meetingSubtitle);
+    if (typeof cfg.meetingDate === "string") setMeetingDate(cfg.meetingDate);
+    setTitles(cfg.titles && typeof cfg.titles === "object" ? cfg.titles : {});
+    setSubtitles(cfg.subtitles && typeof cfg.subtitles === "object" ? cfg.subtitles : {});
+    if (typeof cfg.auto === "boolean") setAuto(cfg.auto);
+    if (typeof cfg.autoSec === "number") setAutoSecState(cfg.autoSec);
+  }, []);
+
+  // Muat agenda bersama dari server. Dipanggil saat login & tiap builder dibuka,
+  // agar urutan/judul/sampul/PDF yang diatur user lain langsung tampil.
+  const refreshAgenda = useCallback(async () => {
+    if (authStatus !== "authenticated") return;
+    try {
+      const res = await getAgenda();
+      if (res?.config) applyConfig(res.config);
+    } catch {
+      /* gagal → pakai cache localStorage apa adanya */
+    } finally {
+      agendaLoadedRef.current = true;
+    }
+  }, [authStatus, applyConfig]);
+
+  useEffect(() => {
+    void refreshAgenda();
+  }, [refreshAgenda]);
 
   // Sisipkan semua halaman sebuah PDF sebagai slide (sebelum "closing"), aktif.
   const addPdf = useCallback((pdf: PdfDoc) => {
@@ -284,6 +371,67 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
       return arr;
     });
   }, []);
+  const reorder = useCallback((from: number, to: number) => {
+    setOrder((o) => {
+      if (from === to || from < 0 || to < 0 || from >= o.length || to >= o.length) return o;
+      const arr = o.slice();
+      const [moved] = arr.splice(from, 1);
+      arr.splice(to, 0, moved);
+      return arr;
+    });
+  }, []);
+  const addCoverSlide = useCallback((afterId?: string) => {
+    const id = makeCustomCoverId();
+    setOrder((o) => {
+      const arr = o.slice();
+      let at = -1;
+      if (afterId) {
+        const i = arr.indexOf(afterId);
+        if (i >= 0) at = i + 1;
+      }
+      if (at < 0) {
+        const closingIdx = arr.indexOf("closing");
+        at = closingIdx >= 0 ? closingIdx : arr.length;
+      }
+      arr.splice(at, 0, id);
+      return arr;
+    });
+    setEnabled((e) => ({ ...e, [id]: true }));
+    setTitles((t) => ({ ...t, [id]: "Sampul Baru" }));
+  }, []);
+  const removeCoverSlide = useCallback((id: string) => {
+    setOrder((o) => o.filter((x) => x !== id));
+    setTitles((t) => {
+      if (!(id in t)) return t;
+      const next = { ...t };
+      delete next[id];
+      return next;
+    });
+    setSubtitles((s) => {
+      if (!(id in s)) return s;
+      const next = { ...s };
+      delete next[id];
+      return next;
+    });
+  }, []);
+  const setSlideTitle = useCallback((id: string, title: string) => {
+    setTitles((t) => {
+      const v = title.trim();
+      const next = { ...t };
+      if (v) next[id] = v;
+      else delete next[id];
+      return next;
+    });
+  }, []);
+  const setSlideSubtitle = useCallback((id: string, subtitle: string) => {
+    setSubtitles((s) => {
+      const v = subtitle.trim();
+      const next = { ...s };
+      if (v) next[id] = v;
+      else delete next[id];
+      return next;
+    });
+  }, []);
   const toggleAuto = useCallback(() => setAuto((a) => !a), []);
   const setAutoSec = useCallback((sec: number) => setAutoSecState(Math.max(4, Math.min(30, sec))), []);
 
@@ -325,11 +473,16 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
     snapshot,
     pdfs,
     refreshPdfs,
+    refreshAgenda,
     addPdf,
     removePdfFromAgenda,
     meetingTitle,
     meetingSubtitle,
     meetingDate,
+    titles,
+    setSlideTitle,
+    subtitles,
+    setSlideSubtitle,
     setMeetingTitle,
     setMeetingSubtitle,
     setMeetingDate,
@@ -337,6 +490,9 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
     refreshPeriods,
     toggleEnabled,
     move,
+    reorder,
+    addCoverSlide,
+    removeCoverSlide,
     toggleAuto,
     setAutoSec,
     start,
