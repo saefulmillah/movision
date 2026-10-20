@@ -124,6 +124,11 @@ export function PresentationOverlay() {
     return idx >= 0 ? idx + 1 : 1;
   };
 
+  // Label scope aktif (regional/cabang); divisi → null. LR & Pendapatan sudah
+  // difilter per scope di backend; Risiko masih level-divisi (Fase 4).
+  const scopeLabel = p.scope && p.scope.level !== "divisi" ? p.scope.label : null;
+  const withScope = (arr: Fact[]): Fact[] => (scopeLabel ? [{ k: "Cakupan", v: scopeLabel }, ...arr] : arr);
+
   const renderSlide = () => {
     if (key === "title") {
       return (
@@ -151,7 +156,7 @@ export function PresentationOverlay() {
           kicker={`Bagian ${sectionNo("lr-cover")}`}
           title="Laba Rugi"
           sub="Realisasi terhadap RKAP — konsolidasi, per regional, dan per ruas."
-          facts={facts["lr-cover"]}
+          facts={withScope(facts["lr-cover"])}
         />
       );
     }
@@ -168,7 +173,7 @@ export function PresentationOverlay() {
     if (key === "lr-konsol" || key === "lr-regional" || key === "lr-ruas") {
       if (p.snapshot.loading) return <StageLoader />;
       const view = key.split("-")[1] as LrView;
-      return <LrTableSlide view={view} data={p.snapshot.data?.lr ?? null} periodLabel={p.periodLabel} />;
+      return <LrTableSlide view={view} data={p.snapshot.data?.lr ?? null} periodLabel={p.periodLabel} scopeLabel={scopeLabel} />;
     }
     if (key === "risk-map") {
       if (p.snapshot.loading) return <StageLoader />;
@@ -180,13 +185,13 @@ export function PresentationOverlay() {
           kicker={`Bagian ${sectionNo("pend-cover")}`}
           title="Pendapatan"
           sub="Pencapaian pendapatan tol dan lainnya terhadap RKAP."
-          facts={facts["pend-cover"]}
+          facts={withScope(facts["pend-cover"])}
         />
       );
     }
     if (key === "pend-overview") {
       if (p.snapshot.loading) return <StageLoader />;
-      return <PendapatanOverviewSlide data={p.snapshot.data?.pend ?? null} periodLabel={p.periodLabel} />;
+      return <PendapatanOverviewSlide data={p.snapshot.data?.pend ?? null} periodLabel={p.periodLabel} scopeLabel={scopeLabel} />;
     }
     if (isCustomCover(key)) {
       return <CoverSlide kicker="Sampul" title={p.titles[key] || "Sampul"} sub={p.subtitles[key] || ""} facts={[]} />;

@@ -12,9 +12,11 @@ export async function getPeriods(): Promise<Period[]> {
   return data?.periods ?? [];
 }
 
-/** Data satu periode (KPI bulan/SD + grafik LHR & Pendapatan per ruas). */
-export function getPeriod(periodKey: string): Promise<PeriodData> {
-  return api.get<PeriodData>(`/pendapatan/${encodeURIComponent(periodKey)}`);
+/** Data satu periode (KPI bulan/SD + grafik LHR & Pendapatan per ruas).
+ *  `scope` opsional (presentasi multi-scope); "divisi"/kosong → data penuh. */
+export function getPeriod(periodKey: string, scope?: string | null): Promise<PeriodData> {
+  const q = scope && scope !== "divisi" ? `?scope=${encodeURIComponent(scope)}` : "";
+  return api.get<PeriodData>(`/pendapatan/${encodeURIComponent(periodKey)}${q}`);
 }
 
 /**

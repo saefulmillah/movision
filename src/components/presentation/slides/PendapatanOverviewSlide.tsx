@@ -7,9 +7,11 @@ import styles from "./PendapatanOverviewSlide.module.css";
 interface PendapatanOverviewSlideProps {
   data: PeriodData | null;
   periodLabel: string;
+  /** Label scope aktif (regional/cabang); null/undefined untuk divisi. */
+  scopeLabel?: string | null;
 }
 
-export function PendapatanOverviewSlide({ data, periodLabel }: PendapatanOverviewSlideProps) {
+export function PendapatanOverviewSlide({ data, periodLabel, scopeLabel }: PendapatanOverviewSlideProps) {
   if (!data) {
     return (
       <div className={styles.stateBox}>
@@ -21,11 +23,27 @@ export function PendapatanOverviewSlide({ data, periodLabel }: PendapatanOvervie
   const monthLabel = data.meta.period_label_month;
   const sdLabel = data.meta.period_label_sd || periodLabel;
   const periodForTitle = monthLabel || sdLabel;
+  const scoped = Boolean(data.meta.scoped);
 
   return (
     <div className={styles.slide}>
       <div className={styles.head}>
         <h1 className={styles.title}>Pendapatan Tol dan Lainnya</h1>
+        {scopeLabel && (
+          <span
+            style={{
+              marginLeft: 10,
+              padding: "3px 10px",
+              borderRadius: 999,
+              background: "rgba(47,107,255,0.14)",
+              color: "var(--st-blue)",
+              fontSize: 12,
+              fontWeight: 700
+            }}
+          >
+            {scopeLabel}
+          </span>
+        )}
         <span className={styles.spacer} />
         <span className={styles.note}>
           Pendapatan <b>(dalam juta)</b>
@@ -33,7 +51,14 @@ export function PendapatanOverviewSlide({ data, periodLabel }: PendapatanOvervie
       </div>
 
       <div className={styles.kpiWrap}>
-        <PendapatanKpiCards kpiMonth={data.kpi_month} kpiSd={data.kpi_sd} monthLabel={monthLabel} sdLabel={sdLabel} unit="juta" />
+        <PendapatanKpiCards
+          kpiMonth={data.kpi_month}
+          kpiSd={data.kpi_sd}
+          monthLabel={monthLabel}
+          sdLabel={sdLabel}
+          unit="juta"
+          scoped={scoped}
+        />
       </div>
 
       <div className={styles.charts}>

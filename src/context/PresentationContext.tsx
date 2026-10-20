@@ -11,6 +11,12 @@ import { DEFAULT_ORDER, SLIDES } from "@/components/presentation/slideRegistry";
 import { isPdfSlide, makePdfSlideId, parsePdfSlide, prunePdfSlides } from "@/components/presentation/pdfSlides";
 import { isCustomCover, makeCustomCoverId } from "@/components/presentation/customCover";
 import { getAgenda, saveAgenda, type PresentationConfig } from "@/lib/presentationConfig";
+import {
+  getPresentationScopes,
+  flattenScopes,
+  type PresentationScope,
+  type PresentationScopesResponse
+} from "@/lib/presentationScope";
 import { listPdfs, type PdfDoc } from "@/lib/presentationPdf";
 
 export type PresentationMode = "builder" | "present";
@@ -51,6 +57,11 @@ interface PresentationContextValue {
   refreshPdfs: () => Promise<void>;
   /** Muat ulang agenda bersama dari server (dipanggil saat builder dibuka). */
   refreshAgenda: () => Promise<void>;
+  // Scope presentasi (divisi/regional/cabang) — Fase 1: pemilihan saja.
+  scope: PresentationScope | null;
+  scopeInfo: PresentationScopesResponse | null;
+  setScope: (scope: PresentationScope) => void;
+  refreshScopes: () => Promise<void>;
   addPdf: (pdf: PdfDoc) => void;
   removePdfFromAgenda: (pdfId: number) => void;
   // Konten slide pembuka (editable di builder).
@@ -159,6 +170,8 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
   const [meetingDate, setMeetingDate] = useState(persisted.meetingDate ?? new Date().toISOString().slice(0, 10));
   const [titles, setTitles] = useState<Record<string, string>>(persisted.titles ?? {});
   const [subtitles, setSubtitles] = useState<Record<string, string>>(persisted.subtitles ?? {});
+  const [scope, setScopeState] = useState<PresentationScope | null>(null);
+  const [scopeInfo, setScopeInfo] = useState<PresentationScopesResponse | null>(null);
 
   // Cache snapshot per periode agar tidak fetch ulang saat bolak-balik.
   const snapCache = useRef<Map<string, PeriodSnapshot>>(new Map());
@@ -303,6 +316,44 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
     void refreshAgenda();
   }, [refreshAgenda]);
 
+  // Scope presentasi: tingkat yang boleh dipresentasikan user (dari branch-scope).
+  const SCOPE_KEY = "tollsentra.presentation.scope";
+  const setScope = useCallback((s: PresentationScope) => {
+    setScopeState(s);
+    try {
+      localStorage.setItem(SCOPE_KEY, s.key);
+    } catch {
+      /* abaikan */
+    }
+  }, []);
+
+  const refreshScopes = useCallback(async () => {
+    if (authStatus !== "authenticated") return;
+    try {
+      const info = await getPresentationScopes();
+      setScopeInfo(info);
+      const all = flattenScopes(info);
+      setScopeState((cur) => {
+        let savedKey = cur?.key || null;
+        if (!savedKey) {
+          try {
+            savedKey = localStorage.getItem(SCOPE_KEY);
+          } catch {
+            savedKey = null;
+          }
+        }
+        const match = savedKey ? all.find((s) => s.key === savedKey) : null;
+        return match || info.default || null;
+      });
+    } catch {
+      /* abaikan — scope tetap null, builder jalan tanpa pemilih */
+    }
+  }, [authStatus]);
+
+  useEffect(() => {
+    void refreshScopes();
+  }, [refreshScopes]);
+
   // Sisipkan semua halaman sebuah PDF sebagai slide (sebelum "closing"), aktif.
   const addPdf = useCallback((pdf: PdfDoc) => {
     const pages = pdf.page_count && pdf.page_count > 0 ? pdf.page_count : 1;
@@ -333,31 +384,34 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
-  const loadSnapshot = useCallback(async (key: string) => {
+  // Snapshot di-cache per periode × scope (LR & Pendapatan difilter per scope di
+  // backend; Risiko masih level-divisi sampai Fase 4, jadi tak di-scope).
+  const loadSnapshot = useCallback(async (key: string, scopeKey: string) => {
     if (!key) {
       setSnapshot({ loading: false, error: null, data: null });
       return;
     }
-    const cached = snapCache.current.get(key);
+    const cacheKey = `${key}::${scopeKey}`;
+    const cached = snapCache.current.get(cacheKey);
     if (cached) {
       setSnapshot({ loading: false, error: null, data: cached });
       return;
     }
     setSnapshot({ loading: true, error: null, data: null });
     const [lr, risk, pend] = await Promise.all([
-      getLrPeriod(key).catch(() => null),
+      getLrPeriod(key, scopeKey).catch(() => null),
       getRiskPeriod(key).catch(() => null),
-      getPendPeriod(key).catch(() => null)
+      getPendPeriod(key, scopeKey).catch(() => null)
     ]);
     const data: PeriodSnapshot = { lr, risk, pend };
-    snapCache.current.set(key, data);
+    snapCache.current.set(cacheKey, data);
     setSnapshot({ loading: false, error: null, data });
   }, []);
 
-  // Muat snapshot ketika masuk mode presentasi atau ganti periode saat presentasi.
+  // Muat snapshot ketika masuk mode presentasi, ganti periode, atau ganti scope.
   useEffect(() => {
-    if (mode === "present") void loadSnapshot(period);
-  }, [mode, period, loadSnapshot]);
+    if (mode === "present") void loadSnapshot(period, scope?.key ?? "divisi");
+  }, [mode, period, scope, loadSnapshot]);
 
   const setPeriod = useCallback((key: string) => setPeriodState(key), []);
   const toggleEnabled = useCallback((id: string) => setEnabled((e) => ({ ...e, [id]: !e[id] })), []);
@@ -474,6 +528,10 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
     pdfs,
     refreshPdfs,
     refreshAgenda,
+    scope,
+    scopeInfo,
+    setScope,
+    refreshScopes,
     addPdf,
     removePdfFromAgenda,
     meetingTitle,

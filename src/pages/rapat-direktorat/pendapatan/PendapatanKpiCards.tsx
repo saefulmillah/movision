@@ -10,6 +10,9 @@ interface PendapatanKpiCardsProps {
   /** Satuan tampilan nilai. "miliar" (default, halaman) = juta ÷ 1000, 2 desimal.
    *  "juta" (slide presentasi) = nilai juta penuh tanpa desimal. */
   unit?: "miliar" | "juta";
+  /** Mode scope (regional/cabang): hanya tampilkan Tol kumulatif (Usaha Lainnya/
+   *  Total & blok bulan tak tersedia per-ruas). */
+  scoped?: boolean;
 }
 
 /** Nilai mentah dalam Rp juta → string Rp sesuai satuan. */
@@ -63,25 +66,32 @@ function KpiCard({ model, unit }: { model: CardModel; unit: "miliar" | "juta" })
  * masing-masing 3 kartu (Tol / Usaha Lainnya / Total). Dipakai halaman & slide.
  * Satuan nilai mengikuti prop `unit`: "miliar" (default) atau "juta" (slide).
  */
-export function PendapatanKpiCards({ kpiMonth, kpiSd, monthLabel, sdLabel, unit = "miliar" }: PendapatanKpiCardsProps) {
-  const groups = [
-    {
-      title: monthLabel,
-      cards: [
-        { label: "Pendapatan Tol", cell: kpiMonth.tol },
-        { label: "Usaha Lainnya", cell: kpiMonth.usaha_lainnya },
-        { label: "Total Pendapatan", cell: kpiMonth.total, total: true }
-      ] as CardModel[]
-    },
-    {
-      title: sdLabel,
-      cards: [
-        { label: "Pendapatan Tol", cell: kpiSd.tol },
-        { label: "Usaha Lainnya", cell: kpiSd.usaha_lainnya },
-        { label: "Total Pendapatan", cell: kpiSd.total, total: true }
-      ] as CardModel[]
-    }
-  ];
+export function PendapatanKpiCards({ kpiMonth, kpiSd, monthLabel, sdLabel, unit = "miliar", scoped = false }: PendapatanKpiCardsProps) {
+  const groups = scoped
+    ? [
+        {
+          title: sdLabel,
+          cards: [{ label: "Pendapatan Tol", cell: kpiSd.tol, total: true }] as CardModel[]
+        }
+      ]
+    : [
+        {
+          title: monthLabel,
+          cards: [
+            { label: "Pendapatan Tol", cell: kpiMonth.tol },
+            { label: "Usaha Lainnya", cell: kpiMonth.usaha_lainnya },
+            { label: "Total Pendapatan", cell: kpiMonth.total, total: true }
+          ] as CardModel[]
+        },
+        {
+          title: sdLabel,
+          cards: [
+            { label: "Pendapatan Tol", cell: kpiSd.tol },
+            { label: "Usaha Lainnya", cell: kpiSd.usaha_lainnya },
+            { label: "Total Pendapatan", cell: kpiSd.total, total: true }
+          ] as CardModel[]
+        }
+      ];
 
   return (
     <div className={styles.kpiGroups}>

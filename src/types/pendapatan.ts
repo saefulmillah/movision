@@ -44,6 +44,8 @@ export interface PeriodMeta {
   period_label_sd: string;
   unit_source: string;
   unit_kpi_display: string;
+  /** true bila data difilter per scope (regional/cabang): hanya Tol + grafik per-ruas. */
+  scoped?: boolean;
   [key: string]: unknown;
 }
 

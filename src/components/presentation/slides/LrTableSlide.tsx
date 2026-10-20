@@ -18,6 +18,8 @@ interface LrTableSlideProps {
   view: LrView;
   data: PeriodData | null;
   periodLabel: string;
+  /** Label scope aktif (regional/cabang); null/undefined untuk divisi. */
+  scopeLabel?: string | null;
 }
 
 type Period = "konsol" | "month" | "sd";
@@ -44,7 +46,7 @@ interface Group {
   span: number; // 2 (collapsed) atau 4 (expanded)
 }
 
-export function LrTableSlide({ view, data, periodLabel }: LrTableSlideProps) {
+export function LrTableSlide({ view, data, periodLabel, scopeLabel }: LrTableSlideProps) {
   const isGrouped = view !== "konsol";
   const [expanded, setExpanded] = useState<Record<string, boolean>>({}); // breakdown vertikal per akun
   const [monthOpen, setMonthOpen] = useState<Record<string, boolean>>({}); // periode-ini per entitas
@@ -123,6 +125,21 @@ export function LrTableSlide({ view, data, periodLabel }: LrTableSlideProps) {
     <div className={styles.slide}>
       <div className={styles.header}>
         <h1 className={styles.title}>{LR_VIEW_TITLE[view]}</h1>
+        {scopeLabel && (
+          <span
+            style={{
+              marginLeft: 10,
+              padding: "3px 10px",
+              borderRadius: 999,
+              background: "rgba(47,107,255,0.14)",
+              color: "var(--st-blue)",
+              fontSize: 12,
+              fontWeight: 700
+            }}
+          >
+            {scopeLabel}
+          </span>
+        )}
         <span className={styles.sub}>
           Periode <b>{periodLabel}</b>
         </span>

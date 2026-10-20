@@ -7,6 +7,7 @@ import { usePresentation } from "@/context/PresentationContext";
 import { SLIDES } from "@/components/presentation/slideRegistry";
 import { parsePdfSlide, pdfSlideLabel } from "@/components/presentation/pdfSlides";
 import { isCustomCover } from "@/components/presentation/customCover";
+import { flattenScopes } from "@/lib/presentationScope";
 import { countPagesOfFile, deletePdf, uploadPdf, type PdfDoc } from "@/lib/presentationPdf";
 import styles from "./PresentasiPage.module.css";
 
@@ -56,13 +57,24 @@ export function PresentasiPage() {
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   const [overIdx, setOverIdx] = useState<number | null>(null);
 
-  // Segarkan periode, dokumen PDF, & agenda bersama tiap builder dibuka.
-  const { refreshPeriods, refreshPdfs, refreshAgenda } = p;
+  // Segarkan periode, dokumen PDF, agenda bersama, & scope tiap builder dibuka.
+  const { refreshPeriods, refreshPdfs, refreshAgenda, refreshScopes } = p;
   useEffect(() => {
     void refreshPeriods();
     void refreshPdfs();
     void refreshAgenda();
-  }, [refreshPeriods, refreshPdfs, refreshAgenda]);
+    void refreshScopes();
+  }, [refreshPeriods, refreshPdfs, refreshAgenda, refreshScopes]);
+
+  // Opsi pemilih scope: untuk divisi (canDrill) = divisi + regional + cabang;
+  // selain itu = scope milik user sendiri.
+  const scopeOptions: SelectOption[] = useMemo(() => {
+    const all = flattenScopes(p.scopeInfo);
+    return all.map((s) => ({
+      value: s.key,
+      label: s.level === "cabang" ? `  • ${s.label}` : s.level === "regional" ? `${s.label}` : s.label
+    }));
+  }, [p.scopeInfo]);
 
   const periodOptions: SelectOption[] = useMemo(
     () => p.periods.map((opt) => ({ value: opt.key, label: opt.label })),
@@ -145,6 +157,24 @@ export function PresentasiPage() {
             </div>
 
             <div className={styles.settingsBody}>
+              <div className={styles.field}>
+                <span className={styles.fieldLabel}>Presentasi untuk</span>
+                {scopeOptions.length > 1 ? (
+                  <Select
+                    value={p.scope?.key ?? ""}
+                    onValueChange={(key) => {
+                      const s = flattenScopes(p.scopeInfo).find((x) => x.key === key);
+                      if (s) p.setScope(s);
+                    }}
+                    options={scopeOptions}
+                    placeholder="Pilih scope"
+                    icon="layers"
+                    ariaLabel="Scope presentasi"
+                  />
+                ) : (
+                  <div className={styles.scopeStatic}>{p.scope?.label ?? "Semua (Divisi)"}</div>
+                )}
+              </div>
               <div className={styles.field}>
                 <span className={styles.fieldLabel}>Judul Rapat</span>
                 <Input
