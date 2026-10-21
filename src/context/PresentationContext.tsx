@@ -10,7 +10,7 @@ import type { PeriodData as PendPeriodData } from "@/types/pendapatan";
 import { DEFAULT_ORDER, SLIDES } from "@/components/presentation/slideRegistry";
 import { isPdfSlide, makePdfSlideId, parsePdfSlide, prunePdfSlides } from "@/components/presentation/pdfSlides";
 import { isCustomCover, makeCustomCoverId } from "@/components/presentation/customCover";
-import { getAgenda, saveAgenda, type PresentationConfig } from "@/lib/presentationConfig";
+import { getAgenda, saveAgenda, resetAgenda as resetAgendaApi, type PresentationConfig } from "@/lib/presentationConfig";
 import {
   getPresentationScopes,
   flattenScopes,
@@ -55,8 +55,12 @@ interface PresentationContextValue {
   // Dokumen PDF (tiap halaman jadi slide).
   pdfs: PdfDoc[];
   refreshPdfs: () => Promise<void>;
-  /** Muat ulang agenda bersama dari server (dipanggil saat builder dibuka). */
+  /** Muat ulang agenda (scope aktif) dari server (dipanggil saat builder dibuka). */
   refreshAgenda: () => Promise<void>;
+  /** true bila scope aktif memakai override sendiri (bukan bawaan divisi). */
+  agendaIsOverride: boolean;
+  /** Hapus override agenda scope aktif → kembali ke bawaan divisi. */
+  resetAgenda: () => Promise<void>;
   // Scope presentasi (divisi/regional/cabang) — Fase 1: pemilihan saja.
   scope: PresentationScope | null;
   scopeInfo: PresentationScopesResponse | null;
@@ -99,9 +103,6 @@ interface PresentationContextValue {
 
 const PresentationContext = createContext<PresentationContextValue | null>(null);
 
-// Pengaturan builder yang dipertahankan antar-sesi (localStorage).
-const STORE_KEY = "tollsentra.presentation";
-
 interface PersistState {
   order: string[];
   enabled: Record<string, boolean>;
@@ -115,13 +116,12 @@ interface PersistState {
   autoSec: number;
 }
 
+// Sumber kebenaran agenda = server PER SCOPE (lihat loadScopeData). Tak ada lagi
+// cache localStorage global karena menyebabkan kontaminasi lintas-scope saat mount
+// (state awal scope lama tampil sebelum data scope aktif termuat). State awal =
+// default; data benar dimuat oleh loadScopeData begitu scope ter-resolve.
 function loadPersisted(): Partial<PersistState> {
-  try {
-    const raw = localStorage.getItem(STORE_KEY);
-    return raw ? (JSON.parse(raw) as Partial<PersistState>) : {};
-  } catch {
-    return {};
-  }
+  return {};
 }
 
 /** Gabungkan urutan tersimpan dengan registry saat ini: buang id yang tak dikenal
@@ -176,17 +176,24 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
   // Cache snapshot per periode agar tidak fetch ulang saat bolak-balik.
   const snapCache = useRef<Map<string, PeriodSnapshot>>(new Map());
 
-  // Sinkronisasi agenda bersama (server). agendaLoadedRef menjadi true setelah
-  // GET awal selesai, agar perubahan belum dimuat tidak menimpa server dengan
-  // default. saveTimerRef men-debounce PUT agar tidak spam saat drag/ketik.
-  const agendaLoadedRef = useRef(false);
+  // Sinkronisasi agenda per scope (server). saveTimerRef men-debounce PUT agar
+  // tidak spam saat drag/ketik.
+  // agendaLoadedForRef = scope yang agendanya SUDAH termuat (gating simpan agar
+  // tak menulis config scope lain / default sebelum scope aktif benar-benar dimuat).
+  const agendaLoadedForRef = useRef<string | null>(null);
+  // true setelah scope pertama ter-resolve (jangan muat agenda/PDF sebelum ini,
+  // agar tidak sempat memuat "divisi" saat scope sebenarnya belum diketahui).
+  const scopeResolvedRef = useRef(false);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Lewati satu kali penyimpanan ke server tepat setelah menerapkan konfig dari
   // server (hindari menulis balik data yang baru saja dimuat).
   const skipServerSaveRef = useRef(false);
+  const [agendaIsOverride, setAgendaIsOverride] = useState(false);
+  // Kunci scope aktif terbaru (untuk target simpan/muat agenda tanpa stale closure).
+  const scopeKeyRef = useRef("divisi");
+  scopeKeyRef.current = scope?.key ?? "divisi";
 
-  // Simpan pengaturan builder: localStorage (cache per-browser) + server (agenda
-  // bersama, di-debounce) agar semua user melihat deck yang sama.
+  // Simpan pengaturan builder ke server (per scope aktif, di-debounce).
   useEffect(() => {
     const cfg: PresentationConfig = {
       order,
@@ -200,22 +207,20 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
       auto,
       autoSec
     };
-    try {
-      localStorage.setItem(STORE_KEY, JSON.stringify(cfg));
-    } catch {
-      /* abaikan kuota / mode privasi localStorage */
-    }
-    // Hanya simpan ke server setelah agenda awal termuat (hindari menimpa
-    // konfigurasi bersama dengan default saat mount).
-    if (!agendaLoadedRef.current) return;
-    // Lewati echo tepat setelah applyConfig (data baru saja dimuat dari server).
+    // Hanya simpan setelah agenda SCOPE AKTIF termuat (hindari menulis config
+    // scope lain / default saat masih berpindah scope).
+    if (agendaLoadedForRef.current !== scopeKeyRef.current) return;
+    // Lewati echo tepat setelah loadScopeData (data baru saja dimuat dari server).
     if (skipServerSaveRef.current) {
       skipServerSaveRef.current = false;
       return;
     }
+    // Edit asli → scope ini punya deck tersimpan (umpan balik UI tombol reset).
+    setAgendaIsOverride(true);
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
-      void saveAgenda(cfg).catch(() => {
+      // Simpan ke scope aktif: divisi → bawaan (base); regional/cabang → override.
+      void saveAgenda(scopeKeyRef.current, cfg).catch(() => {
         /* biarkan localStorage sbg cadangan bila server gagal */
       });
     }, 800);
@@ -265,56 +270,75 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
     };
   }, [authStatus]);
 
-  // Daftar dokumen PDF — di-fetch saat login & tiap builder dibuka. Setelah berhasil,
-  // pangkas slide pdf di agenda yang dokumennya sudah dihapus.
+  // Muat ulang daftar PDF scope aktif (dipakai setelah upload/hapus). Aman-scope:
+  // abaikan hasil basi bila scope sudah berganti.
   const refreshPdfs = useCallback(async () => {
-    if (authStatus !== "authenticated") return;
+    const sk = scopeKeyRef.current;
+    if (authStatus !== "authenticated" || !sk || !scopeResolvedRef.current) return;
     try {
-      const list = await listPdfs();
+      const list = await listPdfs(sk);
+      if (scopeKeyRef.current !== sk) return;
       setPdfs(list);
       setOrder((o) => prunePdfSlides(o, list));
     } catch {
-      /* biarkan agenda apa adanya bila gagal fetch */
+      /* biarkan apa adanya bila gagal fetch */
     }
   }, [authStatus]);
 
-  useEffect(() => {
-    void refreshPdfs();
-  }, [refreshPdfs]);
+  // Muat agenda + daftar PDF sebuah scope SECARA ATOMIK — hindari race & kontaminasi
+  // antar-scope: fetch keduanya, abaikan bila scope sudah berganti, lalu terapkan
+  // order (dipangkas terhadap PDF scope itu) + PDF sekaligus. Scope tanpa deck →
+  // config null → DEFAULT_ORDER bawaan.
+  const loadScopeData = useCallback(
+    async (sk: string | null) => {
+      if (authStatus !== "authenticated" || !sk || !scopeResolvedRef.current) return;
+      const [agendaRes, pdfList] = await Promise.all([
+        getAgenda(sk).catch(() => null),
+        listPdfs(sk).catch(() => [] as PdfDoc[])
+      ]);
+      if (scopeKeyRef.current !== sk) return; // scope sudah berganti → hasil basi
+      const cfg = (agendaRes?.config ?? {}) as Partial<PresentationConfig>;
+      const ord = prunePdfSlides(
+        reconcileOrder(Array.isArray(cfg.order) ? cfg.order : undefined),
+        pdfList
+      );
+      skipServerSaveRef.current = true;
+      setPdfs(pdfList);
+      setOrder(ord);
+      setEnabled(initialEnabled(ord, cfg.enabled));
+      if (typeof cfg.period === "string") setPeriodState(cfg.period);
+      if (typeof cfg.meetingTitle === "string") setMeetingTitle(cfg.meetingTitle);
+      if (typeof cfg.meetingSubtitle === "string") setMeetingSubtitle(cfg.meetingSubtitle);
+      if (typeof cfg.meetingDate === "string") setMeetingDate(cfg.meetingDate);
+      setTitles(cfg.titles && typeof cfg.titles === "object" ? cfg.titles : {});
+      setSubtitles(cfg.subtitles && typeof cfg.subtitles === "object" ? cfg.subtitles : {});
+      if (typeof cfg.auto === "boolean") setAuto(cfg.auto);
+      if (typeof cfg.autoSec === "number") setAutoSecState(cfg.autoSec);
+      setAgendaIsOverride(Boolean(agendaRes?.isOverride));
+      agendaLoadedForRef.current = sk;
+    },
+    [authStatus]
+  );
 
-  // Terapkan konfigurasi agenda bersama dari server ke state builder.
-  const applyConfig = useCallback((cfg: Partial<PresentationConfig>) => {
-    skipServerSaveRef.current = true;
-    const ord = reconcileOrder(Array.isArray(cfg.order) ? cfg.order : undefined);
-    setOrder(ord);
-    setEnabled(initialEnabled(ord, cfg.enabled));
-    if (typeof cfg.period === "string") setPeriodState(cfg.period);
-    if (typeof cfg.meetingTitle === "string") setMeetingTitle(cfg.meetingTitle);
-    if (typeof cfg.meetingSubtitle === "string") setMeetingSubtitle(cfg.meetingSubtitle);
-    if (typeof cfg.meetingDate === "string") setMeetingDate(cfg.meetingDate);
-    setTitles(cfg.titles && typeof cfg.titles === "object" ? cfg.titles : {});
-    setSubtitles(cfg.subtitles && typeof cfg.subtitles === "object" ? cfg.subtitles : {});
-    if (typeof cfg.auto === "boolean") setAuto(cfg.auto);
-    if (typeof cfg.autoSec === "number") setAutoSecState(cfg.autoSec);
-  }, []);
-
-  // Muat agenda bersama dari server. Dipanggil saat login & tiap builder dibuka,
-  // agar urutan/judul/sampul/PDF yang diatur user lain langsung tampil.
+  // Dipakai builder saat dibuka: muat ulang scope aktif.
   const refreshAgenda = useCallback(async () => {
-    if (authStatus !== "authenticated") return;
-    try {
-      const res = await getAgenda();
-      if (res?.config) applyConfig(res.config);
-    } catch {
-      /* gagal → pakai cache localStorage apa adanya */
-    } finally {
-      agendaLoadedRef.current = true;
-    }
-  }, [authStatus, applyConfig]);
+    await loadScopeData(scopeKeyRef.current);
+  }, [loadScopeData]);
 
+  // Muat data scope saat scope ter-resolve / berganti.
   useEffect(() => {
-    void refreshAgenda();
-  }, [refreshAgenda]);
+    void loadScopeData(scope?.key ?? null);
+  }, [scope?.key, loadScopeData]);
+
+  const resetAgenda = useCallback(async () => {
+    const sk = scopeKeyRef.current || "divisi";
+    try {
+      await resetAgendaApi(sk);
+      await loadScopeData(sk);
+    } catch {
+      /* abaikan */
+    }
+  }, [loadScopeData]);
 
   // Scope presentasi: tingkat yang boleh dipresentasikan user (dari branch-scope).
   const SCOPE_KEY = "tollsentra.presentation.scope";
@@ -332,6 +356,7 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
     try {
       const info = await getPresentationScopes();
       setScopeInfo(info);
+      scopeResolvedRef.current = true;
       const all = flattenScopes(info);
       setScopeState((cur) => {
         let savedKey = cur?.key || null;
@@ -528,6 +553,8 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
     pdfs,
     refreshPdfs,
     refreshAgenda,
+    agendaIsOverride,
+    resetAgenda,
     scope,
     scopeInfo,
     setScope,

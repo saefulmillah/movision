@@ -57,14 +57,13 @@ export function PresentasiPage() {
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   const [overIdx, setOverIdx] = useState<number | null>(null);
 
-  // Segarkan periode, dokumen PDF, agenda bersama, & scope tiap builder dibuka.
-  const { refreshPeriods, refreshPdfs, refreshAgenda, refreshScopes } = p;
+  // Segarkan periode, scope, lalu agenda+PDF (atomik per scope) tiap builder dibuka.
+  const { refreshPeriods, refreshAgenda, refreshScopes } = p;
   useEffect(() => {
     void refreshPeriods();
-    void refreshPdfs();
-    void refreshAgenda();
     void refreshScopes();
-  }, [refreshPeriods, refreshPdfs, refreshAgenda, refreshScopes]);
+    void refreshAgenda();
+  }, [refreshPeriods, refreshScopes, refreshAgenda]);
 
   // Opsi pemilih scope: untuk divisi (canDrill) = divisi + regional + cabang;
   // selain itu = scope milik user sendiri.
@@ -97,7 +96,7 @@ export function PresentasiPage() {
         pages = null;
       }
       const title = file.name.replace(/\.pdf$/i, "");
-      const doc = await uploadPdf(file, title, pages);
+      const doc = await uploadPdf(file, title, pages, p.scope?.key ?? null);
       await p.refreshPdfs();
       p.addPdf(doc);
       toast.success("PDF ditambahkan", `${doc.title} (${doc.page_count ?? pages ?? "?"} halaman) masuk agenda.`);
@@ -173,6 +172,27 @@ export function PresentasiPage() {
                   />
                 ) : (
                   <div className={styles.scopeStatic}>{p.scope?.label ?? "Semua (Divisi)"}</div>
+                )}
+                {p.scope && (
+                  <div className={styles.scopeNote}>
+                    <span className={styles.scopeHint}>
+                      Deck &amp; dokumen PDF terpisah per scope — perubahan di sini tidak memengaruhi scope lain.
+                    </span>
+                    {p.agendaIsOverride && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        icon="rotate-ccw"
+                        onClick={() => {
+                          if (window.confirm("Kosongkan deck scope ini dan kembali ke susunan default?")) {
+                            void p.resetAgenda();
+                          }
+                        }}
+                      >
+                        Reset deck
+                      </Button>
+                    )}
+                  </div>
                 )}
               </div>
               <div className={styles.field}>

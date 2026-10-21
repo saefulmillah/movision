@@ -19,16 +19,21 @@ export interface PdfDoc {
   created_at: string;
 }
 
-export function listPdfs(): Promise<PdfDoc[]> {
-  return api.get<PdfDoc[]>("/presentation-pdf");
+function scopeQuery(scope?: string | null): string {
+  return scope && scope !== "divisi" ? `?scope=${encodeURIComponent(scope)}` : "";
 }
 
-export function uploadPdf(file: File, title: string, pageCount: number | null): Promise<PdfDoc> {
+/** Daftar PDF milik scope aktif (isolasi per scope). */
+export function listPdfs(scope?: string | null): Promise<PdfDoc[]> {
+  return api.get<PdfDoc[]>(`/presentation-pdf${scopeQuery(scope)}`);
+}
+
+export function uploadPdf(file: File, title: string, pageCount: number | null, scope?: string | null): Promise<PdfDoc> {
   const fd = new FormData();
   fd.append("file", file);
   if (title) fd.append("title", title);
   if (pageCount != null) fd.append("page_count", String(pageCount));
-  return api.post<PdfDoc>("/presentation-pdf", fd);
+  return api.post<PdfDoc>(`/presentation-pdf${scopeQuery(scope)}`, fd);
 }
 
 export function deletePdf(id: number): Promise<unknown> {

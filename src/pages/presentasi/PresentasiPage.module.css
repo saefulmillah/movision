@@ -115,6 +115,26 @@
   font-weight: 600;
   color: var(--text);
 }
+.scopeNote {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+.scopeBadge {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgba(47, 107, 255, 0.14);
+  color: var(--st-blue);
+  font-size: 11px;
+  font-weight: 700;
+}
+.scopeHint {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
 .fieldLabel {
   font-size: 11px;
   font-weight: 700;

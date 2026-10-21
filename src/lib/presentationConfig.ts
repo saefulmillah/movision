@@ -21,14 +21,28 @@ export interface PresentationConfig {
 
 export interface AgendaResponse {
   config: PresentationConfig | null;
+  /** true bila scope ini memakai override sendiri (bukan bawaan divisi). */
+  isOverride?: boolean;
+  scope?: string;
   updated_by: number | null;
   updated_at: string | null;
 }
 
-export function getAgenda(): Promise<AgendaResponse> {
-  return api.get<AgendaResponse>("/presentation-agenda");
+function scopeQuery(scope?: string | null): string {
+  return scope && scope !== "divisi" ? `?scope=${encodeURIComponent(scope)}` : "";
 }
 
-export function saveAgenda(config: PresentationConfig): Promise<AgendaResponse> {
-  return api.put<AgendaResponse>("/presentation-agenda", { config });
+/** Agenda efektif untuk sebuah scope (override scope bila ada, jika tidak bawaan divisi). */
+export function getAgenda(scope?: string | null): Promise<AgendaResponse> {
+  return api.get<AgendaResponse>(`/presentation-agenda${scopeQuery(scope)}`);
+}
+
+/** Simpan agenda untuk scope aktif. Divisi → bawaan (base); lainnya → override scope. */
+export function saveAgenda(scope: string | null, config: PresentationConfig): Promise<AgendaResponse> {
+  return api.put<AgendaResponse>(`/presentation-agenda${scopeQuery(scope)}`, { config });
+}
+
+/** Hapus override sebuah scope → kembali ke bawaan divisi. */
+export function resetAgenda(scope: string): Promise<AgendaResponse> {
+  return api.delete<AgendaResponse>(`/presentation-agenda?scope=${encodeURIComponent(scope)}`);
 }
