@@ -1,4 +1,5 @@
 import { EmptyState } from "@/components/ui";
+import { SlideFrame } from "@/components/presentation/SlideFrame";
 import { AchievementBarChart } from "@/pages/rapat-direktorat/pendapatan/AchievementBarChart";
 import { PendapatanKpiCards } from "@/pages/rapat-direktorat/pendapatan/PendapatanKpiCards";
 import type { PeriodData } from "@/types/pendapatan";
@@ -14,9 +15,11 @@ interface PendapatanOverviewSlideProps {
 export function PendapatanOverviewSlide({ data, periodLabel, scopeLabel }: PendapatanOverviewSlideProps) {
   if (!data) {
     return (
-      <div className={styles.stateBox}>
-        <EmptyState icon="inbox" title="Data pendapatan tidak tersedia" description="Belum ada snapshot Pendapatan untuk periode ini." />
-      </div>
+      <SlideFrame title="Pendapatan Tol dan Lainnya">
+        <div className={styles.stateBox}>
+          <EmptyState icon="inbox" title="Data pendapatan tidak tersedia" description="Belum ada snapshot Pendapatan untuk periode ini." />
+        </div>
+      </SlideFrame>
     );
   }
 
@@ -26,30 +29,20 @@ export function PendapatanOverviewSlide({ data, periodLabel, scopeLabel }: Penda
   const scoped = Boolean(data.meta.scoped);
 
   return (
-    <div className={styles.slide}>
-      <div className={styles.head}>
-        <h1 className={styles.title}>Pendapatan Tol dan Lainnya</h1>
-        {scopeLabel && (
-          <span
-            style={{
-              marginLeft: 10,
-              padding: "3px 10px",
-              borderRadius: 999,
-              background: "rgba(47,107,255,0.14)",
-              color: "var(--st-blue)",
-              fontSize: 12,
-              fontWeight: 700
-            }}
-          >
-            {scopeLabel}
-          </span>
-        )}
-        <span className={styles.spacer} />
-        <span className={styles.note}>
+    <SlideFrame
+      title="Pendapatan Tol dan Lainnya"
+      rightMeta={
+        <>
           Pendapatan <b>(dalam juta)</b>
-        </span>
-      </div>
-
+        </>
+      }
+      scopeLabel={scopeLabel}
+      footnote={
+        scoped
+          ? "Pendapatan Tol (kumulatif s.d) mengikuti lingkup terpilih; Usaha Lainnya, Total, dan kolom Periode Ini pada tingkat Divisi."
+          : undefined
+      }
+    >
       <div className={styles.kpiWrap}>
         <PendapatanKpiCards
           kpiMonth={data.kpi_month}
@@ -57,7 +50,7 @@ export function PendapatanOverviewSlide({ data, periodLabel, scopeLabel }: Penda
           monthLabel={monthLabel}
           sdLabel={sdLabel}
           unit="juta"
-          scoped={scoped}
+          presentation
         />
       </div>
 
@@ -65,7 +58,7 @@ export function PendapatanOverviewSlide({ data, periodLabel, scopeLabel }: Penda
         <ChartPanel title={`Pencapaian LHR s.d ${periodForTitle}`} data={data.lhr} ariaLabel="Grafik pencapaian LHR per ruas" />
         <ChartPanel title={`Pencapaian Pendapatan Tol s.d ${periodForTitle}`} data={data.pendapatan_ruas} ariaLabel="Grafik pencapaian pendapatan per ruas" />
       </div>
-    </div>
+    </SlideFrame>
   );
 }
 

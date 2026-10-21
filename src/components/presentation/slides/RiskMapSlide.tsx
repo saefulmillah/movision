@@ -1,4 +1,5 @@
 import { EmptyState } from "@/components/ui";
+import { SlideFrame } from "@/components/presentation/SlideFrame";
 import { RiskHeatmap } from "@/pages/rapat-direktorat/manajemen-risiko/RiskHeatmap";
 import type { Level, PeriodData, RiskMatrix, StageValue } from "@/types/risk";
 import styles from "./RiskMapSlide.module.css";
@@ -22,18 +23,17 @@ export function RiskMapSlide({ matrix, risk, periodLabel }: RiskMapSlideProps) {
   const risks = risk?.risks ?? [];
 
   return (
-    <div className={styles.slide}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Peta Risiko &amp; Daftar Top Risk Divisi</h1>
-        <span className={styles.sub}>Operasi &amp; Pemeliharaan Jalan Tol · Rp juta · {periodLabel}</span>
-        <span className={styles.spacer} />
+    <SlideFrame
+      title={<>Peta Risiko &amp; Daftar Top Risk Divisi</>}
+      subtitle={<>Operasi &amp; Pemeliharaan Jalan Tol · Rp juta · {periodLabel}</>}
+      rightMeta={
         <span className={styles.legend}>
           <span className={styles.legItem}><span className={`${styles.dot} ${styles.dotInh}`} />Inherent</span>
           <span className={styles.legItem}><span className={`${styles.dot} ${styles.dotExp}`} />Expected</span>
           <span className={styles.legItem}><span className={`${styles.dot} ${styles.dotRes}`} />Residual</span>
         </span>
-      </div>
-
+      }
+    >
       {!matrix || !risk || risks.length === 0 ? (
         <div className={styles.emptyBox}>
           <EmptyState
@@ -43,19 +43,10 @@ export function RiskMapSlide({ matrix, risk, periodLabel }: RiskMapSlideProps) {
           />
         </div>
       ) : (
+        <>
         <div className={styles.grid}>
-          <div className={styles.leftCol}>
-            <div className={styles.heatCard}>
-              <RiskHeatmap matrix={matrix} risks={risks} />
-            </div>
-            <div className={styles.zoneLegend}>
-              {(Object.keys(matrix.levels) as Level[]).map((lv) => (
-                <span key={lv} className={styles.zoneItem}>
-                  <span className={styles.zoneSw} style={{ background: matrix.levels[lv].color }} />
-                  {matrix.levels[lv].label}
-                </span>
-              ))}
-            </div>
+          <div className={styles.heatCard}>
+            <RiskHeatmap matrix={matrix} risks={risks} />
           </div>
 
           <div className={styles.tableCard}>
@@ -107,8 +98,17 @@ export function RiskMapSlide({ matrix, risk, periodLabel }: RiskMapSlideProps) {
             </table>
           </div>
         </div>
+        <div className={styles.zoneLegend}>
+          {(Object.keys(matrix.levels) as Level[]).map((lv) => (
+            <span key={lv} className={styles.zoneItem}>
+              <span className={styles.zoneSw} style={{ background: matrix.levels[lv].color }} />
+              {matrix.levels[lv].label}
+            </span>
+          ))}
+        </div>
+        </>
       )}
-    </div>
+    </SlideFrame>
   );
 }
 

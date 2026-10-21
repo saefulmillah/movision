@@ -78,28 +78,47 @@
   min-width: 0;
 }
 .heatCard {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
   background: var(--surface-1);
   border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 12px;
+  border-radius: 0;
+  padding: clamp(8px, 1.1vh, 14px);
 }
+/* Heatmap mengisi lebar kartu & dipusatkan vertikal (putih atas-bawah seimbang). */
+.heatCard > * {
+  width: 100%;
+  max-height: 100%;
+}
+/* Legend pill mengalir (wrap) di bawah grid; tiap pill satu baris (nowrap). */
 .zoneLegend {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 6px;
-  font-size: 10.5px;
-  color: var(--text-dim);
-  font-weight: 600;
+  flex: none;
+  margin-top: clamp(8px, 1.2vh, 16px);
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(6px, 0.7vw, 12px);
 }
 .zoneItem {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: clamp(6px, 0.6vw, 10px);
+  white-space: nowrap;
+  padding: clamp(4px, 0.7vh, 8px) clamp(10px, 0.9vw, 16px);
+  border-radius: 999px;
+  background: var(--surface-3);
+  font-size: clamp(11px, 1.4vh, 16px);
+  font-weight: 700;
+  color: var(--text-dim);
 }
 .zoneSw {
-  width: 12px;
-  height: 12px;
-  border-radius: 3px;
+  flex: none;
+  width: clamp(12px, 1.4vh, 17px);
+  height: clamp(12px, 1.4vh, 17px);
+  border-radius: 50%;
   display: inline-block;
 }
 
@@ -108,14 +127,14 @@
   min-height: 0;
   background: var(--surface-1);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 0;
   overflow: auto;
 }
 .table {
   border-collapse: separate;
   border-spacing: 0;
   width: 100%;
-  font-size: 12.5px;
+  font-size: clamp(11px, 1.45vh, 18px);
 }
 .table thead th {
   background: var(--st-blue);
@@ -197,5 +216,5 @@
   place-items: center;
   background: var(--surface-1);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 0;
 }

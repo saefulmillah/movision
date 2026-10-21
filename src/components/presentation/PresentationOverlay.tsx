@@ -260,9 +260,13 @@ export function PresentationOverlay() {
         <div className={styles.progressBar} style={{ width: `${total ? ((cur + 1) / total) * 100 : 0}%` }} />
       </div>
 
-      <div className={`${styles.stageWrap} ${isCover ? styles.stageWrapCover : ""}`}>
-        <div className={`${styles.stage} ${isCover ? styles.stageCover : ""}`}>{renderSlide()}</div>
-      </div>
+      {isCover ? (
+        <div className={`${styles.stageWrap} ${styles.stageWrapCover}`}>
+          <div className={`${styles.stage} ${styles.stageCover}`}>{renderSlide()}</div>
+        </div>
+      ) : (
+        <div className={`${styles.stageWrap} ${styles.stageData}`}>{renderSlide()}</div>
+      )}
 
       <footer className={styles.footer}>
         <button className={styles.navBtn} onClick={p.prev} title="Sebelumnya (◄)" aria-label="Sebelumnya">

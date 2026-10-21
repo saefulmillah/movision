@@ -52,6 +52,7 @@
 
 .kpiWrap {
   flex: none;
+  margin-bottom: clamp(8px, 1.2vh, 16px);
 }
 
 /* ---------- 2 grafik ---------- */
@@ -60,7 +61,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: clamp(8px, 1.2vh, 14px);
 }
 .chartPanel {
   flex: 1 1 0;
@@ -71,9 +72,8 @@
   overflow: hidden;
   background: var(--surface-1);
   border: 1px solid var(--line);
-  border-radius: 14px;
-  box-shadow: var(--card-shadow);
-  padding: 10px 16px;
+  border-radius: 0;
+  padding: clamp(6px, 1vh, 12px) clamp(10px, 1.2vw, 18px);
 }
 .chartHead {
   flex: none;
@@ -131,7 +131,8 @@
 }
 
 .stateBox {
+  flex: 1 1 auto;
+  min-height: 0;
   display: grid;
   place-items: center;
-  min-height: 50vh;
 }
