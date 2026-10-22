@@ -27,6 +27,7 @@ export function PendapatanOverviewSlide({ data, periodLabel, scopeLabel }: Penda
   const sdLabel = data.meta.period_label_sd || periodLabel;
   const periodForTitle = monthLabel || sdLabel;
   const scoped = Boolean(data.meta.scoped);
+  const fromDataset = data.meta.tol_source === "lr_dataset";
 
   return (
     <SlideFrame
@@ -38,9 +39,11 @@ export function PendapatanOverviewSlide({ data, periodLabel, scopeLabel }: Penda
       }
       scopeLabel={scopeLabel}
       footnote={
-        scoped
-          ? "Pendapatan Tol (kumulatif s.d) mengikuti lingkup terpilih; Usaha Lainnya, Total, dan kolom Periode Ini pada tingkat Divisi."
-          : undefined
+        fromDataset
+          ? "KPI (Tol, Usaha Lainnya, Total) & Pendapatan Tol per ruas mengikuti dataset kinerja lingkup terpilih; LHR per ruas dari evaluasi divisi."
+          : scoped
+            ? "Pendapatan Tol (kumulatif s.d) mengikuti lingkup terpilih; Usaha Lainnya, Total, dan kolom Periode Ini pada tingkat Divisi."
+            : undefined
       }
     >
       <div className={styles.kpiWrap}>

@@ -66,6 +66,9 @@ interface PresentationContextValue {
   scopeInfo: PresentationScopesResponse | null;
   setScope: (scope: PresentationScope) => void;
   refreshScopes: () => Promise<void>;
+  /** Buang cache snapshot (periode×scope) agar data dimuat ulang — dipakai setelah
+   *  upload dataset kinerja per-scope. Tanpa argumen → kosongkan seluruh cache. */
+  invalidateSnapshot: (key?: string, scopeKey?: string) => void;
   addPdf: (pdf: PdfDoc) => void;
   removePdfFromAgenda: (pdfId: number) => void;
   // Konten slide pembuka (editable di builder).
@@ -433,6 +436,23 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
     setSnapshot({ loading: false, error: null, data });
   }, []);
 
+  // Buang cache snapshot agar data dimuat ulang (dipakai setelah upload dataset
+  // kinerja per-scope). Bila periode & scope yang dibuang = yang sedang aktif di
+  // mode presentasi, muat ulang segera.
+  const invalidateSnapshot = useCallback(
+    (key?: string, scopeKey?: string) => {
+      if (!key) {
+        snapCache.current.clear();
+      } else {
+        snapCache.current.delete(`${key}::${scopeKey ?? "divisi"}`);
+      }
+      if (mode === "present" && (!key || (key === period && (scopeKey ?? "divisi") === (scope?.key ?? "divisi")))) {
+        void loadSnapshot(period, scope?.key ?? "divisi");
+      }
+    },
+    [mode, period, scope, loadSnapshot]
+  );
+
   // Muat snapshot ketika masuk mode presentasi, ganti periode, atau ganti scope.
   useEffect(() => {
     if (mode === "present") void loadSnapshot(period, scope?.key ?? "divisi");
@@ -559,6 +579,7 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
     scopeInfo,
     setScope,
     refreshScopes,
+    invalidateSnapshot,
     addPdf,
     removePdfFromAgenda,
     meetingTitle,

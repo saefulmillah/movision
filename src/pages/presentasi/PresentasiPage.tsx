@@ -225,6 +225,16 @@ export function PresentasiPage() {
                   ariaLabel="Snapshot periode"
                 />
               </div>
+              {p.scope && p.scope.level !== "divisi" && (
+                <div className={styles.field}>
+                  <span className={styles.fieldLabel}>Data Kinerja L/R</span>
+                  <span className={styles.scopeHint}>
+                    Data kinerja L/R (ringkasan + breakdown) dikelola di menu <b>Laba Rugi Regional</b>. Slide di sini
+                    mengikuti data yang sudah diunggah untuk lingkup terpilih.
+                  </span>
+                </div>
+              )}
+
               <div className={styles.field}>
                 <span className={styles.fieldLabel}>Subjudul</span>
                 <Input

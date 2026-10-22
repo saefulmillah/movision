@@ -1,17 +1,31 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Button, EmptyState, Icon, Select, useToast } from "@/components/ui";
+import { Button, EmptyState, Select, useToast } from "@/components/ui";
 import type { SelectOption } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
-import { getPeriod, getPeriods, importPeriod } from "@/lib/pendapatan";
+import { getPeriod, uploadLhrScoped, downloadLhrTemplate, deleteLhr } from "@/lib/pendapatan";
+import { getPresentationScopes, flattenScopes, type PresentationScope, type PresentationScopesResponse } from "@/lib/presentationScope";
 import type { Period, PeriodData } from "@/types/pendapatan";
 import { PendapatanKpiCards } from "./PendapatanKpiCards";
 import { AchievementBarChart } from "./AchievementBarChart";
 import styles from "./PendapatanPage.module.css";
 
-const MONTH_OPTIONS: SelectOption[] = [
-  "JANUARI", "FEBRUARI", "MARET", "APRIL", "MEI", "JUNI",
-  "JULI", "AGUSTUS", "SEPTEMBER", "OKTOBER", "NOVEMBER", "DESEMBER"
-].map((m) => ({ value: m, label: m.charAt(0) + m.slice(1).toLowerCase() }));
+const MONTH_TITLE_ID = [
+  "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+  "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+];
+
+// Periode = awal tahun s.d bulan berjalan (tahun berjalan).
+function buildPeriods(): Period[] {
+  const now = new Date();
+  const year = now.getFullYear();
+  const cur = now.getMonth() + 1; // 1..12
+  const list: Period[] = [];
+  for (let m = 1; m <= cur; m++) {
+    const title = MONTH_TITLE_ID[m - 1];
+    list.push({ key: `${year}-${String(m).padStart(2, "0")}`, label_month: `${title} ${year}`, label_sd: `SD ${title} ${year}` });
+  }
+  return list;
+}
 
 function periodOptionLabel(p: Period): string {
   return p.label_sd || p.label_month || p.key;
@@ -23,98 +37,110 @@ export function PendapatanPage() {
   const level = moduleLevel("pendapatan");
   const canWrite = hasRole("super_admin") || level === "write" || level === "delete";
 
-  const [periods, setPeriods] = useState<Period[]>([]);
-  const [periodKey, setPeriodKey] = useState("");
+  const periods = useMemo<Period[]>(() => buildPeriods(), []);
+  const [periodKey, setPeriodKey] = useState<string>(() => buildPeriods().slice(-1)[0]?.key ?? "");
+  const [scopeInfo, setScopeInfo] = useState<PresentationScopesResponse | null>(null);
+  const [scope, setScope] = useState<PresentationScope | null>(null);
   const [data, setData] = useState<PeriodData | null>(null);
-  const [loadingPeriods, setLoadingPeriods] = useState(true);
   const [loadingData, setLoadingData] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Panel impor (khusus WRITE)
-  const [importOpen, setImportOpen] = useState(false);
-  const [progFile, setProgFile] = useState<File | null>(null);
-  const [evalFile, setEvalFile] = useState<File | null>(null);
-  const [month, setMonth] = useState("AGUSTUS");
-  const [year, setYear] = useState(String(new Date().getFullYear()));
+  // Pendapatan (KPI + Tol per-ruas) dari file kinerja L/R (menu Laba Rugi); menu ini
+  // hanya mengunggah LHR.
   const [uploading, setUploading] = useState(false);
-  const progRef = useRef<HTMLInputElement>(null);
-  const evalRef = useRef<HTMLInputElement>(null);
+  const [downloading, setDownloading] = useState(false);
+  const lhrRef = useRef<HTMLInputElement>(null);
 
-  const loadPeriods = useCallback(async () => {
-    setLoadingPeriods(true);
+  useEffect(() => {
+    // Scope presentasi: regional/cabang hanya melihat lingkupnya; divisi bisa drill.
+    void getPresentationScopes()
+      .then((info) => {
+        setScopeInfo(info);
+        setScope(info.default || null);
+      })
+      .catch(() => setScopeInfo(null));
+  }, []);
+
+  // Muat data satu periode untuk lingkup aktif. Dipanggil ulang setelah upload/hapus
+  // LHR agar grafik langsung segar tanpa refresh browser.
+  const loadData = useCallback(async (pk: string, scopeKey?: string) => {
+    if (!pk) {
+      setData(null);
+      return;
+    }
+    setLoadingData(true);
+    setError(null);
     try {
-      const list = await getPeriods();
-      setPeriods(list);
-      setPeriodKey((prev) => (prev && list.some((p) => p.key === prev) ? prev : list[0]?.key ?? ""));
+      setData(await getPeriod(pk, scopeKey));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal memuat daftar periode");
+      setData(null);
+      setError(err instanceof Error ? err.message : "Gagal memuat data periode");
     } finally {
-      setLoadingPeriods(false);
+      setLoadingData(false);
     }
   }, []);
 
   useEffect(() => {
-    void loadPeriods();
-  }, [loadPeriods]);
-
-  useEffect(() => {
-    if (!periodKey) {
-      setData(null);
-      return;
-    }
-    let alive = true;
-    setLoadingData(true);
-    setError(null);
-    getPeriod(periodKey)
-      .then((d) => {
-        if (alive) setData(d);
-      })
-      .catch((err) => {
-        if (alive) {
-          setData(null);
-          setError(err instanceof Error ? err.message : "Gagal memuat data periode");
-        }
-      })
-      .finally(() => {
-        if (alive) setLoadingData(false);
-      });
-    return () => {
-      alive = false;
-    };
-  }, [periodKey]);
+    void loadData(periodKey, scope?.key);
+  }, [periodKey, scope, loadData]);
 
   const periodOptions: SelectOption[] = useMemo(
     () => periods.map((p) => ({ value: p.key, label: periodOptionLabel(p) })),
     [periods]
   );
 
+  const scopeOptions: SelectOption[] = useMemo(
+    () =>
+      flattenScopes(scopeInfo).map((s) => ({
+        value: s.key,
+        label: s.level === "cabang" ? `  • ${s.label}` : s.label
+      })),
+    [scopeInfo]
+  );
+
   const subPeriodLabel =
     data?.meta.period_label_sd || periods.find((p) => p.key === periodKey)?.label_sd || "—";
 
-  async function handleImport() {
-    if (!progFile || !evalFile) {
-      toast.error("File belum lengkap", "Pilih file PROG II dan Evaluasi (.xlsx).");
-      return;
-    }
-    if (!/^\d{4}$/.test(year.trim())) {
-      toast.error("Tahun tidak valid", "Isi tahun 4 digit (mis. 2026).");
-      return;
-    }
+  // Upload langsung setelah file dipilih (tanpa panel). Periode & ruas dari file.
+  async function onLhrPicked(file: File | undefined) {
+    if (!file) return;
     setUploading(true);
     try {
-      const res = await importPeriod(progFile, evalFile, month, year.trim());
-      toast.success("Impor berhasil", `Periode ${res.period_key} tersimpan.`);
-      setImportOpen(false);
-      setProgFile(null);
-      setEvalFile(null);
-      if (progRef.current) progRef.current.value = "";
-      if (evalRef.current) evalRef.current.value = "";
-      await loadPeriods();
-      setPeriodKey(res.period_key);
+      const res = await uploadLhrScoped(scope?.key ?? "divisi", file);
+      toast.success("LHR tersimpan", `${res.period_count} bulan, ${res.ruas_count} ruas (${scope?.label ?? "Divisi"}).`);
+      // Pindah ke bulan terbaru yang diunggah bila masih dalam rentang dropdown.
+      const target = res.latest && periods.some((p) => p.key === res.latest) ? res.latest : periodKey;
+      if (target !== periodKey) setPeriodKey(target);
+      await loadData(target, scope?.key); // segarkan grafik langsung
     } catch (err) {
-      toast.error("Impor gagal", err instanceof Error ? err.message : "Terjadi kesalahan");
+      toast.error("Upload LHR gagal", err instanceof Error ? err.message : "Terjadi kesalahan");
     } finally {
       setUploading(false);
+      if (lhrRef.current) lhrRef.current.value = "";
+    }
+  }
+
+  async function handleFlush() {
+    if (!periodKey) return;
+    const label = scope?.label ?? "Divisi";
+    if (!window.confirm(`Hapus data LHR ${periodKey} untuk lingkup ${label}? Anda bisa upload ulang setelahnya.`)) return;
+    try {
+      const res = await deleteLhr(scope?.key ?? "divisi", periodKey);
+      toast.success("LHR dihapus", `${res.deleted} baris dihapus (${label}).`);
+      await loadData(periodKey, scope?.key);
+    } catch (err) {
+      toast.error("Hapus LHR gagal", err instanceof Error ? err.message : "Terjadi kesalahan");
+    }
+  }
+
+  async function handleDownloadTemplate() {
+    setDownloading(true);
+    try {
+      await downloadLhrTemplate(scope?.key ?? "divisi");
+    } catch (err) {
+      toast.error("Unduh template gagal", err instanceof Error ? err.message : "Terjadi kesalahan");
+    } finally {
+      setDownloading(false);
     }
   }
 
@@ -129,6 +155,16 @@ export function PendapatanPage() {
           </div>
         </div>
         <div className={styles.headSpacer} />
+        {scopeOptions.length > 1 && (
+          <Select
+            value={scope?.key ?? ""}
+            onValueChange={(k) => setScope(flattenScopes(scopeInfo).find((s) => s.key === k) ?? null)}
+            options={scopeOptions}
+            placeholder="Lingkup"
+            icon="layers"
+            ariaLabel="Lingkup presentasi"
+          />
+        )}
         <Select
           value={periodKey}
           onValueChange={setPeriodKey}
@@ -139,69 +175,55 @@ export function PendapatanPage() {
         />
         {canWrite && (
           <Button
-            variant="primary"
-            icon={importOpen ? "x" : "upload"}
-            onClick={() => setImportOpen((v) => !v)}
+            variant="secondary"
+            icon={downloading ? "loader" : "download"}
+            disabled={downloading}
+            title="Unduh template LHR"
+            onClick={() => void handleDownloadTemplate()}
           >
-            {importOpen ? "Tutup" : "Impor Periode"}
+            Template
           </Button>
         )}
-      </div>
-
-      {/* Panel impor */}
-      {canWrite && importOpen && (
-        <div className={styles.importCard}>
-          <div className={styles.importGrid}>
-            <FilePick
-              label="PROG II"
-              hint="Workbook GAB PER JENIS"
-              file={progFile}
-              inputRef={progRef}
-              onPick={setProgFile}
+        {canWrite && (
+          <>
+            <input
+              ref={lhrRef}
+              type="file"
+              accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              hidden
+              onChange={(e) => void onLhrPicked(e.target.files?.[0])}
             />
-            <FilePick
-              label="Evaluasi"
-              hint="Workbook LHR & Pendapatan"
-              file={evalFile}
-              inputRef={evalRef}
-              onPick={setEvalFile}
-            />
-            <label className={styles.field}>
-              <span className={styles.fieldLabel}>Bulan</span>
-              <Select value={month} onValueChange={setMonth} options={MONTH_OPTIONS} ariaLabel="Bulan" />
-            </label>
-            <label className={styles.field}>
-              <span className={styles.fieldLabel}>Tahun</span>
-              <input
-                className={styles.yearInput}
-                value={year}
-                inputMode="numeric"
-                maxLength={4}
-                onChange={(e) => setYear(e.target.value.replace(/\D/g, ""))}
-                placeholder="2026"
-              />
-            </label>
             <Button
               variant="primary"
               icon={uploading ? "loader" : "upload"}
               disabled={uploading}
-              onClick={() => void handleImport()}
+              title={`Upload LHR untuk lingkup ${scope?.label ?? "Divisi"} (periode otomatis dari file)`}
+              onClick={() => lhrRef.current?.click()}
             >
-              {uploading ? "Mengunggah…" : "Impor & Segarkan"}
+              {uploading ? "Mengunggah…" : "Upload LHR"}
             </Button>
-          </div>
-        </div>
-      )}
+            <Button
+              variant="ghost"
+              icon="trash-2"
+              disabled={!periodKey}
+              title="Hapus (flush) data LHR lingkup & periode ini"
+              onClick={() => void handleFlush()}
+            >
+              Hapus LHR
+            </Button>
+          </>
+        )}
+      </div>
 
       {/* Konten */}
-      {loadingPeriods || loadingData ? (
+      {loadingData ? (
         <div className={styles.stateBox}>
           <EmptyState icon="loader" title="Memuat data…" />
         </div>
       ) : error ? (
         <div className={styles.stateBox}>
           <EmptyState icon="triangle-alert" title="Gagal memuat" description={error}>
-            <Button icon="refresh-cw" onClick={() => void loadPeriods()}>
+            <Button icon="refresh-cw" onClick={() => void loadData(periodKey, scope?.key)}>
               Coba lagi
             </Button>
           </EmptyState>
@@ -213,7 +235,7 @@ export function PendapatanPage() {
             title="Belum ada periode"
             description={
               canWrite
-                ? "Impor periode (PROG II + Evaluasi) untuk mulai menampilkan data."
+                ? "Upload file LHR (menu ini) dan file kinerja di menu Laba Rugi untuk mulai menampilkan data."
                 : "Belum ada periode Pendapatan untuk ditampilkan."
             }
           />
@@ -231,7 +253,7 @@ export function PendapatanPage() {
           {/* Grafik LHR */}
           <ChartCard
             title="Pencapaian LHR terhadap RKAP"
-            note="LHR = Lalu lintas Harian Rata-rata. % = Realisasi ÷ RKAP. Sumber: Evaluasi LHR & Pendapatan."
+            note="LHR = Lalu lintas Harian Rata-rata. % = Realisasi ÷ RKAP. Sumber: upload LHR."
             data={data.lhr}
             ariaLabel="Grafik pencapaian LHR terhadap RKAP"
           />
@@ -294,33 +316,3 @@ function ChartCard({
   );
 }
 
-function FilePick({
-  label,
-  hint,
-  file,
-  inputRef,
-  onPick
-}: {
-  label: string;
-  hint: string;
-  file: File | null;
-  inputRef: React.RefObject<HTMLInputElement>;
-  onPick: (f: File | null) => void;
-}) {
-  return (
-    <label className={styles.field}>
-      <span className={styles.fieldLabel}>{label}</span>
-      <button type="button" className={styles.dropzone} onClick={() => inputRef.current?.click()}>
-        <Icon name={file ? "file-spreadsheet" : "upload"} size={16} />
-        <span className={styles.dropText}>{file ? file.name : hint}</span>
-      </button>
-      <input
-        ref={inputRef}
-        type="file"
-        accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        hidden
-        onChange={(e) => onPick(e.target.files?.[0] ?? null)}
-      />
-    </label>
-  );
-}

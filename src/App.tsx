@@ -10,6 +10,7 @@ import { NewsPage } from "@/pages/news/NewsPage";
 import { IncidentPage } from "@/pages/incident/IncidentPage";
 import { FeedbackPage } from "@/pages/feedback/FeedbackPage";
 import { LabaRugiPage } from "@/pages/laba-rugi/LabaRugiPage";
+import { LabaRugiRegionalPage } from "@/pages/rapat-direktorat/laba-rugi-regional/LabaRugiRegionalPage";
 import { ManajemenRisikoPage } from "@/pages/rapat-direktorat/manajemen-risiko/ManajemenRisikoPage";
 import { PendapatanPage } from "@/pages/rapat-direktorat/pendapatan/PendapatanPage";
 import { PresentasiPage } from "@/pages/presentasi/PresentasiPage";
@@ -58,6 +59,14 @@ export default function App() {
         />
         {/* Alias lama → path baru di bawah grup Rapat Direktorat. */}
         <Route path="/laba-rugi" element={<Navigate to="/rapat-direktorat/laba-rugi" replace />} />
+        <Route
+          path="/rapat-direktorat/laba-rugi-regional"
+          element={
+            <RequireModule module="laba_rugi_regional">
+              <LabaRugiRegionalPage />
+            </RequireModule>
+          }
+        />
         <Route
           path="/rapat-direktorat/manajemen-risiko"
           element={
