@@ -428,7 +428,7 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
     setSnapshot({ loading: true, error: null, data: null });
     const [lr, risk, pend] = await Promise.all([
       getLrPeriod(key, scopeKey).catch(() => null),
-      getRiskPeriod(key).catch(() => null),
+      getRiskPeriod(key, scopeKey).catch(() => null),
       getPendPeriod(key, scopeKey).catch(() => null)
     ]);
     const data: PeriodSnapshot = { lr, risk, pend };

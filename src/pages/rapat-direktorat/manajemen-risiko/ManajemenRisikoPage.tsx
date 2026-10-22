@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button, EmptyState, Modal, Select, useToast } from "@/components/ui";
 import type { SelectOption } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
@@ -9,9 +9,12 @@ import {
   getPeriod,
   getPeriods,
   publishPeriod,
-  upsertItem
+  upsertItem,
+  uploadRisk,
+  downloadRiskTemplate
 } from "@/lib/risk";
 import type { Level, PeriodData, PeriodMeta, RiskItem, RiskMatrix, Stage, StageValue, UpsertItemInput } from "@/types/risk";
+import { getPresentationScopes, flattenScopes, type PresentationScope, type PresentationScopesResponse } from "@/lib/presentationScope";
 import { RiskHeatmap } from "./RiskHeatmap";
 import { RiskFormModal } from "./RiskFormModal";
 import styles from "./ManajemenRisikoPage.module.css";
@@ -41,10 +44,15 @@ export function ManajemenRisikoPage() {
   const [matrix, setMatrix] = useState<RiskMatrix | null>(null);
   const [periods, setPeriods] = useState<PeriodMeta[]>([]);
   const [periodKey, setPeriodKey] = useState("");
+  const [scopeInfo, setScopeInfo] = useState<PresentationScopesResponse | null>(null);
+  const [scope, setScope] = useState<PresentationScope | null>(null);
   const [data, setData] = useState<PeriodData | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingData, setLoadingData] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Risiko divisi hanya untuk user lihat-semua; regional/cabang untuk user lingkup.
+  const canEditScope = canWrite && Boolean(scope) && (scope?.level !== "divisi" || hasRole("super_admin") || (scopeInfo?.canDrill ?? false));
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<RiskItem | null>(null);
@@ -59,34 +67,47 @@ export function ManajemenRisikoPage() {
   const [confirmDelete, setConfirmDelete] = useState<RiskItem | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  // Muat matriks + daftar periode sekali.
-  const loadBase = useCallback(async () => {
+  const riskFileRef = useRef<HTMLInputElement>(null);
+  const [uploadingRisk, setUploadingRisk] = useState(false);
+  const [downloadingTpl, setDownloadingTpl] = useState(false);
+
+  // Muat matriks + scope sekali.
+  useEffect(() => {
     setLoading(true);
     setError(null);
+    Promise.all([getMatrix(), getPresentationScopes().catch(() => null)])
+      .then(([mx, info]) => {
+        setMatrix(mx);
+        setScopeInfo(info);
+        setScope(info?.default ?? null);
+      })
+      .catch((err) => setError(err instanceof Error ? err.message : "Gagal memuat data awal"))
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Daftar periode (per lingkup) tiap scope berubah.
+  const loadPeriods = useCallback(async (scopeKey: string) => {
     try {
-      const [mx, list] = await Promise.all([getMatrix(), getPeriods()]);
-      setMatrix(mx);
+      const list = await getPeriods(scopeKey);
       setPeriods(list);
       setPeriodKey((prev) => (prev && list.some((p) => p.key === prev) ? prev : list[0]?.key ?? ""));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal memuat data awal");
-    } finally {
-      setLoading(false);
+      setError(err instanceof Error ? err.message : "Gagal memuat daftar periode");
     }
   }, []);
 
   useEffect(() => {
-    void loadBase();
-  }, [loadBase]);
+    if (scope) void loadPeriods(scope.key);
+  }, [scope, loadPeriods]);
 
-  const loadPeriodData = useCallback(async (key: string) => {
+  const loadPeriodData = useCallback(async (key: string, scopeKey?: string) => {
     if (!key) {
       setData(null);
       return;
     }
     setLoadingData(true);
     try {
-      const d = await getPeriod(key);
+      const d = await getPeriod(key, scopeKey);
       setData(d);
     } catch (err) {
       setData(null);
@@ -97,12 +118,21 @@ export function ManajemenRisikoPage() {
   }, []);
 
   useEffect(() => {
-    void loadPeriodData(periodKey);
-  }, [periodKey, loadPeriodData]);
+    void loadPeriodData(periodKey, scope?.key);
+  }, [periodKey, scope, loadPeriodData]);
 
   const periodOptions: SelectOption[] = useMemo(
     () => periods.map((p) => ({ value: p.key, label: `${p.label}${p.status === "draft" ? " (draft)" : ""}` })),
     [periods]
+  );
+
+  const scopeOptions: SelectOption[] = useMemo(
+    () =>
+      flattenScopes(scopeInfo).map((s) => ({
+        value: s.key,
+        label: s.level === "cabang" ? `  • ${s.label}` : s.label
+      })),
+    [scopeInfo]
   );
 
   const currentPeriod = data?.period ?? periods.find((p) => p.key === periodKey) ?? null;
@@ -110,7 +140,7 @@ export function ManajemenRisikoPage() {
 
   /* ---------- aksi tulis ---------- */
   async function refreshAfterWrite() {
-    await loadPeriodData(periodKey);
+    await loadPeriodData(periodKey, scope?.key);
   }
 
   function openCreate() {
@@ -125,7 +155,7 @@ export function ManajemenRisikoPage() {
   async function handleSubmitItem(payload: UpsertItemInput) {
     setSaving(true);
     try {
-      await upsertItem(periodKey, payload);
+      await upsertItem(periodKey, payload, scope?.key);
       toast.success("Tersimpan", `Risiko peringkat ${payload.rank} tersimpan.`);
       setFormOpen(false);
       await refreshAfterWrite();
@@ -162,17 +192,20 @@ export function ManajemenRisikoPage() {
     }
     setCreatingPeriod(true);
     try {
-      const created = await createPeriod({
-        period_key: newKey.trim(),
-        period_label: newLabel.trim(),
-        divisi: newDivisi.trim() || undefined
-      });
+      const created = await createPeriod(
+        {
+          period_key: newKey.trim(),
+          period_label: newLabel.trim(),
+          divisi: newDivisi.trim() || undefined
+        },
+        scope?.key
+      );
       toast.success("Periode dibuat", `${created.label} siap diisi.`);
       setPeriodOpen(false);
       setNewKey("");
       setNewLabel("");
       setNewDivisi("");
-      await loadBase();
+      if (scope) await loadPeriods(scope.key);
       setPeriodKey(created.key);
     } catch (err) {
       toast.error("Gagal membuat periode", err instanceof Error ? err.message : "Terjadi kesalahan");
@@ -181,13 +214,40 @@ export function ManajemenRisikoPage() {
     }
   }
 
+  async function onRiskFile(file: File | undefined) {
+    if (!file || !periodKey) return;
+    setUploadingRisk(true);
+    try {
+      const res = await uploadRisk(periodKey, file, scope?.key);
+      toast.success("Top Risk diunggah", `${res.item_count} risiko (${scope?.label ?? "Divisi"}).`);
+      if (scope) await loadPeriods(scope.key);
+      await loadPeriodData(periodKey, scope?.key);
+    } catch (err) {
+      toast.error("Upload gagal", err instanceof Error ? err.message : "Terjadi kesalahan");
+    } finally {
+      setUploadingRisk(false);
+      if (riskFileRef.current) riskFileRef.current.value = "";
+    }
+  }
+
+  async function handleRiskTemplate() {
+    setDownloadingTpl(true);
+    try {
+      await downloadRiskTemplate(scope?.key, periodKey || undefined);
+    } catch (err) {
+      toast.error("Unduh template gagal", err instanceof Error ? err.message : "Terjadi kesalahan");
+    } finally {
+      setDownloadingTpl(false);
+    }
+  }
+
   async function handlePublish() {
     if (!periodKey) return;
     try {
-      await publishPeriod(periodKey);
+      await publishPeriod(periodKey, scope?.key);
       toast.success("Dipublikasikan", `Periode ${currentPeriod?.label ?? periodKey} kini published.`);
-      await loadBase();
-      await loadPeriodData(periodKey);
+      if (scope) await loadPeriods(scope.key);
+      await loadPeriodData(periodKey, scope?.key);
     } catch (err) {
       toast.error("Gagal publikasi", err instanceof Error ? err.message : "Terjadi kesalahan");
     }
@@ -209,7 +269,7 @@ export function ManajemenRisikoPage() {
       <div className={styles.page}>
         <div className={styles.stateBox}>
           <EmptyState icon="triangle-alert" title="Gagal memuat" description={error}>
-            <Button icon="refresh-cw" onClick={() => void loadBase()}>
+            <Button icon="refresh-cw" onClick={() => scope && void loadPeriods(scope.key)}>
               Coba lagi
             </Button>
           </EmptyState>
@@ -223,13 +283,23 @@ export function ManajemenRisikoPage() {
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.titleBox}>
-          <h1 className={styles.title}>Manajemen Risiko — Top Risk Divisi</h1>
+          <h1 className={styles.title}>Manajemen Risiko — Top Risk</h1>
           <div className={styles.sub}>
-            Periode <b>{currentPeriod?.label || "—"}</b>
-            {currentPeriod?.divisi ? <> · {currentPeriod.divisi}</> : null} · Nilai dalam <b>{currentPeriod?.unit || "Rp juta"}</b>
+            Lingkup <b>{scope?.label || "—"}</b> · Periode <b>{currentPeriod?.label || "—"}</b> · Nilai dalam{" "}
+            <b>{currentPeriod?.unit || "Rp juta"}</b>
           </div>
         </div>
         <div className={styles.spacer} />
+        {scopeOptions.length > 1 && (
+          <Select
+            value={scope?.key ?? ""}
+            onValueChange={(k) => setScope(flattenScopes(scopeInfo).find((s) => s.key === k) ?? null)}
+            options={scopeOptions}
+            placeholder="Lingkup"
+            icon="layers"
+            ariaLabel="Lingkup"
+          />
+        )}
         <Select
           value={periodKey}
           onValueChange={setPeriodKey}
@@ -239,9 +309,36 @@ export function ManajemenRisikoPage() {
           ariaLabel="Pilih periode"
         />
         {canWrite && (
+          <Button
+            variant="secondary"
+            icon={downloadingTpl ? "loader" : "download"}
+            disabled={downloadingTpl}
+            title="Unduh template Top Risk (terisi data periode ini bila ada)"
+            onClick={() => void handleRiskTemplate()}
+          >
+            Template
+          </Button>
+        )}
+        {canEditScope && (
           <>
             <Button icon="calendar-plus" onClick={() => setPeriodOpen(true)}>
               Periode
+            </Button>
+            <input
+              ref={riskFileRef}
+              type="file"
+              accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              hidden
+              onChange={(e) => void onRiskFile(e.target.files?.[0])}
+            />
+            <Button
+              variant="secondary"
+              icon={uploadingRisk ? "loader" : "upload"}
+              disabled={uploadingRisk || !periodKey}
+              title={periodKey ? "Upload Top Risk (.xlsx) — mengganti daftar periode ini" : "Pilih/buat periode dulu"}
+              onClick={() => riskFileRef.current?.click()}
+            >
+              {uploadingRisk ? "Mengunggah…" : "Upload"}
             </Button>
             <Button variant="primary" icon="plus" disabled={!periodKey} onClick={openCreate}>
               Tambah Risiko
@@ -260,9 +357,9 @@ export function ManajemenRisikoPage() {
           <EmptyState
             icon="inbox"
             title="Belum ada periode"
-            description={canWrite ? "Buat periode baru untuk mulai mengisi Top Risk." : "Belum ada periode untuk ditampilkan."}
+            description={canEditScope ? "Buat periode baru untuk mulai mengisi Top Risk." : "Belum ada periode untuk ditampilkan."}
           >
-            {canWrite && (
+            {canEditScope && (
               <Button icon="calendar-plus" onClick={() => setPeriodOpen(true)}>
                 Buat Periode
               </Button>
@@ -275,7 +372,7 @@ export function ManajemenRisikoPage() {
           <div className={styles.card}>
             <h2 className={styles.cardTitle}>Peta Risiko (5 × 5)</h2>
             {matrix && data ? (
-              <RiskHeatmap matrix={matrix} risks={risks} onSelectRank={canWrite ? (rank) => {
+              <RiskHeatmap matrix={matrix} risks={risks} onSelectRank={canEditScope ? (rank) => {
                 const item = risks.find((r) => r.rank === rank);
                 if (item) openEdit(item);
               } : undefined} />
@@ -313,9 +410,9 @@ export function ManajemenRisikoPage() {
                 <EmptyState
                   icon="inbox"
                   title="Belum ada risiko"
-                  description={canWrite ? "Tambahkan risiko pertama untuk periode ini." : "Belum ada data risiko."}
+                  description={canEditScope ? "Tambahkan risiko pertama untuk periode ini." : "Belum ada data risiko."}
                 >
-                  {canWrite && (
+                  {canEditScope && (
                     <Button icon="plus" onClick={openCreate}>
                       Tambah Risiko
                     </Button>
@@ -332,7 +429,7 @@ export function ManajemenRisikoPage() {
                       <th colSpan={2}>Inherent</th>
                       <th colSpan={2}>Expected</th>
                       <th colSpan={2}>Residual</th>
-                      {canWrite && <th rowSpan={2} className={styles.thAct} />}
+                      {canEditScope && <th rowSpan={2} className={styles.thAct} />}
                     </tr>
                     <tr className={styles.subHead}>
                       <th>Exposure</th><th>Nilai</th>
@@ -354,7 +451,7 @@ export function ManajemenRisikoPage() {
                             <ExposureCells key={key} stage={s} matrix={matrix} />
                           );
                         })}
-                        {canWrite && (
+                        {canEditScope && (
                           <td className={styles.tdAct}>
                             <div className={styles.actions}>
                               <Button size="sm" iconOnly icon="pencil" title="Ubah" onClick={() => openEdit(r)} />
