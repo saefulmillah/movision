@@ -1,0 +1,184 @@
+/* Slide Evaluasi LHR & PHR vs BP — 1 baris nama ruas + 3 section (LHR/PHR/Golongan),
+   tiap section 1 kartu per ruas (kolom = jumlah ruas, tanpa wrap). */
+
+.stateBox {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+}
+
+/* Baris nama ruas */
+.band {
+  flex: none;
+  display: grid;
+  gap: clamp(8px, 1vw, 14px);
+  margin-bottom: clamp(6px, 0.9vh, 11px);
+}
+.chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: clamp(5px, 0.7vh, 8px) 10px;
+  box-shadow: 0 1px 3px rgba(16, 42, 67, 0.05);
+  min-width: 0;
+}
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #2d7d93;
+  flex: none;
+}
+.chipName {
+  font-weight: 800;
+  font-size: clamp(11px, 1.45vh, 15px);
+  letter-spacing: 0.04em;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Section */
+.section {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.section:not(:last-child) {
+  margin-bottom: clamp(7px, 1vh, 12px);
+}
+.secHead {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 2px 6px;
+  border-bottom: 2px solid var(--line);
+}
+.secTitleWrap {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+.accent {
+  width: 4px;
+  height: 15px;
+  border-radius: 2px;
+  background: #cf3a3f;
+  flex: none;
+}
+.secTitle {
+  font-weight: 800;
+  font-size: clamp(11px, 1.45vh, 15px);
+  letter-spacing: 0.04em;
+  color: var(--st-blue);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.legend {
+  display: inline-flex;
+  gap: clamp(8px, 1vw, 15px);
+  flex: none;
+}
+.legItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: clamp(9px, 1.1vh, 11px);
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.sw {
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  display: inline-block;
+}
+.swDash {
+  width: 14px;
+  height: 0;
+  border-top: 2px dashed;
+  display: inline-block;
+}
+
+/* Kartu per ruas */
+.cards {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  gap: clamp(8px, 1vw, 14px);
+  margin-top: clamp(6px, 0.9vh, 10px);
+}
+.card {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(16, 42, 67, 0.06);
+  padding: clamp(7px, 1vh, 11px) clamp(8px, 0.8vw, 13px) clamp(4px, 0.6vh, 8px);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+}
+
+.stat {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.statBlocks {
+  display: flex;
+  gap: clamp(10px, 1vw, 18px);
+  min-width: 0;
+}
+.statDiv {
+  padding-left: clamp(10px, 1vw, 18px);
+  border-left: 1px solid var(--line);
+}
+.statLbl {
+  font-size: clamp(7px, 0.9vh, 8.5px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+.statVal {
+  font-weight: 800;
+  font-size: clamp(12px, 1.7vh, 18px);
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: clamp(11px, 1.45vh, 15px);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.chart {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-top: 6px;
+}
+.chartFull {
+  flex: 1 1 auto;
+  min-height: 0;
+}

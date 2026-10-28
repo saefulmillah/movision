@@ -14,7 +14,7 @@ interface CoverSlideProps {
 
 export function CoverSlide({ kicker, title, sub, facts }: CoverSlideProps) {
   return (
-    <div className={styles.cover}>
+    <div className={`${styles.cover} pfx-stagger`}>
       <span className={styles.kicker}>{kicker}</span>
       <h1 className={styles.title}>{title}</h1>
       <div className={styles.sub}>{sub}</div>

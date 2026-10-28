@@ -4,7 +4,7 @@ import type { SelectOption } from "@/components/ui";
 import { Icon } from "@/components/ui/Icon";
 import { useAuth } from "@/context/AuthContext";
 import { usePresentation } from "@/context/PresentationContext";
-import { SLIDES } from "@/components/presentation/slideRegistry";
+import { SLIDES, isSlideAllowedForScope } from "@/components/presentation/slideRegistry";
 import { parsePdfSlide, pdfSlideLabel } from "@/components/presentation/pdfSlides";
 import { isCustomCover } from "@/components/presentation/customCover";
 import { flattenScopes } from "@/lib/presentationScope";
@@ -344,6 +344,9 @@ export function PresentasiPage() {
             {/* Grid kartu slide — drag untuk urut, klik judul untuk ubah */}
             <div className={styles.grid}>
               {p.order.map((id, idx) => {
+            // Slide khusus-scope (mis. Kinerja Regional) disembunyikan di scope lain;
+            // return null menjaga `idx` tetap selaras dengan p.order untuk drag/reorder.
+            if (!isSlideAllowedForScope(id, p.scope?.level)) return null;
             const staticDef = SLIDES[id];
             const isCustom = isCustomCover(id);
             const pdfLabel = staticDef || isCustom ? null : pdfSlideLabel(id, p.pdfs);

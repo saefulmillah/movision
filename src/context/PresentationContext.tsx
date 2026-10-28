@@ -4,10 +4,16 @@ import { useAuth } from "@/context/AuthContext";
 import { getPeriod as getLrPeriod, getPeriods as getLrPeriods } from "@/lib/labaRugi";
 import { getMatrix, getPeriod as getRiskPeriod, getPeriods as getRiskPeriods } from "@/lib/risk";
 import { getPeriod as getPendPeriod, getPeriods as getPendPeriods } from "@/lib/pendapatan";
+import { getDashboard as getSentimentDashboard, getPeriods as getSentimentPeriods } from "@/lib/sentiment";
+import { getOdolPresentation } from "@/lib/insights";
+import { getKinerjaRegional, type KinerjaRegionalData } from "@/lib/kinerjaRegional";
+import { getLhrPhrEval, type LhrPhrEvalData } from "@/lib/lhrPhrEval";
 import type { PeriodData as LrPeriodData } from "@/types/labaRugi";
 import type { PeriodData as RiskPeriodData, RiskMatrix } from "@/types/risk";
 import type { PeriodData as PendPeriodData } from "@/types/pendapatan";
-import { DEFAULT_ORDER, SLIDES } from "@/components/presentation/slideRegistry";
+import type { SentimentDashboard } from "@/types/sentiment";
+import type { OdolPresentation } from "@/types/insights";
+import { DEFAULT_ORDER, SLIDES, isSlideAllowedForScope } from "@/components/presentation/slideRegistry";
 import { isPdfSlide, makePdfSlideId, parsePdfSlide, prunePdfSlides } from "@/components/presentation/pdfSlides";
 import { isCustomCover, makeCustomCoverId } from "@/components/presentation/customCover";
 import { getAgenda, saveAgenda, resetAgenda as resetAgendaApi, type PresentationConfig } from "@/lib/presentationConfig";
@@ -31,6 +37,12 @@ export interface PeriodSnapshot {
   lr: LrPeriodData | null;
   risk: RiskPeriodData | null;
   pend: PendPeriodData | null;
+  sentiment: SentimentDashboard | null;
+  odol: OdolPresentation | null;
+  /** Kinerja Regional (hanya diisi untuk scope regional; null selainnya). */
+  kinerja: KinerjaRegionalData | null;
+  /** Pencapaian LHR & PHR vs BP (hanya scope regional; null selainnya). */
+  lhrPhrEval: LhrPhrEvalData | null;
 }
 
 interface SnapshotState {
@@ -229,7 +241,10 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
     }, 800);
   }, [order, enabled, period, meetingTitle, meetingSubtitle, meetingDate, titles, subtitles, auto, autoSec]);
 
-  const activeSlides = useMemo(() => order.filter((id) => enabled[id]), [order, enabled]);
+  const activeSlides = useMemo(
+    () => order.filter((id) => enabled[id] && isSlideAllowedForScope(id, scope?.level)),
+    [order, enabled, scope]
+  );
   const periodLabel = useMemo(
     () => periods.find((p) => p.key === period)?.label || period || "—",
     [periods, period]
@@ -240,15 +255,17 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
   // (via refreshPeriods) agar periode yang baru di-import langsung tampil.
   const refreshPeriods = useCallback(async () => {
     if (authStatus !== "authenticated") return;
-    const [lrList, riskList, pendList] = await Promise.all([
+    const [lrList, riskList, pendList, sentList] = await Promise.all([
       getLrPeriods().catch(() => []),
       getRiskPeriods().catch(() => []),
-      getPendPeriods().catch(() => [])
+      getPendPeriods().catch(() => []),
+      getSentimentPeriods().catch(() => [])
     ]);
     const byKey = new Map<string, string>();
-    // Risiko & Pendapatan dulu, lalu LR menimpa label (label "SD ..." lebih deskriptif untuk rapat).
+    // Risiko, Pendapatan & Sentimen dulu, lalu LR menimpa label (label "SD ..." lebih deskriptif untuk rapat).
     for (const r of riskList) byKey.set(r.key, r.label);
     for (const pnd of pendList) byKey.set(pnd.key, pnd.label_sd || pnd.label_month || pnd.key);
+    for (const s of sentList) byKey.set(s.key, s.label);
     for (const l of lrList) byKey.set(l.key, l.label);
     const list = [...byKey.entries()]
       .map(([key, label]) => ({ key, label }))
@@ -414,7 +431,7 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
 
   // Snapshot di-cache per periode × scope (LR & Pendapatan difilter per scope di
   // backend; Risiko masih level-divisi sampai Fase 4, jadi tak di-scope).
-  const loadSnapshot = useCallback(async (key: string, scopeKey: string) => {
+  const loadSnapshot = useCallback(async (key: string, scopeKey: string, scopeLevel?: string | null) => {
     if (!key) {
       setSnapshot({ loading: false, error: null, data: null });
       return;
@@ -426,12 +443,19 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
       return;
     }
     setSnapshot({ loading: true, error: null, data: null });
-    const [lr, risk, pend] = await Promise.all([
+    // Slide regional-only (Kinerja Regional, LHR/PHR vs BP) hanya di-fetch utk scope regional.
+    const kinerjaReq = scopeLevel === "regional" ? getKinerjaRegional(key, scopeKey).catch(() => null) : Promise.resolve(null);
+    const lhrPhrReq = scopeLevel === "regional" ? getLhrPhrEval(key, scopeKey).catch(() => null) : Promise.resolve(null);
+    const [lr, risk, pend, sentiment, odol, kinerja, lhrPhrEval] = await Promise.all([
       getLrPeriod(key, scopeKey).catch(() => null),
       getRiskPeriod(key, scopeKey).catch(() => null),
-      getPendPeriod(key, scopeKey).catch(() => null)
+      getPendPeriod(key, scopeKey).catch(() => null),
+      getSentimentDashboard(key, scopeKey).catch(() => null),
+      getOdolPresentation(scopeKey).catch(() => null),
+      kinerjaReq,
+      lhrPhrReq
     ]);
-    const data: PeriodSnapshot = { lr, risk, pend };
+    const data: PeriodSnapshot = { lr, risk, pend, sentiment, odol, kinerja, lhrPhrEval };
     snapCache.current.set(cacheKey, data);
     setSnapshot({ loading: false, error: null, data });
   }, []);
@@ -447,7 +471,7 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
         snapCache.current.delete(`${key}::${scopeKey ?? "divisi"}`);
       }
       if (mode === "present" && (!key || (key === period && (scopeKey ?? "divisi") === (scope?.key ?? "divisi")))) {
-        void loadSnapshot(period, scope?.key ?? "divisi");
+        void loadSnapshot(period, scope?.key ?? "divisi", scope?.level);
       }
     },
     [mode, period, scope, loadSnapshot]
@@ -455,7 +479,7 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
 
   // Muat snapshot ketika masuk mode presentasi, ganti periode, atau ganti scope.
   useEffect(() => {
-    if (mode === "present") void loadSnapshot(period, scope?.key ?? "divisi");
+    if (mode === "present") void loadSnapshot(period, scope?.key ?? "divisi", scope?.level);
   }, [mode, period, scope, loadSnapshot]);
 
   const setPeriod = useCallback((key: string) => setPeriodState(key), []);

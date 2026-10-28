@@ -1,0 +1,196 @@
+/* Halaman admin Sentimen — ringkasan agregat + editor tindak lanjut per isu. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 24px;
+  min-height: 0;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+.titleBox { min-width: 0; }
+.title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.sub {
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+.sub b { color: var(--text); }
+.headSpacer { flex: 1 1 auto; }
+
+.toolbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.stateBox {
+  display: grid;
+  place-items: center;
+  min-height: 40vh;
+}
+
+/* ---- Ringkasan ---- */
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+}
+.statCard {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--st-blue);
+  padding: 12px 14px;
+}
+.statCard.aman { border-left-color: var(--sem-green); }
+.statCard.atensi { border-left-color: var(--sem-amber); }
+.statCard.kritis { border-left-color: var(--sem-red); }
+.statLabel {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+.statVal {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+  margin-top: 4px;
+  letter-spacing: -0.01em;
+}
+.statBig {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  margin-top: 2px;
+}
+.statSub {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.narrative {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--sem-red);
+  padding: 12px 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--st-blue);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.sectionTitle span {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 500;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+/* ---- Editor tindak lanjut ---- */
+.recoList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.recoCard {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.recoHead {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.recoRank {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.recoIssue { min-width: 0; flex: 1 1 auto; }
+.recoTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.35;
+}
+.recoStat {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-top: 2px;
+}
+.recoLink { color: var(--st-blue); text-decoration: underline; }
+
+.recoForm {
+  display: grid;
+  grid-template-columns: 1fr 180px 180px auto;
+  gap: 10px;
+  align-items: start;
+}
+.recoAction,
+.recoPic {
+  font: inherit;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface-2, var(--bg, #fff));
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px 10px;
+  width: 100%;
+  resize: vertical;
+}
+.recoAction:focus,
+.recoPic:focus {
+  outline: none;
+  border-color: var(--st-blue);
+}
+.recoStatusSel { min-width: 0; }
+.recoActions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.foot {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+@media (max-width: 900px) {
+  .recoForm {
+    grid-template-columns: 1fr;
+  }
+}

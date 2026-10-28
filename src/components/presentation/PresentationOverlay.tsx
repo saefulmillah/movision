@@ -8,12 +8,17 @@ import type { Fact } from "./slides/CoverSlide";
 import { LrTableSlide } from "./slides/LrTableSlide";
 import { RiskMapSlide } from "./slides/RiskMapSlide";
 import { PendapatanOverviewSlide } from "./slides/PendapatanOverviewSlide";
+import { KinerjaRegionalSlide } from "./slides/KinerjaRegionalSlide";
+import { LhrPhrBpSlide } from "./slides/LhrPhrBpSlide";
+import { SentimentDashboardSlide } from "./slides/SentimentDashboardSlide";
+import { OdolSlide } from "./slides/OdolSlide";
 import { PdfPageSlide } from "./slides/PdfPageSlide";
 import { parsePdfSlide, pdfSlideLabel } from "./pdfSlides";
 import { isCustomCover } from "./customCover";
 import type { LrView } from "@/lib/labaRugiView";
 import brandLogos from "@/assets/presentation/brand-logos.png";
 import movisionMark from "@/assets/presentation/movision-mark.webp";
+import "@/styles/presentation-anim.css";
 import styles from "./PresentationOverlay.module.css";
 
 const MONTHS_ID = [
@@ -110,14 +115,16 @@ export function PresentationOverlay() {
         { k: "Periode", v: pendMonth ? `${pendMonth} & ${p.periodLabel}` : p.periodLabel },
         { k: "Ruas", v: pendRuas ? `${pendRuas} ruas` : "—" },
         { k: "Unit", v: "Rp miliar" }
-      ]
+      ],
+      "sent-cover": [{ k: "Periode", v: p.periodLabel }],
+      "odol-cover": [{ k: "Periode", v: `Tahun ${new Date().getFullYear()}` }]
     };
   }, [p.periodLabel, p.snapshot.data, meetingDateLabel]);
 
   if (p.mode !== "present") return null;
 
   // Nomor "Bagian" dinamis — mengikuti urutan sampul bagian yang aktif.
-  const SECTION_COVERS = ["lr-cover", "risk-cover", "pend-cover"];
+  const SECTION_COVERS = ["lr-cover", "risk-cover", "pend-cover", "sent-cover", "odol-cover"];
   const sectionNo = (coverKey: string) => {
     const active = p.activeSlides.filter((id) => SECTION_COVERS.includes(id));
     const idx = active.indexOf(coverKey);
@@ -175,6 +182,14 @@ export function PresentationOverlay() {
       const view = key.split("-")[1] as LrView;
       return <LrTableSlide view={view} data={p.snapshot.data?.lr ?? null} periodLabel={p.periodLabel} scopeLabel={scopeLabel} />;
     }
+    if (key === "kinerja-regional") {
+      if (p.snapshot.loading) return <StageLoader />;
+      return <KinerjaRegionalSlide data={p.snapshot.data?.kinerja ?? null} periodLabel={p.periodLabel} scopeLabel={scopeLabel} />;
+    }
+    if (key === "lhr-phr-bp") {
+      if (p.snapshot.loading) return <StageLoader />;
+      return <LhrPhrBpSlide data={p.snapshot.data?.lhrPhrEval ?? null} periodLabel={p.periodLabel} scopeLabel={scopeLabel} />;
+    }
     if (key === "risk-map") {
       if (p.snapshot.loading) return <StageLoader />;
       return <RiskMapSlide matrix={p.matrix} risk={p.snapshot.data?.risk ?? null} periodLabel={p.periodLabel} />;
@@ -192,6 +207,34 @@ export function PresentationOverlay() {
     if (key === "pend-overview") {
       if (p.snapshot.loading) return <StageLoader />;
       return <PendapatanOverviewSlide data={p.snapshot.data?.pend ?? null} periodLabel={p.periodLabel} scopeLabel={scopeLabel} />;
+    }
+    if (key === "sent-cover") {
+      return (
+        <CoverSlide
+          kicker={`Bagian ${sectionNo("sent-cover")}`}
+          title="Analisis Sentimen Media"
+          sub="Persepsi publik di media sosial & daring — komposisi, peta wilayah, isu utama, dan tindak lanjut."
+          facts={withScope(facts["sent-cover"])}
+        />
+      );
+    }
+    if (key === "sent-dashboard") {
+      if (p.snapshot.loading) return <StageLoader />;
+      return <SentimentDashboardSlide data={p.snapshot.data?.sentiment ?? null} periodLabel={p.periodLabel} scopeLabel={scopeLabel} />;
+    }
+    if (key === "odol-cover") {
+      return (
+        <CoverSlide
+          kicker={`Bagian ${sectionNo("odol-cover")}`}
+          title="ODOL"
+          sub="Over Dimension Over Loading — perbandingan kendaraan normal vs ODOL, komposisi & sebaran pelanggaran."
+          facts={withScope(facts["odol-cover"])}
+        />
+      );
+    }
+    if (key === "odol-dashboard") {
+      if (p.snapshot.loading) return <StageLoader />;
+      return <OdolSlide data={p.snapshot.data?.odol ?? null} scopeLabel={scopeLabel} />;
     }
     if (isCustomCover(key)) {
       return <CoverSlide kicker="Sampul" title={p.titles[key] || "Sampul"} sub={p.subtitles[key] || ""} facts={[]} />;
@@ -262,10 +305,10 @@ export function PresentationOverlay() {
 
       {isCover ? (
         <div className={`${styles.stageWrap} ${styles.stageWrapCover}`}>
-          <div className={`${styles.stage} ${styles.stageCover}`}>{renderSlide()}</div>
+          <div key={key} className={`${styles.stage} ${styles.stageCover}`}>{renderSlide()}</div>
         </div>
       ) : (
-        <div className={`${styles.stageWrap} ${styles.stageData}`}>{renderSlide()}</div>
+        <div key={key} className={`${styles.stageWrap} ${styles.stageData}`}>{renderSlide()}</div>
       )}
 
       <footer className={styles.footer}>

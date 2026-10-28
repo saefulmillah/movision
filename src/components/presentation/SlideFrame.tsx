@@ -20,10 +20,13 @@ interface SlideFrameProps {
   footnote?: ReactNode;
   /** Konten tanpa padding dalam (mis. peta/PDF yang mengisi penuh). */
   flush?: boolean;
+  /** Fade-up bertahap pada komponen isi (header judul tetap statis). Default true.
+   *  Slide yang mengatur stagger-nya sendiri (mis. Sentimen) set false. */
+  stagger?: boolean;
   children: ReactNode;
 }
 
-export function SlideFrame({ title, subtitle, rightMeta, scopeLabel, footnote, flush, children }: SlideFrameProps) {
+export function SlideFrame({ title, subtitle, rightMeta, scopeLabel, footnote, flush, stagger = true, children }: SlideFrameProps) {
   const hasFootnote = footnote !== undefined && footnote !== null && footnote !== false && footnote !== "";
   return (
     <div className={styles.frame}>
@@ -35,7 +38,7 @@ export function SlideFrame({ title, subtitle, rightMeta, scopeLabel, footnote, f
         {rightMeta ? <span className={styles.rightMeta}>{rightMeta}</span> : null}
       </div>
 
-      <div className={`${styles.content} ${flush ? styles.flush : ""}`}>{children}</div>
+      <div className={`${styles.content} ${flush ? styles.flush : ""} ${stagger ? "pfx-stagger" : ""}`}>{children}</div>
 
       {hasFootnote ? <div className={styles.footnote}>{footnote}</div> : null}
     </div>
