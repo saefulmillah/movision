@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { Icon } from "@/components/ui/Icon";
+import movisionMark from "@/assets/presentation/movision-mark.webp";
 
 function FullScreenLoader() {
   return (
@@ -15,7 +15,11 @@ function FullScreenLoader() {
         gap: 10
       }}
     >
-      <Icon name="radio-tower" size={30} />
+      <img
+        src={movisionMark}
+        alt="Movision"
+        style={{ width: 44, height: 44, objectFit: "contain", display: "block", borderRadius: 10 }}
+      />
       <span style={{ fontSize: "var(--fs-sm)" }}>Memuat…</span>
     </div>
   );

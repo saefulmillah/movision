@@ -1,5 +1,6 @@
 import { Fragment, useMemo, useState } from "react";
 import { EmptyState } from "@/components/ui";
+import { SlideFrame } from "@/components/presentation/SlideFrame";
 import type { BreakdownItem, EntityData, PeriodData } from "@/types/labaRugi";
 import {
   buildColumns,
@@ -18,6 +19,8 @@ interface LrTableSlideProps {
   view: LrView;
   data: PeriodData | null;
   periodLabel: string;
+  /** Label scope aktif (regional/cabang); null/undefined untuk divisi. */
+  scopeLabel?: string | null;
 }
 
 type Period = "konsol" | "month" | "sd";
@@ -44,7 +47,7 @@ interface Group {
   span: number; // 2 (collapsed) atau 4 (expanded)
 }
 
-export function LrTableSlide({ view, data, periodLabel }: LrTableSlideProps) {
+export function LrTableSlide({ view, data, periodLabel, scopeLabel }: LrTableSlideProps) {
   const isGrouped = view !== "konsol";
   const [expanded, setExpanded] = useState<Record<string, boolean>>({}); // breakdown vertikal per akun
   const [monthOpen, setMonthOpen] = useState<Record<string, boolean>>({}); // periode-ini per entitas
@@ -119,17 +122,26 @@ export function LrTableSlide({ view, data, periodLabel }: LrTableSlideProps) {
   const headerRows = isGrouped ? 3 : 2;
   const grpCls = (c: Col) => (c.groupFirst ? styles.grp : styles.grpSub);
 
-  return (
-    <div className={styles.slide}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>{LR_VIEW_TITLE[view]}</h1>
-        <span className={styles.sub}>
-          Periode <b>{periodLabel}</b>
-        </span>
-        <span className={styles.spacer} />
-        <span className={styles.note}>RKAP vs Realisasi <b>(dalam juta)</b></span>
-      </div>
+  const footText = `${LR_FOOTNOTES[view]}${
+    isGrouped && groups.some((g) => g.canOpen) ? " · Klik header ruas/regional untuk menampilkan periode berjalan." : ""
+  }`.trim();
 
+  return (
+    <SlideFrame
+      title={LR_VIEW_TITLE[view]}
+      subtitle={
+        <>
+          Periode <b>{periodLabel}</b>
+        </>
+      }
+      rightMeta={
+        <>
+          RKAP vs Realisasi <b>(dalam juta)</b>
+        </>
+      }
+      scopeLabel={scopeLabel}
+      footnote={footText || undefined}
+    >
       {!data || cols.length === 0 ? (
         <div className={styles.emptyBox}>
           <EmptyState
@@ -139,7 +151,7 @@ export function LrTableSlide({ view, data, periodLabel }: LrTableSlideProps) {
           />
         </div>
       ) : (
-        <div className={styles.tableCard}>
+        <div className={styles.tableWrap}>
           <table className={`${styles.table} ${isGrouped ? styles.grouped : ""}`}>
             <thead>
               <tr>
@@ -288,11 +300,6 @@ export function LrTableSlide({ view, data, periodLabel }: LrTableSlideProps) {
           </table>
         </div>
       )}
-
-      <div className={styles.foot}>
-        {LR_FOOTNOTES[view]}
-        {isGrouped && groups.some((g) => g.canOpen) ? " · Klik header ruas/regional untuk menampilkan periode berjalan." : ""}
-      </div>
-    </div>
+    </SlideFrame>
   );
 }

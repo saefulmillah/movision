@@ -10,8 +10,14 @@ import { NewsPage } from "@/pages/news/NewsPage";
 import { IncidentPage } from "@/pages/incident/IncidentPage";
 import { FeedbackPage } from "@/pages/feedback/FeedbackPage";
 import { LabaRugiPage } from "@/pages/laba-rugi/LabaRugiPage";
+import { LabaRugiRegionalPage } from "@/pages/rapat-direktorat/laba-rugi-regional/LabaRugiRegionalPage";
 import { ManajemenRisikoPage } from "@/pages/rapat-direktorat/manajemen-risiko/ManajemenRisikoPage";
 import { PendapatanPage } from "@/pages/rapat-direktorat/pendapatan/PendapatanPage";
+import { SentimenPage } from "@/pages/rapat-direktorat/sentimen/SentimenPage";
+import { OdolPage } from "@/pages/operasional/OdolPage";
+import { KecelakaanPage } from "@/pages/operasional/KecelakaanPage";
+import { KendaraanBantuanPage } from "@/pages/operasional/KendaraanBantuanPage";
+import { PeralatanPage } from "@/pages/operasional/PeralatanPage";
 import { PresentasiPage } from "@/pages/presentasi/PresentasiPage";
 import { PresentationOverlay } from "@/components/presentation/PresentationOverlay";
 import { UsersPage } from "@/pages/users/UsersPage";
@@ -59,6 +65,14 @@ export default function App() {
         {/* Alias lama → path baru di bawah grup Rapat Direktorat. */}
         <Route path="/laba-rugi" element={<Navigate to="/rapat-direktorat/laba-rugi" replace />} />
         <Route
+          path="/rapat-direktorat/laba-rugi-regional"
+          element={
+            <RequireModule module="laba_rugi_regional">
+              <LabaRugiRegionalPage />
+            </RequireModule>
+          }
+        />
+        <Route
           path="/rapat-direktorat/manajemen-risiko"
           element={
             <RequireModule module="manajemen_risiko">
@@ -73,6 +87,30 @@ export default function App() {
               <PendapatanPage />
             </RequireModule>
           }
+        />
+        <Route
+          path="/rapat-direktorat/sentimen"
+          element={
+            <RequireModule module="sentimen">
+              <SentimenPage />
+            </RequireModule>
+          }
+        />
+        <Route
+          path="/operasional/odol"
+          element={<RequireModule module="insights"><OdolPage /></RequireModule>}
+        />
+        <Route
+          path="/operasional/kecelakaan"
+          element={<RequireModule module="insights"><KecelakaanPage /></RequireModule>}
+        />
+        <Route
+          path="/operasional/kendaraan-bantuan"
+          element={<RequireModule module="insights"><KendaraanBantuanPage /></RequireModule>}
+        />
+        <Route
+          path="/operasional/peralatan"
+          element={<RequireModule module="insights"><PeralatanPage /></RequireModule>}
         />
         <Route path="/presentasi" element={<PresentasiPage />} />
         <Route

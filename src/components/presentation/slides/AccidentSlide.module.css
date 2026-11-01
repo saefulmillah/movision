@@ -1,0 +1,74 @@
+/* Slide Kecelakaan (Rapat Direktorat) — KPI strip + hero (lokasi | total) + analisis (4 kartu). */
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+
+.slide {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  background: #eef1f5;
+  color: #16202e;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+}
+.body { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 10px; padding: 12px 18px; }
+/* SVG tersembunyi penampung pola arsir (dirujuk url(#id) oleh batang tahun berjalan). */
+.defs { position: absolute; width: 0; height: 0; pointer-events: none; }
+
+.legend { display: inline-flex; gap: 12px; font-size: 11.5px; color: #5b6b80; font-weight: 600; }
+.legend span { display: inline-flex; align-items: center; gap: 5px; }
+.sw { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+.swHatch { background: #e0a233; background-image: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.6) 0 2px, transparent 2px 5px); }
+
+/* ---- KPI strip ---- */
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; flex: none; }
+.kpi {
+  position: relative; overflow: hidden;
+  background: #fff; border: 1px solid #e2e7ee; border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(16, 32, 46, 0.06), 0 6px 18px rgba(16, 32, 46, 0.05);
+  padding: 9px 13px 8px; display: flex; flex-direction: column; gap: 3px;
+}
+.kpi::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #123a5e; opacity: 0.85; }
+.kpi.kBad::before { background: #d4484b; }
+.kpi.kGood::before { background: #128a5a; }
+.kpiLab { font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #5b6b80; }
+.kpiVal { display: flex; align-items: baseline; gap: 6px; }
+.kpiBig { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; }
+.kpiUnit { font-size: 10.5px; color: #8a99ac; font-weight: 600; }
+.delta { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 999px; width: fit-content; }
+.upBad { background: #fbe7e7; color: #d4484b; }
+.downGood { background: #e3f3ec; color: #128a5a; }
+.kpiCtx { font-size: 10.5px; color: #8a99ac; line-height: 1.25; }
+
+/* ---- bands ---- */
+.heroBand { display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; flex: 1 1 46%; min-height: 0; }
+.gridBand { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; flex: 1 1 52%; min-height: 0; }
+
+/* ---- card ---- */
+.card {
+  background: #fff; border: 1px solid #e2e7ee; border-radius: 13px;
+  box-shadow: 0 1px 2px rgba(16, 32, 46, 0.06), 0 6px 18px rgba(16, 32, 46, 0.05);
+  padding: 11px 14px; display: flex; flex-direction: column; min-width: 0; min-height: 0;
+}
+.ch { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex: none; }
+.cTitle { margin: 0; font-size: 12.5px; font-weight: 700; letter-spacing: 0.01em; color: #16202e; }
+.yr { font-size: 10px; font-weight: 700; color: #8a99ac; background: #f7f9fb; border: 1px solid #e2e7ee; padding: 2px 7px; border-radius: 999px; white-space: nowrap; }
+
+.plot { position: relative; flex: 1 1 auto; min-height: 0; width: 100%; margin-top: 6px; }
+.miniEmpty { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #8a99ac; }
+
+/* Insight menempel di dalam grafik (overlay sudut atas-kiri). Tembus-pandang +
+   blur agar data di bawahnya tetap terlihat; pointer-events none agar tooltip jalan. */
+.anno {
+  position: absolute; top: 2px; left: 2px; right: 10px; z-index: 2; pointer-events: none;
+  background: rgba(255, 255, 255, 0.82); backdrop-filter: blur(2px);
+  border-left: 3px solid #8a99ac; border-radius: 7px; padding: 4px 9px;
+  font-size: 10.5px; line-height: 1.35; color: #5b6b80; font-weight: 500;
+  box-shadow: 0 1px 4px rgba(16, 32, 46, 0.08);
+}
+.anno b { color: #16202e; font-weight: 700; }
+
+/* ---- empty ---- */
+.emptyBox { flex: 1 1 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 40px; }
+.emptyTitle { font-size: 18px; font-weight: 800; color: #16202e; }
+.emptySub { font-size: 13px; color: #5b6b80; text-align: center; max-width: 520px; }

@@ -10,6 +10,8 @@ interface PendapatanKpiCardsProps {
   /** Satuan tampilan nilai. "miliar" (default, halaman) = juta ÷ 1000, 2 desimal.
    *  "juta" (slide presentasi) = nilai juta penuh tanpa desimal. */
   unit?: "miliar" | "juta";
+  /** Mode presentasi: ukuran diskalakan ke layar (lebih besar & profesional). */
+  presentation?: boolean;
 }
 
 /** Nilai mentah dalam Rp juta → string Rp sesuai satuan. */
@@ -63,7 +65,14 @@ function KpiCard({ model, unit }: { model: CardModel; unit: "miliar" | "juta" })
  * masing-masing 3 kartu (Tol / Usaha Lainnya / Total). Dipakai halaman & slide.
  * Satuan nilai mengikuti prop `unit`: "miliar" (default) atau "juta" (slide).
  */
-export function PendapatanKpiCards({ kpiMonth, kpiSd, monthLabel, sdLabel, unit = "miliar" }: PendapatanKpiCardsProps) {
+export function PendapatanKpiCards({
+  kpiMonth,
+  kpiSd,
+  monthLabel,
+  sdLabel,
+  unit = "miliar",
+  presentation = false
+}: PendapatanKpiCardsProps) {
   const groups = [
     {
       title: monthLabel,
@@ -84,7 +93,7 @@ export function PendapatanKpiCards({ kpiMonth, kpiSd, monthLabel, sdLabel, unit 
   ];
 
   return (
-    <div className={styles.kpiGroups}>
+    <div className={`${styles.kpiGroups} ${presentation ? styles.pres : ""}`}>
       {groups.map((g) => (
         <div key={g.title} className={styles.kpiGroup}>
           <div className={styles.kpiGroupHead}>

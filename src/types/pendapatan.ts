@@ -44,6 +44,10 @@ export interface PeriodMeta {
   period_label_sd: string;
   unit_source: string;
   unit_kpi_display: string;
+  /** true bila data difilter per scope (regional/cabang). */
+  scoped?: boolean;
+  /** "lr_dataset" bila KPI & Tol per-ruas bersumber dari dataset kinerja per-scope. */
+  tol_source?: string;
   [key: string]: unknown;
 }
 

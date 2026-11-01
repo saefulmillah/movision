@@ -12,13 +12,14 @@
   background-color: #081628;
 }
 
-/* Lapisan foto latar (toll road) */
+/* Lapisan foto latar — default toll road, dapat ditimpa per scope lewat
+   custom property --cover-bg (gambar sampul yang diunggah user). */
 .cover::before {
   content: "";
   position: absolute;
   inset: 0;
   z-index: -2;
-  background-image: url("../../../assets/presentation/toll-road.jpg");
+  background-image: var(--cover-bg, url("../../../assets/presentation/toll-road.jpg"));
   background-size: cover;
   background-position: center 44%;
   transform: scale(1.03);

@@ -20,3 +20,6 @@ dist-ssr
 logs
 *.log
 npm-debug.log*
+
+# Build cache TypeScript (bukan artefak sumber)
+*.tsbuildinfo

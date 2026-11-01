@@ -1,46 +1,27 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
-import { EmptyState } from "@/components/ui";
 import { usePresentation } from "@/context/PresentationContext";
 import { SLIDES } from "./slideRegistry";
-import { CoverSlide } from "./slides/CoverSlide";
-import type { Fact } from "./slides/CoverSlide";
-import { LrTableSlide } from "./slides/LrTableSlide";
-import { RiskMapSlide } from "./slides/RiskMapSlide";
-import { PendapatanOverviewSlide } from "./slides/PendapatanOverviewSlide";
-import { PdfPageSlide } from "./slides/PdfPageSlide";
-import { parsePdfSlide, pdfSlideLabel } from "./pdfSlides";
-import type { LrView } from "@/lib/labaRugiView";
+import { pdfSlideLabel } from "./pdfSlides";
+import { SlideView, isCoverSlide } from "./SlideView";
+import { resolveCoverUrl } from "@/lib/presentationCover";
 import brandLogos from "@/assets/presentation/brand-logos.png";
 import movisionMark from "@/assets/presentation/movision-mark.webp";
+import "@/styles/presentation-anim.css";
 import styles from "./PresentationOverlay.module.css";
-
-const MONTHS_ID = [
-  "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-  "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-];
-
-/** ISO "2026-09-29" → "29 September 2026"; kosong/invalid → "". */
-function formatDateId(iso: string): string {
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || "");
-  if (!m) return "";
-  const y = Number(m[1]);
-  const mo = Number(m[2]);
-  const d = Number(m[3]);
-  if (mo < 1 || mo > 12) return "";
-  return `${d} ${MONTHS_ID[mo - 1]} ${y}`;
-}
 
 export function PresentationOverlay() {
   const p = usePresentation();
   const rootRef = useRef<HTMLDivElement>(null);
   const periodRef = useRef<HTMLDivElement>(null);
   const [periodOpen, setPeriodOpen] = useState(false);
+  // Gambar sampul pembuka per scope aktif (null → foto bawaan).
+  const [coverBg, setCoverBg] = useState<string | null>(null);
 
   const total = p.activeSlides.length;
   const cur = Math.min(p.cur, Math.max(0, total - 1));
   const key = p.activeSlides[cur] || "title";
-  const isCover = SLIDES[key]?.badge === "Sampul";
+  const isCover = isCoverSlide(key);
 
   // Aksi stabil (useCallback di context) — dipakai di efek tanpa memicu re-run tiap render.
   const { mode, auto, autoSec, next, prev, exit: ctxExit } = p;
@@ -80,6 +61,18 @@ export function PresentationOverlay() {
     return () => document.removeEventListener("mousedown", onDown);
   }, [periodOpen]);
 
+  // Muat gambar sampul scope aktif saat masuk mode present / ganti scope.
+  useEffect(() => {
+    if (p.mode !== "present") return;
+    let alive = true;
+    resolveCoverUrl(p.scope?.key ?? "divisi")
+      .then((url) => alive && setCoverBg(url))
+      .catch(() => alive && setCoverBg(null));
+    return () => {
+      alive = false;
+    };
+  }, [p.mode, p.scope?.key]);
+
   const toggleFullscreen = useCallback(() => {
     const el = rootRef.current;
     if (!el) return;
@@ -95,107 +88,14 @@ export function PresentationOverlay() {
     ctxExit();
   }, [ctxExit]);
 
-  const meetingDateLabel = formatDateId(p.meetingDate);
-  const facts = useMemo<Record<string, Fact[]>>(() => {
-    const pendRuas = p.snapshot.data?.pend?.lhr.length ?? 0;
-    const pendMonth = p.snapshot.data?.pend?.meta.period_label_month;
-    const titleFacts: Fact[] = [{ k: "Periode", v: p.periodLabel }];
-    if (meetingDateLabel) titleFacts.push({ k: "Tanggal Rapat", v: meetingDateLabel });
-    return {
-      title: titleFacts,
-      "lr-cover": [{ k: "Periode", v: p.periodLabel }],
-      "risk-cover": [],
-      "pend-cover": [
-        { k: "Periode", v: pendMonth ? `${pendMonth} & ${p.periodLabel}` : p.periodLabel },
-        { k: "Ruas", v: pendRuas ? `${pendRuas} ruas` : "—" },
-        { k: "Unit", v: "Rp miliar" }
-      ]
-    };
-  }, [p.periodLabel, p.snapshot.data, meetingDateLabel]);
-
   if (p.mode !== "present") return null;
 
-  // Nomor "Bagian" dinamis — mengikuti urutan sampul bagian yang aktif.
-  const SECTION_COVERS = ["lr-cover", "risk-cover", "pend-cover"];
-  const sectionNo = (coverKey: string) => {
-    const active = p.activeSlides.filter((id) => SECTION_COVERS.includes(id));
-    const idx = active.indexOf(coverKey);
-    return idx >= 0 ? idx + 1 : 1;
-  };
+  // Slide dirender oleh SlideView (dipakai bersama preview thumbnail builder).
+  const renderSlide = () => <SlideView slideId={key} coverBg={coverBg} />;
 
-  const renderSlide = () => {
-    if (key === "title") {
-      return (
-        <CoverSlide
-          kicker="Movision"
-          title={p.meetingTitle || "Rapat Direktorat"}
-          sub={p.meetingSubtitle}
-          facts={facts.title}
-        />
-      );
-    }
-    if (key === "closing") {
-      return (
-        <CoverSlide
-          kicker="Penutup"
-          title="Terima Kasih"
-          sub={`${p.meetingTitle || "Rapat Direktorat"}${meetingDateLabel ? ` · ${meetingDateLabel}` : ""}`}
-          facts={[]}
-        />
-      );
-    }
-    if (key === "lr-cover") {
-      return (
-        <CoverSlide
-          kicker={`Bagian ${sectionNo("lr-cover")}`}
-          title="Laba Rugi"
-          sub="Realisasi terhadap RKAP — konsolidasi, per regional, dan per ruas."
-          facts={facts["lr-cover"]}
-        />
-      );
-    }
-    if (key === "risk-cover") {
-      return (
-        <CoverSlide
-          kicker={`Bagian ${sectionNo("risk-cover")}`}
-          title="Manajemen Risiko"
-          sub="Top Risk Divisi pada peta risiko 5×5 beserta nilai eksposur tiap tahapan."
-          facts={facts["risk-cover"]}
-        />
-      );
-    }
-    if (key === "lr-konsol" || key === "lr-regional" || key === "lr-ruas") {
-      if (p.snapshot.loading) return <StageLoader />;
-      const view = key.split("-")[1] as LrView;
-      return <LrTableSlide view={view} data={p.snapshot.data?.lr ?? null} periodLabel={p.periodLabel} />;
-    }
-    if (key === "risk-map") {
-      if (p.snapshot.loading) return <StageLoader />;
-      return <RiskMapSlide matrix={p.matrix} risk={p.snapshot.data?.risk ?? null} periodLabel={p.periodLabel} />;
-    }
-    if (key === "pend-cover") {
-      return (
-        <CoverSlide
-          kicker={`Bagian ${sectionNo("pend-cover")}`}
-          title="Pendapatan"
-          sub="Pencapaian pendapatan tol dan lainnya terhadap RKAP."
-          facts={facts["pend-cover"]}
-        />
-      );
-    }
-    if (key === "pend-overview") {
-      if (p.snapshot.loading) return <StageLoader />;
-      return <PendapatanOverviewSlide data={p.snapshot.data?.pend ?? null} periodLabel={p.periodLabel} />;
-    }
-    const pdfMeta = parsePdfSlide(key);
-    if (pdfMeta) {
-      return <PdfPageSlide pdfId={pdfMeta.pdfId} page={pdfMeta.page} />;
-    }
-    return null;
-  };
-
-  // Label slide untuk dots (judul statis atau label PDF).
-  const dotLabel = (id: string): string => SLIDES[id]?.title || pdfSlideLabel(id, p.pdfs)?.title || id;
+  // Label slide untuk dots (override judul builder → judul statis → label PDF).
+  const dotLabel = (id: string): string =>
+    p.titles[id] || SLIDES[id]?.title || pdfSlideLabel(id, p.pdfs)?.title || id;
 
   return (
     <div className={styles.overlay} ref={rootRef}>
@@ -250,9 +150,13 @@ export function PresentationOverlay() {
         <div className={styles.progressBar} style={{ width: `${total ? ((cur + 1) / total) * 100 : 0}%` }} />
       </div>
 
-      <div className={`${styles.stageWrap} ${isCover ? styles.stageWrapCover : ""}`}>
-        <div className={`${styles.stage} ${isCover ? styles.stageCover : ""}`}>{renderSlide()}</div>
-      </div>
+      {isCover ? (
+        <div className={`${styles.stageWrap} ${styles.stageWrapCover}`}>
+          <div key={key} className={`${styles.stage} ${styles.stageCover}`}>{renderSlide()}</div>
+        </div>
+      ) : (
+        <div key={key} className={`${styles.stageWrap} ${styles.stageData}`}>{renderSlide()}</div>
+      )}
 
       <footer className={styles.footer}>
         <button className={styles.navBtn} onClick={p.prev} title="Sebelumnya (◄)" aria-label="Sebelumnya">
@@ -285,14 +189,6 @@ export function PresentationOverlay() {
           <img src={brandLogos} alt="Danantara Indonesia · Hutama Karya" />
         </div>
       </footer>
-    </div>
-  );
-}
-
-function StageLoader() {
-  return (
-    <div style={{ display: "grid", placeItems: "center", minHeight: "50vh" }}>
-      <EmptyState icon="loader" title="Memuat snapshot…" />
     </div>
   );
 }

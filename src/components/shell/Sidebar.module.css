@@ -247,6 +247,172 @@
   display: none;
 }
 
+/* ---- Grup (menu dengan submenu / dropdown) ---- */
+.group {
+  position: relative;
+}
+
+.groupHeader {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: auto;
+  margin: 2px 10px;
+  padding: 11px 14px 11px 20px;
+  border-radius: var(--r-lg);
+  color: var(--text-muted);
+  font-size: var(--fs-md);
+  font-weight: 500;
+  white-space: nowrap;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--t-fast), color var(--t-fast);
+}
+.groupHeader:hover {
+  background: rgba(47, 107, 255, 0.1);
+}
+.groupHeader .navLabel {
+  flex: 1 1 auto;
+}
+.groupActive {
+  color: var(--text);
+}
+
+.chevron {
+  flex: none;
+  margin-left: 4px;
+  transition: transform var(--t-fast);
+}
+.group[data-open="true"] .chevron {
+  transform: rotate(90deg);
+}
+.groupBadge {
+  margin-left: 0;
+}
+
+.submenu {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 2px 0 4px;
+  animation: rise var(--t-fast);
+}
+
+.subItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 1px 10px;
+  padding: 9px 14px 9px 34px;
+  border-radius: var(--r-lg);
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background var(--t-fast), color var(--t-fast);
+}
+.subItem:hover {
+  background: rgba(47, 107, 255, 0.1);
+}
+.subItem.active {
+  background: var(--nav-active-bg);
+  color: var(--nav-active-text);
+}
+.subItem.active::before {
+  content: "";
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 15px;
+  border-radius: 2px;
+  background: var(--st-blue);
+}
+
+/* ---- Perilaku terlipat (collapsed): grup jadi ikon + flyout saat hover ---- */
+/* Ikon menu dibuat tile seragam & terpusat agar rapi saat sidebar dilipat. */
+.collapsed .navItem,
+.collapsed .groupHeader {
+  justify-content: center;
+  gap: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  margin: 3px auto;
+}
+.collapsed .chevron,
+.collapsed .groupHeader .navLabel {
+  display: none;
+}
+.collapsed .submenu {
+  display: none;
+}
+.collapsed .groupBadge {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  min-width: 8px;
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  font-size: 0;
+}
+
+/* Flyout hanya muncul saat sidebar terlipat & grup di-hover. Sidebar/nav
+   dibuat overflow:visible saat collapsed agar flyout tidak terpotong, dan
+   sidebar diangkat (z-index) agar flyout menimpa konten di sebelahnya. */
+.collapsed {
+  overflow: visible;
+  position: relative;
+  z-index: 30;
+}
+.collapsed .nav {
+  overflow: visible;
+}
+
+.flyout {
+  display: none;
+  position: absolute;
+  left: 100%;
+  top: 0;
+  z-index: 200;
+  min-width: 192px;
+  padding: 6px;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+.collapsed .group:hover .flyout {
+  display: flex;
+  animation: slideInRight var(--t-fast);
+}
+.flyoutTitle {
+  padding: 6px 10px 8px;
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.flyout .subItem {
+  margin: 0;
+  padding: 8px 12px;
+}
+/* Label item di dalam flyout harus tetap terlihat meski sidebar terlipat
+   (aturan .collapsed .navLabel{display:none} ikut mengenai item flyout). */
+.flyout .navLabel {
+  display: block;
+}
+.flyout .subItem.active::before {
+  display: none;
+}
+
 /* Keyframes lokal (CSS Modules meng-hash referensi animasi; definisi lokal agar cocok). */
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
 @keyframes pulse { 0% { transform: scale(1); opacity: 0.9; } 70% { transform: scale(1.9); opacity: 0; } 100% { opacity: 0; } }

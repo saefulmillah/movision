@@ -1,0 +1,355 @@
+/* Slide Kinerja Keuangan Regional: KPI row (5) + area utama (P&L per tipe kiri,
+   tabel LHR/PHR kanan). Mengisi tinggi panggung tanpa scroll. Token Movision. */
+
+.stateBox {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+}
+
+/* ---------- KPI row ---------- */
+.kpiRow {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: clamp(6px, 0.7vw, 12px);
+  margin-bottom: clamp(8px, 1.1vh, 14px);
+}
+.kpiCard {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: clamp(8px, 1vh, 14px) clamp(9px, 0.9vw, 15px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(4px, 0.6vh, 8px);
+  min-width: 0;
+}
+.kpiLabel {
+  font-weight: 700;
+  font-size: clamp(11px, 1.3vh, 15px);
+  color: var(--st-blue);
+  letter-spacing: 0.01em;
+}
+.kpiValue {
+  font-weight: 800;
+  font-size: clamp(18px, 2.7vh, 32px);
+  line-height: 1;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.kpiValue.neg,
+.neg {
+  color: var(--sem-red);
+}
+.kpiSubs {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.kpiSub {
+  display: flex;
+  justify-content: space-between;
+  font-size: clamp(9px, 1.1vh, 12px);
+}
+.kpiSub > span:first-child {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.kpiSub > span:last-child {
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.kpiVs {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border-top: 1px solid var(--line);
+  padding-top: 5px;
+  margin-top: auto;
+}
+.kpiVsRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.kpiVsPct {
+  font-weight: 800;
+  font-size: clamp(12px, 1.5vh, 17px);
+  font-variant-numeric: tabular-nums;
+}
+.kpiVsLabel {
+  font-weight: 600;
+  font-size: clamp(8px, 0.9vh, 10px);
+  color: var(--text-muted);
+  letter-spacing: 0.03em;
+}
+
+/* ---------- Area utama ---------- */
+.main {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  /* P&L sengaja dilebarkan (korban lebar LHR/PHR) agar batang & label terbaca. */
+  grid-template-columns: 2.5fr 0.85fr;
+  gap: clamp(8px, 1vw, 14px);
+}
+
+.pnlCard {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: clamp(8px, 1.1vh, 16px) clamp(10px, 1vw, 18px);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.pnlHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  flex: none;
+}
+.pnlTitle {
+  font-weight: 800;
+  font-size: clamp(13px, 1.6vh, 17px);
+  color: var(--st-blue);
+  letter-spacing: 0.02em;
+}
+.pnlSub {
+  font-size: clamp(10px, 1.1vh, 12px);
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-top: 2px;
+}
+.tabs {
+  display: flex;
+  gap: 6px;
+  flex: none;
+}
+.tab {
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: clamp(10px, 1.1vh, 12px);
+  padding: 6px 13px;
+  border-radius: 7px;
+  background: var(--surface-2, color-mix(in srgb, var(--line) 40%, transparent));
+  color: var(--text-muted);
+}
+.tabOn {
+  background: #2d7d93;
+  color: #fff;
+}
+.tabStatic {
+  cursor: default;
+}
+
+.legend {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 1vw, 15px);
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.legItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: clamp(10px, 1.1vh, 12px);
+  color: var(--text-muted);
+}
+.sw {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  display: inline-block;
+}
+.entKey {
+  margin-left: auto;
+  font-size: clamp(8px, 0.9vh, 10px);
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+  text-align: right;
+}
+
+.pnlGrid {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 1fr;
+  gap: clamp(7px, 0.9vh, 12px);
+  margin-top: 10px;
+}
+.panel {
+  background: var(--surface-2, color-mix(in srgb, var(--line) 22%, transparent));
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 7px 9px 5px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.panelHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+  flex: none;
+}
+.panelLabel {
+  font-weight: 800;
+  font-size: clamp(10px, 1.2vh, 13px);
+  color: var(--text);
+  letter-spacing: 0.01em;
+}
+.panelAchs {
+  display: flex;
+  gap: 7px;
+  align-items: baseline;
+}
+.panelAch {
+  font-weight: 800;
+  font-size: clamp(9px, 1vh, 11px);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.panelAch em {
+  font-style: normal;
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.panelChart {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-top: 2px;
+}
+
+/* Tile ringkasan */
+.summary {
+  background: linear-gradient(140deg, #16315d, #23457f);
+  border-radius: 9px;
+  padding: clamp(9px, 1.1vh, 14px) clamp(10px, 1vw, 15px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  color: #fff;
+}
+.summaryTitle {
+  font-weight: 800;
+  font-size: clamp(10px, 1.2vh, 13px);
+  letter-spacing: 0.03em;
+  color: #9fc3d6;
+}
+.summaryRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding-bottom: 5px;
+}
+.summaryRow > span:first-child {
+  font-size: clamp(9px, 1.05vh, 12px);
+  font-weight: 600;
+  color: #c7d6ea;
+}
+.summaryRow > span:last-child {
+  font-weight: 800;
+  font-size: clamp(12px, 1.5vh, 16px);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Kolom kanan: LHR & PHR ---------- */
+.sideCol {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1vw, 14px);
+  min-height: 0;
+}
+.tblCard {
+  flex: 1 1 0;
+  min-height: 0;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: clamp(9px, 1.1vh, 15px) clamp(10px, 1vw, 18px);
+  display: flex;
+  flex-direction: column;
+}
+.tblTitle {
+  flex: none;
+  font-weight: 800;
+  font-size: clamp(12px, 1.4vh, 15px);
+  color: var(--st-blue);
+  letter-spacing: 0.02em;
+}
+.tblEmpty {
+  flex: 1 1 auto;
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+  font-size: clamp(11px, 1.2vh, 13px);
+  font-weight: 500;
+}
+.tblBody {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+.tblRow {
+  display: grid;
+  grid-template-columns: 1.3fr 0.8fr 0.8fr auto;
+  gap: 4px 10px;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--line);
+}
+.tblHeadRow {
+  margin-top: 9px;
+  padding-bottom: 6px;
+  font-size: clamp(8px, 1vh, 10px);
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+.tblRow:last-child {
+  border-bottom: none;
+}
+.ruasName {
+  font-weight: 700;
+  font-size: clamp(11px, 1.25vh, 14px);
+  color: var(--text);
+}
+.r {
+  text-align: right;
+  font-weight: 600;
+  font-size: clamp(11px, 1.25vh, 14px);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.rPill {
+  display: flex;
+  justify-content: flex-end;
+}
+.pill {
+  font-weight: 800;
+  font-size: clamp(10px, 1.15vh, 12px);
+  padding: 3px 8px;
+  border-radius: 6px;
+  min-width: 50px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}

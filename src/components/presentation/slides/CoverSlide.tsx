@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import styles from "./CoverSlide.module.css";
 
 export interface Fact {
@@ -10,11 +11,15 @@ interface CoverSlideProps {
   title: string;
   sub: string;
   facts: Fact[];
+  /** Gambar latar sampul kustom (per scope). Menimpa foto bawaan; teks tetap tampil
+   *  di atasnya berkat scrim. Kosong → pakai foto bawaan. */
+  bgUrl?: string | null;
 }
 
-export function CoverSlide({ kicker, title, sub, facts }: CoverSlideProps) {
+export function CoverSlide({ kicker, title, sub, facts, bgUrl }: CoverSlideProps) {
+  const style = bgUrl ? ({ "--cover-bg": `url("${bgUrl}")` } as CSSProperties) : undefined;
   return (
-    <div className={styles.cover}>
+    <div className={`${styles.cover} pfx-stagger`} style={style}>
       <span className={styles.kicker}>{kicker}</span>
       <h1 className={styles.title}>{title}</h1>
       <div className={styles.sub}>{sub}</div>

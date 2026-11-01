@@ -1,0 +1,264 @@
+/* Kotak preview 16:9 untuk thumbnail kartu agenda. Slide asli dirender pada
+   ukuran tetap (BASE_W×BASE_H) lalu diperkecil dengan transform: scale. */
+.box {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 9px;
+  overflow: hidden;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+/* Sampul full-bleed — tanpa border agar gradien/foto mepet tepi. */
+.boxCover {
+  border-color: transparent;
+}
+
+.stage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+  pointer-events: none;
+  background: var(--surface-1);
+  overflow: hidden;
+}
+
+/* Preview statis — matikan animasi masuk (fade-up) agar tidak "main" tiap
+   kartu muncul di viewport. Konten kembali ke state natural (opacity 1). */
+.stage :global(.pfx-stagger) > *,
+.stage :global(.pfx-fade-up) {
+  animation: none !important;
+}
+
+.skeleton {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, var(--surface-2) 30%, var(--surface-3) 50%, var(--surface-2) 70%);
+  background-size: 300% 100%;
+  animation: previewShimmer 1.3s ease-in-out infinite;
+}
+
+/* Thumbnail PDF ringan (gambar JPEG resolusi rendah, di-cache). */
+.pdfThumb {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--surface-2);
+}
+.pdfThumbImg {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.pdfThumbState {
+  color: var(--text-muted);
+}
+
+/* Petunjuk hover pada thumbnail skematik — ikon mata + "Klik untuk preview". */
+.hint {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #fff;
+  background: rgba(10, 20, 40, 0.55);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+.box:hover .hint {
+  opacity: 1;
+}
+.hintText {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hint {
+    transition: none;
+  }
+}
+
+/* ---------- Skematik ringan per jenis slide (saat kartu tidak dipilih) ---------- */
+/* Sampul */
+.schemCover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 18px;
+  background: linear-gradient(135deg, #1e4c87, #3a6cae);
+  background-size: cover;
+  background-position: center;
+}
+.schemCoverBar1 {
+  width: 26%;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.55);
+}
+.schemCoverBar2 {
+  width: 68%;
+  height: 11px;
+  border-radius: 2px;
+  background: #fff;
+}
+.schemCoverBar3 {
+  width: 44%;
+  height: 7px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.65);
+}
+
+/* Tabel */
+.schemTable {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 18px;
+}
+.schemRowHead {
+  height: 11px;
+  border-radius: 3px;
+  background: var(--st-blue);
+  opacity: 0.85;
+}
+.schemRow {
+  height: 7px;
+  border-radius: 3px;
+  background: var(--surface-3);
+}
+.schemRowS {
+  height: 7px;
+  width: 70%;
+  border-radius: 3px;
+  background: var(--surface-3);
+}
+
+/* Peta risiko 3×3 */
+.schemMatrix {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 5px;
+  padding: 16px 18px;
+}
+.schemMatrix > span {
+  border-radius: 4px;
+}
+.cellGreen {
+  background: rgba(52, 211, 153, 0.35);
+}
+.cellAmber {
+  background: rgba(251, 191, 36, 0.38);
+}
+.cellRed {
+  background: rgba(244, 63, 94, 0.35);
+}
+
+/* Grafik batang */
+.schemChart {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 18px 20px 16px;
+}
+.schemChart > span {
+  flex: 1;
+  border-radius: 3px 3px 0 0;
+  background: var(--st-blue);
+}
+.schemChart > span:nth-child(odd) {
+  background: var(--surface-3);
+}
+
+/* KPI 2×2 */
+.schemKpi {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 16px 18px;
+}
+.schemKpi > span {
+  border-radius: 6px;
+  background: var(--surface-3);
+}
+.schemKpi > span:nth-child(2n) {
+  background: color-mix(in srgb, var(--st-blue) 18%, var(--surface-3));
+}
+
+/* Halaman PDF */
+.schemPdf {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--surface-2);
+}
+.schemPdfPage {
+  position: relative;
+  width: 50%;
+  height: 78%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 12px 11px;
+  background: var(--surface-1);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(10, 20, 40, 0.25);
+}
+.schemLine,
+.schemLineW,
+.schemLineS {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--surface-3);
+}
+.schemLineW {
+  width: 70%;
+  background: color-mix(in srgb, var(--st-blue) 40%, var(--surface-3));
+}
+.schemLineS {
+  width: 85%;
+}
+.schemPdfTag {
+  margin-top: auto;
+  align-self: flex-start;
+  font-size: 8px;
+  font-weight: 800;
+  color: #fff;
+  background: #c4525f;
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+@keyframes previewShimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}

@@ -35,6 +35,12 @@
   --line:          rgba(150, 185, 230, .16);
   --line-strong:   rgba(150, 185, 230, .26);
 
+  /* Aksen presentasi (band judul: biru muda di tema gelap). Navy indikator
+     utama tetap fixed di kedua tema. */
+  --pres-accent:   #7EA6FF;
+  --pres-navy:     #1E4C87;
+  --pres-navy-ink: #FFFFFF;
+
   /* Peta */
   --map-bg:        #102F5C;
   --grid:          rgba(130, 170, 230, .09);
@@ -94,6 +100,11 @@
   --line-soft:     rgba(45, 65, 95, .045);
   --line:          #E4E9EF;
   --line-strong:   #D8DFE7;
+
+  /* Aksen presentasi: navy di tema terang. */
+  --pres-accent:   #1E4C87;
+  --pres-navy:     #1E4C87;
+  --pres-navy-ink: #FFFFFF;
 
   --map-bg:        #E6EBF2;
   --grid:          rgba(90, 120, 165, .05);

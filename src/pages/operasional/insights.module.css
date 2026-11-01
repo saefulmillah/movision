@@ -1,0 +1,153 @@
+/* Halaman Operasional (Insights) — mengikuti token tema aplikasi. */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 24px;
+  min-height: 0;
+}
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.titleBox { min-width: 0; }
+.title {
+  margin: 0;
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.sub {
+  margin-top: 3px;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.sub b { color: var(--text); }
+
+.filterBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.spacer { flex: 1 1 auto; }
+.asOf {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 11px;
+  white-space: nowrap;
+}
+.asOfStale { color: #2a2118; background: color-mix(in srgb, var(--sem-amber) 18%, var(--surface-1)); border-color: color-mix(in srgb, var(--sem-amber) 40%, var(--line)); }
+
+/* KPI */
+.kpiRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+}
+.kpi {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--st-blue);
+  border-radius: 12px;
+  padding: 13px 15px;
+}
+.kpi_accent { border-left-color: var(--sem-amber); }
+.kpi_good { border-left-color: var(--sem-green); }
+.kpi_warning { border-left-color: var(--sem-amber); }
+.kpi_critical { border-left-color: var(--sem-red); }
+.kpiLabel {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+.kpiValue {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  margin-top: 3px;
+  line-height: 1.15;
+}
+.kpiSub { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+
+/* Panel */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.panel {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px 16px;
+  min-width: 0;
+}
+.panelHead { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.panelTitle {
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--st-blue);
+}
+.chartBox { width: 100%; height: 280px; }
+.chartBoxTall { width: 100%; height: 340px; }
+
+.stateBox { display: grid; place-items: center; min-height: 240px; }
+
+/* Tabel */
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table thead th {
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  font-weight: 700;
+  padding: 8px 10px;
+  border-bottom: 2px solid var(--line);
+}
+.table tbody td { padding: 8px 10px; border-bottom: 1px solid var(--line); color: var(--text); vertical-align: middle; }
+.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rank { color: var(--text-muted); font-weight: 800; width: 36px; text-align: center; }
+
+/* bar inline di tabel */
+.barCell { min-width: 120px; }
+.bar { height: 8px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.bar span { display: block; height: 100%; }
+
+/* chip status */
+.statusChip {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 1px 9px;
+  border-radius: 999px;
+  color: #fff;
+}
+.s_good { background: var(--sem-green); }
+.s_warning { background: var(--sem-amber); color: #2a2118; }
+.s_critical { background: var(--sem-red); }
+.s_na { background: var(--text-muted); }
+
+/* legend & change */
+.legend { display: inline-flex; gap: 14px; font-size: 11.5px; color: var(--text-muted); font-weight: 600; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+.chgGood { color: var(--sem-green); font-weight: 700; font-size: 12px; }
+.chgBad { color: var(--sem-red); font-weight: 700; font-size: 12px; }
+.chgFlat { color: var(--text-muted); font-size: 12px; }
+
+@media (max-width: 900px) {
+  .grid2 { grid-template-columns: 1fr; }
+}

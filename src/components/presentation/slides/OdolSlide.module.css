@@ -1,0 +1,103 @@
+/* Slide ODOL (Rapat Direktorat) — layout: KPI | batang | donut (atas); 3 kolom (bawah). */
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&display=swap");
+
+.slide {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  background: #eef1f6;
+  color: #1f2d3f;
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+}
+.body { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 12px; padding: 14px 20px; }
+
+.legend { display: inline-flex; gap: 14px; font-size: 12px; color: #475569; font-weight: 600; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+
+/* ---- bands ---- */
+.topBand { display: grid; grid-template-columns: 0.82fr 2.2fr 1.25fr; gap: 12px; flex: 1 1 52%; min-height: 220px; }
+.botBand { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; flex: 1 1 46%; min-height: 200px; }
+
+/* ---- card dasar ---- */
+.card {
+  background: #fff; border: 1px solid #e6eaf0; border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(30, 45, 70, 0.04), 0 4px 14px rgba(30, 45, 70, 0.05);
+  padding: 12px 14px; display: flex; flex-direction: column; min-height: 0;
+}
+.cardHead { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; flex: none; }
+.cardTitle { font-size: 12.5px; font-weight: 800; letter-spacing: 0.03em; color: #1e3a6b; }
+.cardHead .cardTitle { margin: 0; }
+
+/* ---- KPI (ikon + judul di atas, angka, narasi) — tanpa garis aksen ---- */
+.kpiCol { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+.kpiCard {
+  flex: 1 1 0; min-height: 0;
+  background: #fff; border: 1px solid #e6eaf0; border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(30, 45, 70, 0.04), 0 4px 14px rgba(30, 45, 70, 0.05);
+  padding: 9px 13px; display: flex; flex-direction: column; justify-content: center; gap: 2px;
+}
+.kpiHead { display: flex; align-items: center; gap: 7px; }
+.kpiDot { flex: none; width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+.kpiTitle { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; }
+.kpiValue { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; color: #1f2d3f; line-height: 1.05; }
+.kpiDesc { font-size: 11px; line-height: 1.3; color: #76859a; margin-top: 3px; }
+
+/* ---- grafik batang ---- */
+.barCard { min-height: 0; }
+.barBox { flex: 1 1 auto; min-height: 0; width: 100%; }
+
+/* ---- donut ---- */
+.donutRow { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; gap: 8px; }
+.donutWrap { position: relative; flex: 0 0 48%; height: 100%; min-width: 0; }
+/* varian donut: chart di tengah, legenda di bawah (Normal vs ODOL) */
+.donutColumn { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; align-items: center; }
+.donutColumn .donutWrap { flex: 1 1 auto; width: 100%; }
+.legendBelow { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 20px; font-size: 12.5px; color: #334155; font-weight: 600; flex: none; margin-top: 6px; }
+.legendBelow span { display: inline-flex; align-items: center; gap: 6px; }
+.legendBelow b { color: #1f2d3f; font-weight: 800; }
+.donutCenter { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
+.donutBig { font-size: 21px; font-weight: 800; color: #1f2d3f; letter-spacing: -0.02em; }
+.donutSmall { font-size: 9.5px; font-weight: 700; letter-spacing: 1.2px; color: #64748b; }
+.legendList { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 4px; overflow-x: hidden; overflow-y: auto; }
+.legRow { display: grid; grid-template-columns: 11px minmax(0, 1fr) auto; align-items: center; gap: 7px; font-size: 12px; padding: 2px 0; }
+.legRowBtn { border: none; background: transparent; font: inherit; text-align: left; cursor: pointer; border-radius: 6px; padding: 3px 5px; margin: 0 -5px; width: calc(100% + 10px); }
+.legRowBtn:hover { background: #eef4fb; }
+.legDot { width: 11px; height: 11px; border-radius: 50%; flex: none; }
+.legName { min-width: 0; color: #334155; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.legPct { color: #1f2d3f; font-weight: 800; font-variant-numeric: tabular-nums; }
+.drillHint { font-size: 10.5px; color: #2e6fb5; font-weight: 700; }
+.backBtn { display: inline-flex; align-items: center; gap: 4px; border: 1px solid #e4e9ef; background: #f1f4f9; color: #1e3a6b; font: inherit; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 99px; cursor: pointer; }
+.backBtn:hover { border-color: #3c63b4; background: #fff; }
+.backIc { width: 12px; height: 12px; display: inline-flex; }
+
+/* ---- strip catatan ---- */
+.note { display: flex; align-items: flex-start; gap: 8px; border-radius: 9px; padding: 6px 10px; margin-top: 8px; flex: none; }
+.noteIcon { flex: none; width: 15px; height: 15px; margin-top: 1px; }
+.noteIcon svg { display: block; }
+.noteText { font-size: 12px; line-height: 1.3; font-weight: 500; }
+.note_info { background: #eaf2fb; color: #1b3a63; }
+.note_info .noteIcon { color: #2e6fb5; }
+.note_warn { background: #fbf2de; color: #5c4410; }
+.note_warn .noteIcon { color: #bb8a1a; }
+.note_critical { background: #fbe7ea; color: #6d2330; }
+.note_critical .noteIcon { color: #d1495b; }
+
+/* ---- Top (tab) ---- */
+.topCard { overflow: hidden; }
+.tabs { display: inline-flex; background: #f1f4f9; border: 1px solid #e4e9ef; border-radius: 8px; padding: 2px; }
+.tabs button { border: none; background: transparent; color: #64748b; font: inherit; font-size: 11px; font-weight: 700; padding: 3px 11px; border-radius: 6px; cursor: pointer; }
+.tabOn { background: #1e3a6b !important; color: #fff !important; }
+.tableWrap { flex: 1 1 auto; min-height: 0; overflow: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.table thead th { position: sticky; top: 0; background: #fff; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.03em; color: #64748b; font-weight: 700; padding: 5px 8px; border-bottom: 2px solid #eef1f5; }
+.table tbody td { padding: 5px 8px; border-bottom: 1px solid #eef2f7; color: #1f2d3f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+.rank { color: #94a3b8; font-weight: 800; width: 24px; text-align: center; }
+
+/* ---- empty ---- */
+.emptyBox { flex: 1 1 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 40px; }
+.emptyTitle { font-size: 18px; font-weight: 800; color: #1f2d3f; }
+.emptySub { font-size: 13px; color: #64748b; text-align: center; max-width: 520px; }
