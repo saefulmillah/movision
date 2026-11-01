@@ -29,12 +29,19 @@ export interface KinerjaRegionalData {
   /** Label kolom bulan berjalan & s.d bulan (dari dataset). */
   month_label: string | null;
   sd_label: string | null;
+  /** Label kolom RKK = bulan BERIKUTNYA (rencana) & s.d-nya (dari dataset periode ini). */
+  rkk_label?: string | null;
+  rkk_sd_label?: string | null;
   /** RKAP setahun penuh entitas regional: {account_id: [rkap, null]}. */
   fy_rkap: EntityData;
   /** Per ruas, kolom s.d bulan: {account_id: [rkap, real]}. */
   entities: Record<string, EntityData>;
   /** Per ruas, kolom bulan berjalan. */
   entities_month: Record<string, EntityData>;
+  /** Per ruas, kolom RKK bulan berikutnya: {account_id: [rkap, rkk]}. */
+  entities_rkk?: Record<string, EntityData>;
+  /** Per ruas, kolom RKK s.d bulan berikutnya. */
+  entities_rkk_sd?: Record<string, EntityData>;
   /** Konsol entitas regional per label kolom (SD / bulan / proyeksi). */
   konsol: Record<string, EntityData>;
   /** Urutan + grup ruas yang hadir. */

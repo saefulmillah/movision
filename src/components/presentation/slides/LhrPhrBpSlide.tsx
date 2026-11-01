@@ -42,7 +42,6 @@ type Tier = { color: string; bg: string; border: string; arrow: string };
 function tier(ach: number | null): Tier {
   if (ach == null) return { color: "var(--text-muted)", bg: "var(--surface-2)", border: "var(--line)", arrow: "" };
   if (ach >= 100) return { color: "#15934e", bg: "#eaf6ef", border: "#c9e9d5", arrow: "▲" };
-  if (ach >= 50) return { color: "#c47f1d", bg: "#fdf3e3", border: "#f3e0bd", arrow: "▶" };
   return { color: "#cf3a3f", bg: "#fcebec", border: "#f5ccce", arrow: "▼" };
 }
 
@@ -187,7 +186,7 @@ function MonthlyCard({ series, reportIdx, monthAbbr }: { series: TrafficSeries; 
             />
             <Tooltip cursor={{ fill: "rgba(148,163,184,0.1)" }} contentStyle={tipStyle} formatter={(v: number) => [fmt(v), "Realisasi"]} />
             {series.bp != null && <ReferenceLine y={series.bp} stroke={C.bpRed} strokeWidth={2} strokeDasharray="5 4" ifOverflow="extendDomain" />}
-            <Bar dataKey="real" name="Realisasi" radius={[3, 3, 0, 0]} maxBarSize={16} isAnimationActive={false}>
+            <Bar dataKey="real" name="Realisasi" radius={[3, 3, 0, 0]} maxBarSize={16} isAnimationActive animationDuration={700}>
               {rows.map((_, i) => (
                 <Cell key={i} fill={i === reportIdx ? C.navy : C.realLight} />
               ))}
@@ -211,9 +210,9 @@ function GolCard({ gol }: { gol: RuasEval["gol"] }) {
             <YAxis tick={{ fontSize: 9, fill: "#b4bcc7" }} tickLine={false} axisLine={false} width={30} tickCount={4} tickFormatter={(v: number) => compact(v)} />
             <YAxis yAxisId="r" orientation="right" tick={{ fontSize: 8.5, fill: C.amber }} tickLine={false} axisLine={false} width={26} tickCount={4} tickFormatter={(v: number) => `${v}%`} />
             <Tooltip cursor={{ fill: "rgba(148,163,184,0.1)" }} contentStyle={tipStyle} formatter={(v: number, n: string) => [n === "% RL" ? `${v}%` : fmt(v), n]} />
-            <Bar dataKey="bp" name="BP" fill={C.navy} radius={[2, 2, 0, 0]} maxBarSize={22} isAnimationActive={false} />
-            <Bar dataKey="real" name="Realisasi" fill={C.teal} radius={[2, 2, 0, 0]} maxBarSize={22} isAnimationActive={false} />
-            <Line yAxisId="r" type="monotone" dataKey="rl" name="% RL" stroke={C.amber} strokeWidth={2} dot={{ r: 2.5, fill: C.amber, strokeWidth: 0 }} isAnimationActive={false} />
+            <Bar dataKey="bp" name="BP" fill={C.navy} radius={[2, 2, 0, 0]} maxBarSize={22} isAnimationActive animationDuration={700} />
+            <Bar dataKey="real" name="Realisasi" fill={C.teal} radius={[2, 2, 0, 0]} maxBarSize={22} isAnimationActive animationDuration={700} />
+            <Line yAxisId="r" type="monotone" dataKey="rl" name="% RL" stroke={C.amber} strokeWidth={2} dot={{ r: 2.5, fill: C.amber, strokeWidth: 0 }} isAnimationActive animationDuration={900} />
           </ComposedChart>
         </ResponsiveContainer>
       </div>

@@ -20,10 +20,14 @@ export const SLIDES: Record<string, SlideDef> = {
   "risk-map": { id: "risk-map", feature: "Manajemen Risiko", title: "Peta Risiko & Top Risk", badge: "Peta" },
   "pend-cover": { id: "pend-cover", feature: "Pendapatan", title: "Pendapatan — Pembuka", badge: "Sampul" },
   "pend-overview": { id: "pend-overview", feature: "Pendapatan", title: "KPI & Pencapaian per Ruas", badge: "Dashboard" },
+  "rpend-cover": { id: "rpend-cover", feature: "Rencana Pendapatan", title: "Rencana Pendapatan — Pembuka", badge: "Sampul" },
+  "rpend-tol": { id: "rpend-tol", feature: "Rencana Pendapatan", title: "Rencana Pendapatan Tol & Kinerja L/R", badge: "Dashboard" },
   "sent-cover": { id: "sent-cover", feature: "Sentimen", title: "Analisis Sentimen — Pembuka", badge: "Sampul" },
   "sent-dashboard": { id: "sent-dashboard", feature: "Sentimen", title: "Dashboard Sentimen (drill)", badge: "Dashboard" },
   "odol-cover": { id: "odol-cover", feature: "ODOL", title: "ODOL — Pembuka", badge: "Sampul" },
   "odol-dashboard": { id: "odol-dashboard", feature: "ODOL", title: "Dashboard ODOL", badge: "Dashboard" },
+  "accident-cover": { id: "accident-cover", feature: "Kecelakaan", title: "Kecelakaan — Pembuka", badge: "Sampul" },
+  "accident-dashboard": { id: "accident-dashboard", feature: "Kecelakaan", title: "Data Kecelakaan Regional", badge: "Dashboard" },
   closing: { id: "closing", feature: "Penutup", title: "Terima Kasih", badge: "Sampul" }
 };
 
@@ -39,10 +43,14 @@ export const DEFAULT_ORDER = [
   "risk-map",
   "pend-cover",
   "pend-overview",
+  "rpend-cover",
+  "rpend-tol",
   "sent-cover",
   "sent-dashboard",
   "odol-cover",
   "odol-dashboard",
+  "accident-cover",
+  "accident-dashboard",
   "closing"
 ];
 
@@ -51,7 +59,11 @@ export const DEFAULT_ORDER = [
    (tidak di divisi/cabang — keputusan user). */
 export const SLIDE_SCOPE_ONLY: Record<string, "divisi" | "regional" | "cabang"> = {
   "kinerja-regional": "regional",
-  "lhr-phr-bp": "regional"
+  "lhr-phr-bp": "regional",
+  "rpend-cover": "regional",
+  "rpend-tol": "regional",
+  "accident-cover": "regional",
+  "accident-dashboard": "regional"
 };
 
 /** Apakah slide `id` boleh tampil pada scope dengan level `level`? */

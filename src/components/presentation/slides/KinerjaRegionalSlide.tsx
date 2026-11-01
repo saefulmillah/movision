@@ -51,7 +51,16 @@ const RED = "var(--sem-red)";
 export function KinerjaRegionalSlide({ data, periodLabel, scopeLabel }: Props) {
   const [showSept, setShowSept] = useState(false);
 
-  const ruasList = useMemo(() => (data ? data.ruas.map((r) => r.id).filter((id) => data.entities[id] || data.entities_month[id]) : []), [data]);
+  // Daftar entitas grafik dari `entities` yang benar-benar ada (urut mengikuti
+  // `data.ruas` dulu, lalu entitas lain yg tak ada di meta — mis. PBBL/Cabang Jambi
+  // yang tidak terdaftar di RUAS_TO_REGIONAL sehingga absen dari `data.ruas`).
+  const ruasList = useMemo(() => {
+    if (!data) return [];
+    const present = new Set([...Object.keys(data.entities || {}), ...Object.keys(data.entities_month || {})]);
+    const ordered = (data.ruas || []).map((r) => r.id).filter((id) => present.has(id));
+    const extra = [...present].filter((id) => !ordered.includes(id));
+    return [...ordered, ...extra];
+  }, [data]);
 
   if (!data || (data.meta.empty && data.lhr.length === 0 && data.phr.length === 0 && ruasList.length === 0)) {
     return (
@@ -337,31 +346,38 @@ function panelAch(entities: PnlEntity[], m: PnlMetric, showSept: boolean) {
 }
 
 // ---- Mini grouped bar chart (Recharts, dukung nilai negatif) ----
-// Palet SENGAJA kontras antar-periode & antar-seri: S.d = teal/merah; bulan ini
-// (mis. September) = ungu/amber (hue jelas berbeda, tidak mirip satu sama lain).
-const PNL_COLORS = { rkapSd: "#2d7d93", realSd: "#cf3a3f", rkapMo: "#6b4fbb", realMo: "#e08a1e" } as const;
+// Warna = IDENTITAS seri (RKAP = teal, Real = merah) dan konsisten di kedua
+// periode. Dimensi periode dibedakan lewat shade: bulan ini = shade lebih terang,
+// S.d = shade penuh. Jadi "periode ini" & "s.d periode ini" memakai pewarnaan yang
+// sama per seri, tetap terbaca saat ditampilkan bersamaan.
+const PNL_COLORS = { rkapSd: "#2d7d93", realSd: "#cf3a3f", rkapMo: "#7ab8c7", realMo: "#e38a8d" } as const;
 const tipStyle: CSSProperties = { background: "#fff", border: "1px solid #e4e9ef", borderRadius: 8, fontSize: 11, color: "#1f2d3f", padding: "4px 8px" };
 
-// Label nilai per batang: VERTIKAL (rotate -90) SELALU di ujung ATAS batang
-// (positif → di atas puncak; negatif → tepat di atas garis nol) agar konsisten di
-// atas & tak pernah terpotong tepi bawah panel. Halo sewarna latar utk kontras.
+// Label nilai per batang: VERTIKAL (rotate -90) dan SELALU menempel di ujung LUAR
+// batang (jauh dari garis nol) → positif: di atas puncak, tumbuh ke atas; negatif:
+// di bawah dasar batang, tumbuh ke bawah. Jadi label batang minus konsisten dengan
+// yang positif (tetap vertikal, menempel pada ujung batang), bukan mengambang di
+// garis nol. Halo sewarna latar utk kontras.
 function VBarLabel(color: string, size: number) {
   return (props: { x?: number | string; y?: number | string; width?: number | string; height?: number | string; value?: number | string | null }) => {
     const x = Number(props.x) || 0;
     const y = Number(props.y) || 0;
     const width = Number(props.width) || 0;
+    const height = Number(props.height) || 0;
     const value = props.value == null ? null : Number(props.value);
     if (value == null || !Number.isFinite(value) || Math.round(value) === 0) return null;
     const cx = x + width / 2;
-    // Untuk batang positif, `y` = puncak; untuk negatif, `y` = garis nol (sisi atas
-    // rect). Selalu taruh label di atas sisi tsb → selalu "di atas".
-    const ay = y - 3;
+    const negative = value < 0;
+    // Positif: `y` = puncak → label 3px di atasnya, anchor "start" (tumbuh ke atas).
+    // Negatif: `y` = garis nol, `y + height` = dasar batang → label 3px di bawahnya,
+    // anchor "end" (tumbuh ke bawah) → cermin dari batang positif.
+    const ay = negative ? y + height + 3 : y - 3;
     return (
       <text
         x={cx}
         y={ay}
         transform={`rotate(-90, ${cx}, ${ay})`}
-        textAnchor="start"
+        textAnchor={negative ? "end" : "start"}
         dominantBaseline="central"
         fontSize={size}
         fontWeight={800}
@@ -391,9 +407,10 @@ function PnlMiniChart({ entities, metric, showSept }: { entities: PnlEntity[]; m
   const dmax = Math.max(0, ...vals);
   const dmin = Math.min(0, ...vals);
   const span = dmax - dmin || 1;
-  // Label selalu di atas → butuh headroom ATAS (0.34) utk label; bawah cukup
-  // sedikit agar ujung batang negatif tak menempel sumbu.
-  const lo = dmin < 0 ? dmin - span * 0.06 : 0;
+  // Label menempel di ujung luar batang → butuh headroom ATAS (0.34) utk label
+  // positif dan, bila ada nilai negatif, headroom BAWAH yang sepadan utk label minus
+  // agar tak terpotong tepi panel.
+  const lo = dmin < 0 ? dmin - span * 0.34 : 0;
   let hi = Math.max(dmax, 0) + span * 0.34;
   if (hi === 0) hi = 1;
 
@@ -418,18 +435,18 @@ function PnlMiniChart({ entities, metric, showSept }: { entities: PnlEntity[]; m
         />
         {showSept && (
           <>
-            <Bar dataKey="rkapMo" name="rkapMo" fill={PNL_COLORS.rkapMo} radius={[2, 2, 0, 0]} maxBarSize={14} isAnimationActive={false}>
+            <Bar dataKey="rkapMo" name="rkapMo" fill={PNL_COLORS.rkapMo} radius={[2, 2, 0, 0]} maxBarSize={14} isAnimationActive animationDuration={650} animationEasing="ease-out">
               <LabelList dataKey="rkapMo" content={VBarLabel(PNL_COLORS.rkapMo, lblSize)} />
             </Bar>
-            <Bar dataKey="realMo" name="realMo" fill={PNL_COLORS.realMo} radius={[2, 2, 0, 0]} maxBarSize={14} isAnimationActive={false}>
+            <Bar dataKey="realMo" name="realMo" fill={PNL_COLORS.realMo} radius={[2, 2, 0, 0]} maxBarSize={14} isAnimationActive animationDuration={650} animationEasing="ease-out">
               <LabelList dataKey="realMo" content={VBarLabel(PNL_COLORS.realMo, lblSize)} />
             </Bar>
           </>
         )}
-        <Bar dataKey="rkapSd" name="rkapSd" fill={PNL_COLORS.rkapSd} radius={[2, 2, 0, 0]} maxBarSize={showSept ? 14 : 30} isAnimationActive={false}>
+        <Bar dataKey="rkapSd" name="rkapSd" fill={PNL_COLORS.rkapSd} radius={[2, 2, 0, 0]} maxBarSize={showSept ? 14 : 30} isAnimationActive animationDuration={650} animationEasing="ease-out">
           <LabelList dataKey="rkapSd" content={VBarLabel(PNL_COLORS.rkapSd, lblSize)} />
         </Bar>
-        <Bar dataKey="realSd" name="realSd" fill={PNL_COLORS.realSd} radius={[2, 2, 0, 0]} maxBarSize={showSept ? 14 : 30} isAnimationActive={false}>
+        <Bar dataKey="realSd" name="realSd" fill={PNL_COLORS.realSd} radius={[2, 2, 0, 0]} maxBarSize={showSept ? 14 : 30} isAnimationActive animationDuration={650} animationEasing="ease-out">
           <LabelList dataKey="realSd" content={VBarLabel(PNL_COLORS.realSd, lblSize)} />
         </Bar>
       </BarChart>
@@ -461,17 +478,17 @@ function TrafficTable({ title, rows, empty }: { title: string; rows: TrafficRow[
           </div>
           <div className={styles.tblBody}>
             {rows.map((r) => {
+              // Pencapaian <100% = merah (tanpa tier amber); >=100% = hijau.
               const good = r.ach >= 100;
-              const warn = r.ach >= 90 && r.ach < 100;
-              const pill = good ? GREEN : warn ? "var(--sem-amber)" : RED;
+              const pill = good ? GREEN : RED;
               return (
                 <div key={r.ruas} className={styles.tblRow}>
                   <span className={styles.ruasName}>{r.ruas}</span>
                   <span className={styles.r}>{num(r.rkap)}</span>
                   <span className={styles.r}>{num(r.real)}</span>
                   <span className={styles.rPill}>
-                    <span className={styles.pill} style={{ background: pill, color: warn ? "#2a2118" : "#fff" }}>
-                      {r.ach >= 100 ? UP : DOWN} {idNum.format(Math.round(r.ach))}%
+                    <span className={styles.pill} style={{ background: pill, color: "#fff" }}>
+                      {good ? UP : DOWN} {idNum.format(Math.round(r.ach))}%
                     </span>
                   </span>
                 </div>

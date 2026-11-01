@@ -57,9 +57,59 @@
   border: 1.5px solid #111;
 }
 
-.grid {
+/* ---- Selector scope (Regional + cabang) — hanya untuk scope regional ---- */
+.scopeBar {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: clamp(8px, 1.1vh, 14px);
+}
+.scopeBtn {
+  border: 1px solid var(--line);
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: clamp(10px, 1.2vh, 13px);
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--surface-1);
+  color: var(--text-muted);
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.scopeBtn:hover {
+  border-color: var(--st-blue);
+  color: var(--st-blue);
+}
+.scopeBtnOn {
+  background: var(--st-blue);
+  border-color: var(--st-blue);
+  color: #fff;
+}
+.scopeBtnOn:hover {
+  color: #fff;
+}
+.loadingText {
+  color: var(--text-muted);
+  font-size: clamp(12px, 1.4vh, 16px);
+  font-weight: 600;
+}
+
+/* Pembungkus konten (grid + zone legend): mengisi sisa tinggi panggung dan
+   memusatkan isinya secara vertikal (grid sendiri tetap setinggi konten). */
+.centerWrap {
   flex: 1 1 auto;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.grid {
+  /* Tidak memenuhi tinggi panggung: tinggi grid = konten (flex: none). Namun kedua
+     kartu (heatmap & tabel) meregang ke tinggi konten TERTINGGI di antara keduanya
+     (align-items: stretch) → ketinggian kartu selalu sama. */
+  flex: none;
   display: grid;
   grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
   gap: 20px;
@@ -78,8 +128,7 @@
   min-width: 0;
 }
 .heatCard {
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: none;
   display: flex;
   align-items: center;
   justify-content: center;

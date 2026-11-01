@@ -43,16 +43,6 @@ const IcWarn = (
 const IcBack = (
   <svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
 );
-// Ikon KPI (sesuai metrik).
-const IcScale = (
-  <svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="5" r="2.6" /><path d="M6.8 8.2h10.4l2.3 11.1a1 1 0 0 1-1 1.2H5.5a1 1 0 0 1-1-1.2z" /></svg>
-);
-const IcCheck = (
-  <svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="m8 12 3 3 5-6" /></svg>
-);
-const IcPercent = (
-  <svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="5" x2="5" y2="19" /><circle cx="6.5" cy="6.5" r="2.5" /><circle cx="17.5" cy="17.5" r="2.5" /></svg>
-);
 
 type NoteType = "info" | "warn" | "critical";
 function Note({ type, children }: { type: NoteType; children: ReactNode }) {
@@ -120,10 +110,10 @@ export function OdolSlide({ data, scopeLabel }: Props) {
     ? { type: cmp.direction === "up" && cmp.is_higher_worse ? "warn" : "info", text: `${cmp.direction === "up" ? "Naik" : "Turun"} ${pct(Math.abs(cmp.change_percent))} dibanding tahun lalu.` }
     : { type: "warn", text: "Perlu pengawasan muatan berlebih." };
   const kpis = [
-    { value: fmt(k.total_weighed), title: "Kendaraan Tertimbang", icon: IcScale, color: C.navy, note: { type: "info" as NoteType, text: `Akumulasi penimbangan tahun ${cur.period.year}.` } },
-    { value: fmt(k.total_normal), title: "Normal", icon: IcCheck, color: C.green, note: { type: "info" as NoteType, text: `${pct(normalPct)} dari total kendaraan.` } },
-    { value: fmt(k.total_odol), title: "Pelanggaran ODOL", icon: IcWarn, color: C.red, note: { type: "critical" as NoteType, text: `${pct(odolPct)} dari total kendaraan.` } },
-    { value: pct(k.odol_percent), title: "Persentase ODOL", icon: IcPercent, color: C.amber, note: cmpNote }
+    { value: fmt(k.total_weighed), title: "Kendaraan Tertimbang", color: C.navy, note: { type: "info" as NoteType, text: `Akumulasi penimbangan tahun ${cur.period.year}.` } },
+    { value: fmt(k.total_normal), title: "Normal", color: C.green, note: { type: "info" as NoteType, text: `${pct(normalPct)} dari total kendaraan.` } },
+    { value: fmt(k.total_odol), title: "Pelanggaran ODOL", color: C.red, note: { type: "critical" as NoteType, text: `${pct(odolPct)} dari total kendaraan.` } },
+    { value: pct(k.odol_percent), title: "Persentase ODOL", color: C.amber, note: cmpNote }
   ];
   const sebItems = cur.sebaran.items.filter((i) => i.key !== "lainnya" && i.label !== "Lainnya").slice(0, 6);
 
@@ -150,11 +140,11 @@ export function OdolSlide({ data, scopeLabel }: Props) {
               {kpis.map((kp) => (
                 <div key={kp.title} className={styles.kpiCard}>
                   <div className={styles.kpiHead}>
-                    <span className={styles.kpiIcon} style={{ color: kp.color, background: `${kp.color}1f` }}>{kp.icon}</span>
+                    <span className={styles.kpiDot} style={{ background: kp.color }} />
                     <span className={styles.kpiTitle}>{kp.title}</span>
                   </div>
                   <div className={styles.kpiValue}>{kp.value}</div>
-                  <Note type={kp.note.type}>{kp.note.text}</Note>
+                  <div className={styles.kpiDesc}>{kp.note.text}</div>
                 </div>
               ))}
             </div>

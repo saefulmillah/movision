@@ -17,7 +17,8 @@ import type {
   EquipmentSummary,
   EquipmentBranchRow,
   EquipmentTrend,
-  OdolPresentation
+  OdolPresentation,
+  AccidentPresentation
 } from "@/types/insights";
 
 // Konsumen /api/insights/* (backend menandatangani & menyimpan data on-demand).
@@ -62,6 +63,12 @@ export const getAccidentTrend = (p: Period & { granularity?: string }) =>
   api.get<InsightsEnvelope<AccidentTrend>>(`/insights/accidents/trend${qs(p)}`);
 export const getAccidentBreakdown = (p: Period & { by: string }) =>
   api.get<InsightsEnvelope<AccidentBreakdown>>(`/insights/accidents/breakdown${qs(p)}`);
+
+// Agregator Kecelakaan untuk slide presentasi (sadar-scope, 3 tahun mengikuti periode).
+export const getAccidentPresentation = (periodKey: string, scope?: string | null) =>
+  api.get<AccidentPresentation>(
+    `/insights/accidents/presentation${qs({ period: periodKey, scope: scope && scope !== "divisi" ? scope : undefined })}`
+  );
 
 // --- Kendaraan Bantuan ---
 export const getRescueSummary = (branch_codes?: string) =>

@@ -5,14 +5,14 @@ import { getPeriod as getLrPeriod, getPeriods as getLrPeriods } from "@/lib/laba
 import { getMatrix, getPeriod as getRiskPeriod, getPeriods as getRiskPeriods } from "@/lib/risk";
 import { getPeriod as getPendPeriod, getPeriods as getPendPeriods } from "@/lib/pendapatan";
 import { getDashboard as getSentimentDashboard, getPeriods as getSentimentPeriods } from "@/lib/sentiment";
-import { getOdolPresentation } from "@/lib/insights";
+import { getOdolPresentation, getAccidentPresentation } from "@/lib/insights";
 import { getKinerjaRegional, type KinerjaRegionalData } from "@/lib/kinerjaRegional";
 import { getLhrPhrEval, type LhrPhrEvalData } from "@/lib/lhrPhrEval";
 import type { PeriodData as LrPeriodData } from "@/types/labaRugi";
 import type { PeriodData as RiskPeriodData, RiskMatrix } from "@/types/risk";
 import type { PeriodData as PendPeriodData } from "@/types/pendapatan";
 import type { SentimentDashboard } from "@/types/sentiment";
-import type { OdolPresentation } from "@/types/insights";
+import type { OdolPresentation, AccidentPresentation } from "@/types/insights";
 import { DEFAULT_ORDER, SLIDES, isSlideAllowedForScope } from "@/components/presentation/slideRegistry";
 import { isPdfSlide, makePdfSlideId, parsePdfSlide, prunePdfSlides } from "@/components/presentation/pdfSlides";
 import { isCustomCover, makeCustomCoverId } from "@/components/presentation/customCover";
@@ -43,6 +43,8 @@ export interface PeriodSnapshot {
   kinerja: KinerjaRegionalData | null;
   /** Pencapaian LHR & PHR vs BP (hanya scope regional; null selainnya). */
   lhrPhrEval: LhrPhrEvalData | null;
+  /** Data Kecelakaan 3 tahun (hanya scope regional; null selainnya). */
+  accident: AccidentPresentation | null;
 }
 
 interface SnapshotState {
@@ -81,6 +83,9 @@ interface PresentationContextValue {
   /** Buang cache snapshot (periode×scope) agar data dimuat ulang — dipakai setelah
    *  upload dataset kinerja per-scope. Tanpa argumen → kosongkan seluruh cache. */
   invalidateSnapshot: (key?: string, scopeKey?: string) => void;
+  /** Pastikan snapshot periode×scope aktif termuat (dipanggil builder untuk preview
+   *  thumbnail). Memakai cache yang sama dengan mode presentasi → tanpa fetch ganda. */
+  ensureSnapshot: () => void;
   addPdf: (pdf: PdfDoc) => void;
   removePdfFromAgenda: (pdfId: number) => void;
   // Konten slide pembuka (editable di builder).
@@ -99,9 +104,14 @@ interface PresentationContextValue {
   setPeriod: (key: string) => void;
   refreshPeriods: () => Promise<void>;
   toggleEnabled: (id: string) => void;
+  /** Set status aktif banyak slide sekaligus (aktif/nonaktif massal). */
+  setManyEnabled: (ids: string[], on: boolean) => void;
   move: (id: string, dir: number) => void;
   /** Pindahkan slide dari posisi `from` ke `to` (untuk drag-and-drop). */
   reorder: (from: number, to: number) => void;
+  /** Pindahkan banyak slide sekaligus ke slot sisipan `insertSlot` (0..N, celah
+   *  ANTAR kartu). Urutan relatif antar slide terpilih dipertahankan. */
+  reorderMany: (ids: string[], insertSlot: number) => void;
   /** Tambah slide sampul kustom (pembatas). Bila `afterId` diisi, sisipkan tepat
    *  setelah slide tersebut; jika tidak, sebelum "closing". */
   addCoverSlide: (afterId?: string) => void;
@@ -446,16 +456,18 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
     // Slide regional-only (Kinerja Regional, LHR/PHR vs BP) hanya di-fetch utk scope regional.
     const kinerjaReq = scopeLevel === "regional" ? getKinerjaRegional(key, scopeKey).catch(() => null) : Promise.resolve(null);
     const lhrPhrReq = scopeLevel === "regional" ? getLhrPhrEval(key, scopeKey).catch(() => null) : Promise.resolve(null);
-    const [lr, risk, pend, sentiment, odol, kinerja, lhrPhrEval] = await Promise.all([
+    const accidentReq = scopeLevel === "regional" ? getAccidentPresentation(key, scopeKey).catch(() => null) : Promise.resolve(null);
+    const [lr, risk, pend, sentiment, odol, kinerja, lhrPhrEval, accident] = await Promise.all([
       getLrPeriod(key, scopeKey).catch(() => null),
       getRiskPeriod(key, scopeKey).catch(() => null),
       getPendPeriod(key, scopeKey).catch(() => null),
       getSentimentDashboard(key, scopeKey).catch(() => null),
       getOdolPresentation(scopeKey).catch(() => null),
       kinerjaReq,
-      lhrPhrReq
+      lhrPhrReq,
+      accidentReq
     ]);
-    const data: PeriodSnapshot = { lr, risk, pend, sentiment, odol, kinerja, lhrPhrEval };
+    const data: PeriodSnapshot = { lr, risk, pend, sentiment, odol, kinerja, lhrPhrEval, accident };
     snapCache.current.set(cacheKey, data);
     setSnapshot({ loading: false, error: null, data });
   }, []);
@@ -482,8 +494,21 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
     if (mode === "present") void loadSnapshot(period, scope?.key ?? "divisi", scope?.level);
   }, [mode, period, scope, loadSnapshot]);
 
+  // Dipanggil builder untuk memuat snapshot preview (di luar mode present).
+  const ensureSnapshot = useCallback(() => {
+    void loadSnapshot(period, scope?.key ?? "divisi", scope?.level);
+  }, [period, scope, loadSnapshot]);
+
   const setPeriod = useCallback((key: string) => setPeriodState(key), []);
   const toggleEnabled = useCallback((id: string) => setEnabled((e) => ({ ...e, [id]: !e[id] })), []);
+  const setManyEnabled = useCallback((ids: string[], on: boolean) => {
+    if (ids.length === 0) return;
+    setEnabled((e) => {
+      const next = { ...e };
+      for (const id of ids) next[id] = on;
+      return next;
+    });
+  }, []);
   const move = useCallback((id: string, dir: number) => {
     setOrder((o) => {
       const arr = o.slice();
@@ -501,6 +526,19 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
       const [moved] = arr.splice(from, 1);
       arr.splice(to, 0, moved);
       return arr;
+    });
+  }, []);
+  // Geser sekelompok slide bersamaan. `insertSlot` = celah sisipan pada urutan
+  // SAAT INI (0..N). Blok terpilih dicabut lalu disisipkan kembali di celah itu,
+  // dihitung relatif terhadap slide yang TIDAK terpilih agar posisi stabil.
+  const reorderMany = useCallback((ids: string[], insertSlot: number) => {
+    setOrder((o) => {
+      const sel = new Set(ids);
+      const block = o.filter((id) => sel.has(id));
+      if (block.length === 0 || block.length === o.length) return o;
+      const rest = o.filter((id) => !sel.has(id));
+      const before = o.slice(0, Math.max(0, insertSlot)).filter((id) => !sel.has(id)).length;
+      return [...rest.slice(0, before), ...block, ...rest.slice(before)];
     });
   }, []);
   const addCoverSlide = useCallback((afterId?: string) => {
@@ -604,6 +642,7 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
     setScope,
     refreshScopes,
     invalidateSnapshot,
+    ensureSnapshot,
     addPdf,
     removePdfFromAgenda,
     meetingTitle,
@@ -619,8 +658,10 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
     setPeriod,
     refreshPeriods,
     toggleEnabled,
+    setManyEnabled,
     move,
     reorder,
+    reorderMany,
     addCoverSlide,
     removeCoverSlide,
     toggleAuto,

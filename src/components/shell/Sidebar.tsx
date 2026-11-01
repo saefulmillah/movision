@@ -3,6 +3,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { Icon } from "@/components/ui/Icon";
 import { useAuth } from "@/context/AuthContext";
 import type { MenuNode } from "@/types/api";
+import movisionMark from "@/assets/presentation/movision-mark.webp";
 import styles from "./Sidebar.module.css";
 
 interface SidebarProps {
@@ -139,8 +140,12 @@ export function Sidebar({ open, onToggle, openTickets }: SidebarProps) {
     <aside className={`${styles.sidebar} ${open ? "" : styles.collapsed}`} data-collapsed={!open}>
       <div className={styles.header}>
         <div className={styles.brand}>
-          <span className={styles.brandMark}>
-            <Icon name="radio-tower" size={18} />
+          <span className={styles.brandMark} style={{ background: "#fff", overflow: "hidden" }}>
+            <img
+              src={movisionMark}
+              alt="Movision"
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+            />
           </span>
           <span className={styles.brandText}>
             <span className={styles.brandName}>Movision</span>

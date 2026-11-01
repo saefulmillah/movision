@@ -1,0 +1,333 @@
+/* Slide Rencana Pendapatan Tol & Kinerja Laba Rugi (scope regional).
+   Kiri: tabel Tol & Lainnya + grafik Pendapatan per ruas. Kanan: Kinerja L/R
+   per ruas (tab metrik) + ringkasan total. Mengisi tinggi panggung tanpa scroll. */
+
+.stateBox {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+}
+
+.legend {
+  display: inline-flex;
+  gap: 16px;
+}
+.legItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 600;
+  font-size: clamp(11px, 1.3vh, 14px);
+  color: var(--text-muted);
+}
+.sw {
+  width: 13px;
+  height: 13px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  /* Kolom kanan (Kinerja L/R per Ruas) dilebarkan agar grafik lebih lega. */
+  grid-template-columns: 0.68fr 1.32fr;
+  gap: clamp(10px, 1vw, 16px);
+}
+
+.leftCol {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1vh, 14px);
+  min-height: 0;
+}
+
+.card {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 1px 4px rgba(16, 42, 67, 0.07);
+  padding: clamp(12px, 1.3vh, 18px) clamp(13px, 1vw, 20px);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.grow {
+  flex: 1 1 auto;
+}
+
+.cardHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  flex: none;
+}
+.cardTitle {
+  font-weight: 800;
+  font-size: clamp(14px, 1.6vh, 17px);
+  color: var(--st-blue);
+  letter-spacing: 0.02em;
+}
+.cardSub {
+  font-size: clamp(10px, 1.1vh, 12px);
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-top: 1px;
+}
+
+/* ---- Blok 1: Tol & Lainnya ---- */
+.revGroup {
+  margin-top: clamp(11px, 1.4vh, 17px);
+}
+.revGroup:first-of-type {
+  margin-top: clamp(9px, 1.1vh, 13px);
+}
+/* Label periode — gaya soft/tinted (teks aksen + latar transparan tipis),
+   lebih kalem & menyatu dgn tema card (bukan chip terisi penuh). */
+.revChip {
+  display: inline-block;
+  font-weight: 800;
+  font-size: 10.5px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 4px 11px;
+  border-radius: 7px;
+  color: var(--chip-accent, var(--st-blue));
+  background: color-mix(in srgb, var(--chip-accent, var(--st-blue)) 13%, transparent);
+}
+/* Grid bersama header & baris data (kolom selaras). Kolom % ACH = auto agar
+   badge tak pernah terpotong/wrap ke baris baru. */
+.revRow {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr auto;
+  gap: 4px 14px;
+  align-items: center;
+  padding: 7px 10px;
+  border-radius: 8px;
+}
+.revHead {
+  margin-top: 8px;
+  padding-top: 0;
+  padding-bottom: 4px;
+}
+.rHead,
+.achHead {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.rHead {
+  text-align: right;
+}
+.achHead {
+  text-align: center;
+}
+/* Baris data: separator halus antar baris (bukan border di tiap sisi). */
+.revRows .revRow + .revRow {
+  border-top: 1px solid var(--line);
+}
+.revLabel {
+  font-weight: 600;
+  font-size: clamp(11px, 1.3vh, 13.5px);
+  color: var(--text);
+}
+.r {
+  text-align: right;
+  font-weight: 600;
+  font-size: clamp(11px, 1.3vh, 13.5px);
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+/* Baris Total — ditonjolkan (latar tipis + garis atas aksen + tebal). */
+.revTotal {
+  margin-top: 4px;
+  background: color-mix(in srgb, var(--st-blue) 8%, transparent);
+  border-top: 1.5px solid color-mix(in srgb, var(--st-blue) 32%, var(--line)) !important;
+}
+.revTotal .revLabel,
+.revTotal .r {
+  font-weight: 800;
+  color: var(--text);
+}
+.rPill {
+  display: flex;
+  justify-content: center;
+}
+/* Badge % ACH — gaya konsisten dgn tabel LHR/PHR (Kinerja Keuangan Regional):
+   span sederhana, satu baris, sudut membulat. */
+.pill {
+  font-weight: 800;
+  font-size: clamp(10px, 1.15vh, 12px);
+  color: #fff;
+  padding: 3px 9px;
+  border-radius: 6px;
+  min-width: 58px;
+  text-align: center;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Tabs (periode & metrik) ---- */
+.tabs {
+  display: flex;
+  gap: 6px;
+  flex: none;
+}
+.tab {
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: clamp(10px, 1.1vh, 12px);
+  padding: 6px 12px;
+  border-radius: 7px;
+}
+/* ---- Lapis 1: KPI Total Konsol per metrik (selektor) ---- */
+.kpiRow {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: clamp(5px, 0.5vw, 8px);
+  margin-top: clamp(10px, 1.2vh, 14px);
+  flex: none;
+}
+.kpiCard {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface-1);
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  padding: clamp(6px, 0.8vh, 9px) clamp(7px, 0.6vw, 10px);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+.kpiCard:hover {
+  border-color: var(--st-blue);
+}
+.kpiCardOn {
+  border-color: #16315d;
+  background: color-mix(in srgb, #16315d 10%, var(--surface-1));
+  box-shadow: inset 0 0 0 1px #16315d;
+}
+.kpiName {
+  font-size: clamp(8.5px, 1vh, 10.5px);
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.kpiVal {
+  font-weight: 800;
+  font-size: clamp(14px, 1.9vh, 20px);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.05;
+}
+.kpiDelta {
+  font-size: clamp(8px, 0.92vh, 10px);
+  font-weight: 700;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.kpiDelta em {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--text-faint);
+}
+
+/* Judul di dalam grafik (lapis 2) & judul ringkasan (lapis 3) */
+.chartTitle {
+  margin-top: clamp(6px, 0.8vh, 10px);
+  font-size: clamp(10px, 1.15vh, 12.5px);
+  font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: 0.01em;
+  flex: none;
+}
+.summaryHead {
+  margin-top: clamp(8px, 1vh, 12px);
+  font-size: clamp(10px, 1.15vh, 12.5px);
+  font-weight: 800;
+  color: var(--st-blue);
+  letter-spacing: 0.02em;
+  flex: none;
+}
+
+/* ---- Grafik ---- */
+.chart {
+  position: relative;
+  min-height: 0;
+  width: 100%;
+  margin-top: clamp(6px, 0.8vh, 10px);
+}
+.chart.grow {
+  flex: 1 1 auto;
+}
+
+/* ---- Ringkasan total (blok 3) ---- */
+.summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(8px, 0.9vw, 12px);
+  margin-top: clamp(6px, 0.8vh, 10px);
+  flex: none;
+}
+.summaryCard {
+  background: var(--surface-2, color-mix(in srgb, var(--line) 22%, transparent));
+  border-radius: 11px;
+  padding: clamp(9px, 1vh, 13px) clamp(11px, 0.9vw, 16px);
+}
+.summaryPeriod {
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+.summaryVals {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 6px;
+}
+.summaryRight {
+  text-align: right;
+}
+.summaryLbl {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.summaryVal {
+  font-weight: 800;
+  font-size: clamp(16px, 2vh, 20px);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+/* ---- Responsif (lapis 1 & lapis 3) ---- */
+@media (max-width: 980px) {
+  .kpiRow {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 560px) {
+  .kpiRow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .summary {
+    grid-template-columns: 1fr;
+  }
+}

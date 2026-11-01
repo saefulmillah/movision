@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Icon } from "@/components/ui/Icon";
 import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/api";
+import movisionMark from "@/assets/presentation/movision-mark.webp";
 import styles from "./LoginPage.module.css";
 
 type FormState = "idle" | "submitting";
@@ -51,8 +52,12 @@ export function LoginPage() {
     <div className={styles.wrap}>
       <section className={styles.brandPanel}>
         <div className={styles.brandTop}>
-          <span className={styles.brandMark}>
-            <Icon name="radio-tower" size={22} />
+          <span className={styles.brandMark} style={{ background: "#fff", overflow: "hidden" }}>
+            <img
+              src={movisionMark}
+              alt="Movision"
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+            />
           </span>
           <span>
             <div className={styles.brandName}>Movision</div>

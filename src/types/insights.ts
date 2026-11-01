@@ -199,6 +199,50 @@ export interface EquipmentTrend {
   categories: EquipmentTrendCategory[];
 }
 
+// --- Kecelakaan untuk slide presentasi (agregator sadar-scope, 3 tahun) ---
+export interface AccidentYearValue {
+  year: number;
+  total: number;
+}
+export interface AccidentLocationRow {
+  key: string;
+  label: string;
+  by_year: { year: number; count: number }[];
+}
+export interface AccidentVictimsYear {
+  year: number;
+  lr: number; // luka ringan
+  lb: number; // luka berat
+  md: number; // meninggal dunia
+}
+export interface AccidentRateYear {
+  year: number;
+  rate: number | null;
+}
+export interface AccidentTimeBlock {
+  key: string;
+  label: string;
+  range: string;
+  count: number;
+}
+export interface AccidentPresentation {
+  scope: { key: string; level: string; label: string };
+  period: { year: number; month: number; months_elapsed: number; report_month_label: string | null; range: { start_date: string; end_date: string } };
+  years: number[];
+  per_location: AccidentLocationRow[];
+  total_by_year: AccidentYearValue[];
+  victims_by_year: AccidentVictimsYear[];
+  tk_by_year: AccidentRateYear[]; // tingkat kecelakaan (accident_rate)
+  tf_by_year: AccidentRateYear[]; // tingkat fatality (fatality_rate)
+  causes: CountItem[];
+  by_hour: CountItem[];
+  by_time_block: AccidentTimeBlock[];
+  data_as_of: string | null;
+  stale: boolean;
+  empty: boolean;
+  narratives: { overall: string; trend: string; victims: string; cause: string; location: string };
+}
+
 // --- ODOL untuk slide presentasi (agregator sadar-scope) ---
 export interface OdolPresTrendPoint {
   month: string;

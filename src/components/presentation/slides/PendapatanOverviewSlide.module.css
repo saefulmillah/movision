@@ -75,6 +75,11 @@
   border-radius: 0;
   padding: clamp(6px, 1vh, 12px) clamp(10px, 1.2vw, 18px);
 }
+.chartBody {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+}
 .chartHead {
   flex: none;
   display: flex;
