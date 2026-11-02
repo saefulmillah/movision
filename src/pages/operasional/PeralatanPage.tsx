@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 import { getEquipmentSummary, getEquipmentBreakdown, getEquipmentTrend } from "@/lib/insights";
 import type { EquipmentSummary, EquipmentBranchRow, EquipmentTrend } from "@/types/insights";
@@ -13,6 +13,7 @@ export function PeralatanPage() {
   const { options } = useBranchOptions();
   const [branch, setBranch] = useState("");
   const [tick, setTick] = useState(0);
+  const forceRef = useRef(false); // true hanya saat tombol refresh ditekan → paksa ambil ulang
   const [summary, setSummary] = useState<EquipmentSummary | null>(null);
   const [rows, setRows] = useState<EquipmentBranchRow[] | null>(null);
   const [trend, setTrend] = useState<EquipmentTrend | null>(null);
@@ -23,12 +24,14 @@ export function PeralatanPage() {
 
   useEffect(() => {
     const bp = branch || undefined;
+    const refresh = forceRef.current; // konsumsi flag sekali pakai
+    forceRef.current = false;
     let alive = true;
     setLoading(true); setError(null);
     Promise.all([
-      getEquipmentSummary(bp),
-      getEquipmentBreakdown(bp),
-      getEquipmentTrend({ start_date: period.value.start_date, end_date: period.value.end_date, branch_codes: bp, granularity: period.value.granularity })
+      getEquipmentSummary(bp, refresh),
+      getEquipmentBreakdown(bp, refresh),
+      getEquipmentTrend({ start_date: period.value.start_date, end_date: period.value.end_date, branch_codes: bp, granularity: period.value.granularity, refresh })
     ])
       .then(([s, b, t]) => {
         if (!alive) return;
@@ -59,7 +62,7 @@ export function PeralatanPage() {
           <div className={styles.sub}>Ketersediaan peralatan <b>online</b> per kategori (terkini) & tren Persentase Waktu Online (PWO).</div>
         </div>
       </div>
-      <FilterBar period={period} branch={{ value: branch, onChange: setBranch, options }} dataAsOf={asOf} stale={stale} loading={loading} onRefresh={() => setTick((t) => t + 1)} />
+      <FilterBar period={period} branch={{ value: branch, onChange: setBranch, options }} dataAsOf={asOf} stale={stale} loading={loading} onRefresh={() => { forceRef.current = true; setTick((t) => t + 1); }} />
 
       {loading && !summary ? <StateBox loading /> : error ? <StateBox error={error} /> : (
         <>

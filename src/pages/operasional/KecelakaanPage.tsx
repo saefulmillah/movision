@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ResponsiveContainer, ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 import { Tabs } from "@/components/ui";
 import type { TabItem } from "@/components/ui";
@@ -20,6 +20,7 @@ export function KecelakaanPage() {
   const [branch, setBranch] = useState("");
   const [by, setBy] = useState("cause");
   const [tick, setTick] = useState(0);
+  const forceRef = useRef(false); // true hanya saat tombol refresh ditekan → paksa ambil ulang
 
   const [summary, setSummary] = useState<AccidentSummary | null>(null);
   const [trend, setTrend] = useState<AccidentTrend | null>(null);
@@ -30,7 +31,9 @@ export function KecelakaanPage() {
   const [stale, setStale] = useState(false);
 
   useEffect(() => {
-    const p = { start_date: period.value.start_date, end_date: period.value.end_date, branch_codes: branch || undefined };
+    const refresh = forceRef.current; // konsumsi flag sekali pakai
+    forceRef.current = false;
+    const p = { start_date: period.value.start_date, end_date: period.value.end_date, branch_codes: branch || undefined, refresh };
     let alive = true;
     setLoading(true); setError(null);
     Promise.all([
@@ -59,7 +62,7 @@ export function KecelakaanPage() {
           <div className={styles.sub}>Jumlah kecelakaan, korban, serta <b>accident rate</b> & <b>fatality rate</b> (per 100 juta km-kendaraan).</div>
         </div>
       </div>
-      <FilterBar period={period} branch={{ value: branch, onChange: setBranch, options }} dataAsOf={asOf} stale={stale} loading={loading} onRefresh={() => setTick((t) => t + 1)} />
+      <FilterBar period={period} branch={{ value: branch, onChange: setBranch, options }} dataAsOf={asOf} stale={stale} loading={loading} onRefresh={() => { forceRef.current = true; setTick((t) => t + 1); }} />
 
       {loading && !summary ? <StateBox loading /> : error ? <StateBox error={error} /> : (
         <>
