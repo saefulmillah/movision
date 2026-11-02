@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ResponsiveContainer, ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 import { getOdolSummary, getOdolTrend, getOdolBreakdown, getOdolPlateRegions, getOdolCompanies } from "@/lib/insights";
 import type { OdolSummary, OdolTrend, OdolBreakdown, OdolPlateRegions, OdolCompanies } from "@/types/insights";
@@ -12,6 +12,7 @@ export function OdolPage() {
   const { options } = useBranchOptions();
   const [branch, setBranch] = useState("");
   const [tick, setTick] = useState(0);
+  const forceRef = useRef(false); // true hanya saat tombol refresh ditekan → paksa ambil ulang
 
   const [summary, setSummary] = useState<OdolSummary | null>(null);
   const [trend, setTrend] = useState<OdolTrend | null>(null);
@@ -24,7 +25,9 @@ export function OdolPage() {
   const [stale, setStale] = useState(false);
 
   useEffect(() => {
-    const p = { start_date: period.value.start_date, end_date: period.value.end_date, branch_codes: branch || undefined };
+    const refresh = forceRef.current; // konsumsi flag sekali pakai
+    forceRef.current = false;
+    const p = { start_date: period.value.start_date, end_date: period.value.end_date, branch_codes: branch || undefined, refresh };
     let alive = true;
     setLoading(true);
     setError(null);
@@ -58,7 +61,7 @@ export function OdolPage() {
       <FilterBar
         period={period}
         branch={{ value: branch, onChange: setBranch, options }}
-        dataAsOf={asOf} stale={stale} loading={loading} onRefresh={() => setTick((t) => t + 1)}
+        dataAsOf={asOf} stale={stale} loading={loading} onRefresh={() => { forceRef.current = true; setTick((t) => t + 1); }}
       />
 
       {loading && !summary ? <StateBox loading /> : error ? <StateBox error={error} /> : (
