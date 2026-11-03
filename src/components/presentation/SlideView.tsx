@@ -14,6 +14,8 @@ import { SentimentDashboardSlide } from "./slides/SentimentDashboardSlide";
 import { OdolSlide } from "./slides/OdolSlide";
 import { AccidentSlide } from "./slides/AccidentSlide";
 import { PdfPageSlide } from "./slides/PdfPageSlide";
+import { EcoArsitekturSlide } from "./slides/EcoArsitekturSlide";
+import { ControlCenterSlide } from "./slides/ControlCenterSlide";
 import { parsePdfSlide } from "./pdfSlides";
 import { isCustomCover } from "./customCover";
 import type { LrView } from "@/lib/labaRugiView";
@@ -72,8 +74,7 @@ export function SlideView({ slideId: key, coverBg }: SlideViewProps) {
       "risk-cover": [],
       "pend-cover": [
         { k: "Periode", v: pendMonth ? `${pendMonth} & ${p.periodLabel}` : p.periodLabel },
-        { k: "Ruas", v: pendRuas ? `${pendRuas} ruas` : "—" },
-        { k: "Unit", v: "Rp miliar" }
+        { k: "Ruas", v: pendRuas ? `${pendRuas} ruas` : "—" }
       ],
       "rpend-cover": [{ k: "Periode", v: p.periodLabel }],
       "sent-cover": [{ k: "Periode", v: p.periodLabel }],
@@ -114,6 +115,12 @@ export function SlideView({ slideId: key, coverBg }: SlideViewProps) {
       />
     );
   }
+  if (key === "eco-arsitektur") {
+    return <EcoArsitekturSlide />;
+  }
+  if (key === "control-center") {
+    return <ControlCenterSlide />;
+  }
   if (key === "lr-cover") {
     return (
       <CoverSlide
@@ -139,11 +146,11 @@ export function SlideView({ slideId: key, coverBg }: SlideViewProps) {
   if (key === "lr-konsol" || key === "lr-regional" || key === "lr-ruas") {
     if (p.snapshot.loading) return <StageLoader />;
     const view = key.split("-")[1] as LrView;
-    return <LrTableSlide view={view} data={p.snapshot.data?.lr ?? null} periodLabel={p.periodLabel} scopeLabel={scopeLabel} />;
+    return <LrTableSlide view={view} data={p.snapshot.data?.lr ?? null} periodLabel={p.periodLabel} scopeLabel={scopeLabel} fontScale={p.fontScale} />;
   }
   if (key === "kinerja-regional") {
     if (p.snapshot.loading) return <StageLoader />;
-    return <KinerjaRegionalSlide data={p.snapshot.data?.kinerja ?? null} periodLabel={p.periodLabel} scopeLabel={scopeLabel} />;
+    return <KinerjaRegionalSlide data={p.snapshot.data?.kinerja ?? null} periodLabel={p.periodLabel} scopeLabel={scopeLabel} fontScale={p.fontScale} />;
   }
   if (key === "lhr-phr-bp") {
     if (p.snapshot.loading) return <StageLoader />;
@@ -175,7 +182,7 @@ export function SlideView({ slideId: key, coverBg }: SlideViewProps) {
   }
   if (key === "pend-overview") {
     if (p.snapshot.loading) return <StageLoader />;
-    return <PendapatanOverviewSlide data={p.snapshot.data?.pend ?? null} periodLabel={p.periodLabel} scopeLabel={scopeLabel} />;
+    return <PendapatanOverviewSlide data={p.snapshot.data?.pend ?? null} periodLabel={p.periodLabel} scopeLabel={scopeLabel} fontScale={p.fontScale} />;
   }
   if (key === "rpend-cover") {
     return (
@@ -195,6 +202,7 @@ export function SlideView({ slideId: key, coverBg }: SlideViewProps) {
         kinerja={p.snapshot.data?.kinerja ?? null}
         periodLabel={p.periodLabel}
         scopeLabel={scopeLabel}
+        fontScale={p.fontScale}
       />
     );
   }
@@ -226,7 +234,7 @@ export function SlideView({ slideId: key, coverBg }: SlideViewProps) {
   }
   if (key === "odol-dashboard") {
     if (p.snapshot.loading) return <StageLoader />;
-    return <OdolSlide data={p.snapshot.data?.odol ?? null} scopeLabel={scopeLabel} />;
+    return <OdolSlide data={p.snapshot.data?.odol ?? null} scopeLabel={scopeLabel} fontScale={p.fontScale} />;
   }
   if (key === "accident-cover") {
     return (
@@ -241,7 +249,7 @@ export function SlideView({ slideId: key, coverBg }: SlideViewProps) {
   }
   if (key === "accident-dashboard") {
     if (p.snapshot.loading) return <StageLoader />;
-    return <AccidentSlide data={p.snapshot.data?.accident ?? null} periodLabel={p.periodLabel} scopeLabel={scopeLabel} />;
+    return <AccidentSlide data={p.snapshot.data?.accident ?? null} periodLabel={p.periodLabel} scopeLabel={scopeLabel} fontScale={p.fontScale} />;
   }
   if (isCustomCover(key)) {
     return <CoverSlide kicker="Sampul" title={p.titles[key] || "Sampul"} sub={p.subtitles[key] || ""} facts={[]} bgUrl={coverBg} />;
@@ -255,5 +263,6 @@ export function SlideView({ slideId: key, coverBg }: SlideViewProps) {
 
 /** Apakah slide `id` bertipe sampul (full-bleed) — untuk memilih kelas stage. */
 export function isCoverSlide(id: string): boolean {
-  return SLIDES[id]?.badge === "Sampul" || isCustomCover(id);
+  const badge = SLIDES[id]?.badge;
+  return badge === "Sampul" || badge === "Imersif" || isCustomCover(id);
 }

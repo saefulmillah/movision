@@ -39,6 +39,8 @@ interface Props {
   data: AccidentPresentation | null;
   periodLabel?: string;
   scopeLabel?: string | null;
+  /** Pengali ukuran font label grafik (1 = normal). */
+  fontScale?: number;
 }
 
 // Pola arsir untuk tahun berjalan (belum setahun penuh) — satu per warna tahun.
@@ -60,7 +62,9 @@ function HatchSvg() {
   );
 }
 
-export function AccidentSlide({ data, periodLabel, scopeLabel }: Props) {
+export function AccidentSlide({ data, periodLabel, scopeLabel, fontScale = 1 }: Props) {
+  // Skala ukuran font label grafik (tick & label nilai) mengikuti setelan slide.
+  const fz = (n: number) => Math.round(n * fontScale * 100) / 100;
   const hasData = !!data && !data.empty && data.total_by_year.some((t) => t.total > 0);
 
   // Posisi geser (drag) tiap callout — offset dari posisi default. Reset saat
@@ -182,10 +186,10 @@ export function AccidentSlide({ data, periodLabel, scopeLabel }: Props) {
       const partial = Number(val) === partialYear && isPartial;
       return (
         <g transform={`translate(${p.x},${p.y})`}>
-          <text x={0} y={0} dy={12} textAnchor="middle" fontSize={11} fontWeight={700} fill={C.muted}>
+          <text x={0} y={0} dy={12} textAnchor="middle" fontSize={fz(11)} fontWeight={700} fill={C.muted}>
             {val}{partial && star ? " *" : ""}
           </text>
-          {partial ? <text x={0} y={0} dy={24} textAnchor="middle" fontSize={9} fill={C.faint}>s.d {mon}</text> : null}
+          {partial ? <text x={0} y={0} dy={24} textAnchor="middle" fontSize={fz(9)} fill={C.faint}>s.d {mon}</text> : null}
         </g>
       );
     };
@@ -204,7 +208,7 @@ export function AccidentSlide({ data, periodLabel, scopeLabel }: Props) {
     return (
       <g transform={`translate(${p.x},${p.y})`}>
         {lines.map((ln, i) => (
-          <text key={i} x={0} y={0} dy={11 + i * 10} textAnchor="middle" fontSize={9} fill={C.muted}>{ln}</text>
+          <text key={i} x={0} y={0} dy={11 + i * 10} textAnchor="middle" fontSize={fz(9)} fill={C.muted}>{ln}</text>
         ))}
       </g>
     );
@@ -216,8 +220,8 @@ export function AccidentSlide({ data, periodLabel, scopeLabel }: Props) {
     const range = blockData[p.index ?? -1]?.range ?? "";
     return (
       <g transform={`translate(${p.x},${p.y})`}>
-        <text x={0} y={0} dy={11} textAnchor="middle" fontSize={9.5} fontWeight={700} fill={C.ink}>{val}</text>
-        {range ? <text x={0} y={0} dy={22} textAnchor="middle" fontSize={8.5} fill={C.faint}>{range}</text> : null}
+        <text x={0} y={0} dy={11} textAnchor="middle" fontSize={fz(9.5)} fontWeight={700} fill={C.ink}>{val}</text>
+        {range ? <text x={0} y={0} dy={22} textAnchor="middle" fontSize={fz(8.5)} fill={C.faint}>{range}</text> : null}
       </g>
     );
   }
@@ -279,11 +283,11 @@ export function AccidentSlide({ data, periodLabel, scopeLabel }: Props) {
                   <BarChart data={locData} margin={{ top: 20, right: 6, bottom: 20, left: 2 }} barGap={2} barCategoryGap="24%">
                     <CartesianGrid vertical={false} stroke={C.grid} strokeDasharray="3 3" />
                     <XAxis dataKey="label" tick={RuasTick} tickLine={false} axisLine={{ stroke: C.line }} interval={0} height={30} />
-                    <YAxis tick={{ fontSize: 10, fill: C.faint }} width={30} tickLine={false} axisLine={false} />
+                    <YAxis tick={{ fontSize: fz(10), fill: C.faint }} width={30} tickLine={false} axisLine={false} />
                     <Tooltip contentStyle={tip} formatter={(v: number, n: string) => [nf(v), n]} />
                     {years.map((y, i) => (
                       <Bar key={y} dataKey={String(y)} name={String(y)} fill={yrFill(i)} radius={[4, 4, 0, 0]} maxBarSize={40}>
-                        <LabelList dataKey={String(y)} position="top" formatter={labelInt} style={{ fontSize: 10, fontWeight: 700, fill: C.muted }} />
+                        <LabelList dataKey={String(y)} position="top" formatter={labelInt} style={{ fontSize: fz(10), fontWeight: 700, fill: C.muted }} />
                       </Bar>
     ))}
                     {locTop && locTopIdx >= 0 ? (
@@ -301,11 +305,11 @@ export function AccidentSlide({ data, periodLabel, scopeLabel }: Props) {
                   <BarChart data={totalData} margin={{ top: 22, right: 8, bottom: 22, left: 2 }} barCategoryGap="30%">
                     <CartesianGrid vertical={false} stroke={C.grid} strokeDasharray="3 3" />
                     <XAxis dataKey="label" tick={YearTick(false)} tickLine={false} axisLine={{ stroke: C.line }} height={34} interval={0} />
-                    <YAxis tick={{ fontSize: 10, fill: C.faint }} width={30} tickLine={false} axisLine={false} />
+                    <YAxis tick={{ fontSize: fz(10), fill: C.faint }} width={30} tickLine={false} axisLine={false} />
                     <Tooltip contentStyle={tip} formatter={(v: number) => [nf(v), "Kejadian"]} />
                     <Bar dataKey="v" radius={[5, 5, 0, 0]} maxBarSize={70}>
                       {totalData.map((d, i) => <Cell key={d.year} fill={yrFill(i)} />)}
-                      <LabelList dataKey="v" position="top" formatter={labelInt} style={{ fontSize: 13, fontWeight: 700, fill: C.ink }} />
+                      <LabelList dataKey="v" position="top" formatter={labelInt} style={{ fontSize: fz(13), fontWeight: 700, fill: C.ink }} />
                     </Bar>
                     {curTotal != null && prevTotal != null ? (
                       <Customized component={(p: unknown) => <BarCallout chart={p} seriesKey="v" index={nY - 1} orient="v" title={`${nf(curTotal)} kejadian · s.d ${mon}`} sub={`${curTotal > prevTotal ? "melewati" : "di bawah"} ${prevYear} penuh (${nf(prevTotal)})`} offDx={calloutPos.total?.dx || 0} offDy={calloutPos.total?.dy || 0} onDragStart={startCalloutDrag("total")} />} />
@@ -325,11 +329,11 @@ export function AccidentSlide({ data, periodLabel, scopeLabel }: Props) {
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={causeData} layout="vertical" margin={{ top: 2, right: 34, bottom: 2, left: 2 }}>
                       <XAxis type="number" hide />
-                      <YAxis type="category" dataKey="label" tick={{ fontSize: 9.5, fill: C.muted }} width={92} tickLine={false} axisLine={false} />
+                      <YAxis type="category" dataKey="label" tick={{ fontSize: fz(9.5), fill: C.muted }} width={92} tickLine={false} axisLine={false} />
                       <Tooltip contentStyle={tip} formatter={(v: number) => [nf(v), "Kejadian"]} />
                       <Bar dataKey="count" radius={[0, 5, 5, 0]} maxBarSize={20}>
                         {causeData.map((d, i) => <Cell key={d.label} fill={i === 0 ? C.bad : C.c24} />)}
-                        <LabelList dataKey="count" position="right" formatter={labelInt} style={{ fontSize: 10, fontWeight: 700, fill: C.ink }} />
+                        <LabelList dataKey="count" position="right" formatter={labelInt} style={{ fontSize: fz(10), fontWeight: 700, fill: C.ink }} />
                       </Bar>
                       {causeTop && causeTotal ? (
                         <Customized component={(p: unknown) => <BarCallout chart={p} seriesKey="count" index={0} orient="h" title={`Penyebab dominan · ${causePct}%`} sub={`${short(causeTop.label, 16)}: ${nf(causeTop.count)}`} offDx={calloutPos.cause?.dx || 0} offDy={calloutPos.cause?.dy || 0} onDragStart={startCalloutDrag("cause")} />} />
@@ -348,11 +352,11 @@ export function AccidentSlide({ data, periodLabel, scopeLabel }: Props) {
                     <BarChart data={blockData} margin={{ top: 16, right: 6, bottom: 22, left: 2 }} barCategoryGap="22%">
                       <CartesianGrid vertical={false} stroke={C.grid} strokeDasharray="3 3" />
                       <XAxis dataKey="label" tick={BlockTick} tickLine={false} axisLine={{ stroke: C.line }} interval={0} height={32} />
-                      <YAxis tick={{ fontSize: 9, fill: C.faint }} width={24} tickLine={false} axisLine={false} />
+                      <YAxis tick={{ fontSize: fz(9), fill: C.faint }} width={24} tickLine={false} axisLine={false} />
                       <Tooltip contentStyle={tip} formatter={(v: number, _n: string, pl: { payload?: { range?: string } }) => [nf(v), pl?.payload?.range || "Kejadian"]} />
                       <Bar dataKey="count" radius={[4, 4, 0, 0]} maxBarSize={44}>
                         {blockData.map((b) => <Cell key={b.key} fill={b.count >= blockPeak && blockPeak > 0 ? C.bad : C.c26} />)}
-                        <LabelList dataKey="count" position="top" formatter={labelInt} style={{ fontSize: 10, fontWeight: 700, fill: C.ink }} />
+                        <LabelList dataKey="count" position="top" formatter={labelInt} style={{ fontSize: fz(10), fontWeight: 700, fill: C.ink }} />
                       </Bar>
                       {blockTop && blockTop.count > 0 && blockTopIdx >= 0 ? (
                         <Customized component={(p: unknown) => <BarCallout chart={p} seriesKey="count" index={blockTopIdx} orient="v" title={`Puncak · ${blockTop.range}`} sub={`${blockTop.label}: ${nf(blockTop.count)} kejadian`} offDx={calloutPos.jam?.dx || 0} offDy={calloutPos.jam?.dy || 0} onDragStart={startCalloutDrag("jam")} />} />
@@ -377,12 +381,12 @@ export function AccidentSlide({ data, periodLabel, scopeLabel }: Props) {
                   <BarChart data={victimData} margin={{ top: 16, right: 4, bottom: 22, left: 2 }} barGap={1} barCategoryGap="26%">
                     <CartesianGrid vertical={false} stroke={C.grid} strokeDasharray="3 3" />
                     <XAxis dataKey="label" tick={YearTick(false)} tickLine={false} axisLine={{ stroke: C.line }} height={34} interval={0} />
-                    <YAxis tick={{ fontSize: 9, fill: C.faint }} width={24} tickLine={false} axisLine={false} />
+                    <YAxis tick={{ fontSize: fz(9), fill: C.faint }} width={24} tickLine={false} axisLine={false} />
                     <Tooltip contentStyle={tip} formatter={(v: number, n: string) => [nf(v), n]} />
                     {(["LR", "LB", "MD"] as const).map((key, si) => (
                       <Bar key={key} dataKey={key} name={key} radius={[3, 3, 0, 0]} maxBarSize={15}>
                         {victimData.map((d, i) => <Cell key={d.year} fill={seriesFill(si, i)} />)}
-                        <LabelList dataKey={key} position="top" formatter={labelInt} style={{ fontSize: 8, fontWeight: 700, fill: C.muted }} />
+                        <LabelList dataKey={key} position="top" formatter={labelInt} style={{ fontSize: fz(8), fontWeight: 700, fill: C.muted }} />
                       </Bar>
                     ))}
                     {curMd != null && prevMd != null ? (
@@ -409,10 +413,10 @@ export function AccidentSlide({ data, periodLabel, scopeLabel }: Props) {
                     <YAxis hide domain={[0, "auto"]} />
                     <Tooltip contentStyle={tip} formatter={(v: number, n: string) => [rate4(v), n === "tk" ? "TK" : "TF"]} />
                     <Line type="monotone" dataKey="tk" name="TK" stroke={C.tk} strokeWidth={2.6} dot={rateDot(C.tk)} activeDot={{ r: 5 }} connectNulls>
-                      <LabelList dataKey="tk" position="top" offset={8} formatter={(v: number) => rate2(v)} style={{ fontSize: 10.5, fontWeight: 700, fill: C.tk }} />
+                      <LabelList dataKey="tk" position="top" offset={8} formatter={(v: number) => rate2(v)} style={{ fontSize: fz(10.5), fontWeight: 700, fill: C.tk }} />
                     </Line>
                     <Line type="monotone" dataKey="tf" name="TF" stroke={C.tf} strokeWidth={2.6} dot={rateDot(C.tf)} activeDot={{ r: 5 }} connectNulls>
-                      <LabelList dataKey="tf" position="bottom" offset={8} formatter={(v: number) => rate2(v)} style={{ fontSize: 10.5, fontWeight: 700, fill: C.tf }} />
+                      <LabelList dataKey="tf" position="bottom" offset={8} formatter={(v: number) => rate2(v)} style={{ fontSize: fz(10.5), fontWeight: 700, fill: C.tf }} />
                     </Line>
                     {curTk != null && prevTk != null ? (
                       <Customized component={(p: unknown) => <ChartCallout chart={p} orient="v" cat={String(partialYear)} val={curTk} title={`TK ${curTk > (prevTk ?? 0) ? "naik" : "turun"} · ${rate2(curTk)}`} sub={curTf != null ? `TF ${rate2(curTf)}${prevTf != null ? (curTf < prevTf ? " (membaik)" : " (memburuk)") : ""}` : ""} offDx={calloutPos.tktf?.dx || 0} offDy={calloutPos.tktf?.dy || 0} onDragStart={startCalloutDrag("tktf")} />} />

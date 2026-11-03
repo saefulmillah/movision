@@ -4,6 +4,7 @@ import { EmptyState } from "@/components/ui";
 import { SlideFrame } from "@/components/presentation/SlideFrame";
 import { PendapatanKpiCards } from "@/pages/rapat-direktorat/pendapatan/PendapatanKpiCards";
 import type { PeriodData, RuasBar } from "@/types/pendapatan";
+import { toOperationalRuas } from "@/lib/ruasAlias";
 import styles from "./PendapatanOverviewSlide.module.css";
 
 /* ============================================================
@@ -19,9 +20,11 @@ interface PendapatanOverviewSlideProps {
   periodLabel: string;
   /** Label scope aktif (regional/cabang); null/undefined untuk divisi. */
   scopeLabel?: string | null;
+  /** Pengali ukuran font label grafik (1 = normal). */
+  fontScale?: number;
 }
 
-export function PendapatanOverviewSlide({ data, periodLabel, scopeLabel }: PendapatanOverviewSlideProps) {
+export function PendapatanOverviewSlide({ data, periodLabel, scopeLabel, fontScale = 1 }: PendapatanOverviewSlideProps) {
   if (!data) {
     return (
       <SlideFrame title="Pendapatan Tol dan Lainnya">
@@ -33,7 +36,9 @@ export function PendapatanOverviewSlide({ data, periodLabel, scopeLabel }: Penda
   }
 
   const monthLabel = data.meta.period_label_month;
-  const sdLabel = data.meta.period_label_sd || periodLabel;
+  // periodLabel kini berawalan "s.d " (diseragamkan di context); judul grafik sudah
+  // menambah "s.d " sendiri, jadi buang prefiks agar tak dobel ("s.d s.d ...").
+  const sdLabel = data.meta.period_label_sd || periodLabel.replace(/^s\.d\s+/i, "");
   const periodForTitle = monthLabel || sdLabel;
   const scoped = Boolean(data.meta.scoped);
   const fromDataset = data.meta.tol_source === "lr_dataset";
@@ -67,14 +72,14 @@ export function PendapatanOverviewSlide({ data, periodLabel, scopeLabel }: Penda
       </div>
 
       <div className={styles.charts}>
-        <ChartPanel title={`Pencapaian LHR s.d ${periodForTitle}`} data={data.lhr} ariaLabel="Grafik pencapaian LHR per ruas" />
-        <ChartPanel title={`Pencapaian Pendapatan Tol s.d ${periodForTitle}`} data={data.pendapatan_ruas} ariaLabel="Grafik pencapaian pendapatan per ruas" />
+        <ChartPanel title={`Pencapaian LHR s.d ${periodForTitle}`} data={data.lhr} ariaLabel="Grafik pencapaian LHR per ruas" fs={fontScale} />
+        <ChartPanel title={`Pencapaian Pendapatan Tol s.d ${periodForTitle}`} data={data.pendapatan_ruas} ariaLabel="Grafik pencapaian pendapatan per ruas" fs={fontScale} />
       </div>
     </SlideFrame>
   );
 }
 
-function ChartPanel({ title, data, ariaLabel }: { title: string; data: RuasBar[]; ariaLabel: string }) {
+function ChartPanel({ title, data, ariaLabel, fs = 1 }: { title: string; data: RuasBar[]; ariaLabel: string; fs?: number }) {
   return (
     <div className={styles.chartPanel}>
       <div className={styles.chartHead}>
@@ -100,7 +105,7 @@ function ChartPanel({ title, data, ariaLabel }: { title: string; data: RuasBar[]
         </span>
       </div>
       <div className={styles.chartBody}>
-        <AchievementBars data={data} ariaLabel={ariaLabel} />
+        <AchievementBars data={data} ariaLabel={ariaLabel} fs={fs} />
       </div>
     </div>
   );
@@ -125,38 +130,38 @@ function regionLabel(reg: string | null): string {
   return reg === "JKT" ? "JKT" : `REG ${reg}`;
 }
 
-function AchievementBars({ data, ariaLabel }: { data: RuasBar[]; ariaLabel: string }) {
+function AchievementBars({ data, ariaLabel, fs = 1 }: { data: RuasBar[]; ariaLabel: string; fs?: number }) {
   if (!data.length) {
     return <EmptyState icon="inbox" title="Belum ada realisasi" description="Tidak ada ruas berrealisasi pada periode ini." />;
   }
   return (
     <ResponsiveContainer width="100%" height="100%">
       <BarChart data={data} margin={{ top: 26, right: 10, bottom: 24, left: 10 }} barGap={2} barCategoryGap="30%" role="img" aria-label={ariaLabel}>
-        <XAxis dataKey="ruas" tick={{ fontSize: 9, fontWeight: 700, fill: C.axis }} tickLine={false} axisLine={{ stroke: "#cbd5e1" }} interval={0} height={16} />
+        <XAxis dataKey="ruas" tickFormatter={toOperationalRuas} tick={{ fontSize: Math.round(9 * fs), fontWeight: 700, fill: C.axis }} tickLine={false} axisLine={{ stroke: "#cbd5e1" }} interval={0} height={16} />
         <YAxis hide domain={[0, (max: number) => max * 1.18]} />
         <Tooltip
           cursor={{ fill: "rgba(148,163,184,0.1)" }}
           contentStyle={tipStyle}
           labelFormatter={(label, payload) => {
             const p = payload && payload[0] && (payload[0].payload as RuasBar);
-            return p ? `${p.ruas} · ${p.ach}%` : String(label);
+            return p ? `${toOperationalRuas(p.ruas)} · ${p.ach}%` : String(label);
           }}
           formatter={(v: number, n: string) => [idFmt.format(v), n]}
         />
         <Bar dataKey="rkap" name="RKAP" fill={C.rkap} stroke={C.rkapLine} strokeWidth={1} radius={[3, 3, 0, 0]} maxBarSize={24} isAnimationActive animationDuration={650}>
-          <LabelList dataKey="rkap" content={topLabel(C.rkapLine)} />
+          <LabelList dataKey="rkap" content={topLabel(C.rkapLine, fs)} />
         </Bar>
         <Bar dataKey="real" name="Realisasi" fill={C.real} radius={[3, 3, 0, 0]} maxBarSize={24} isAnimationActive animationDuration={650}>
-          <LabelList dataKey="real" content={topLabel("#a06d10")} />
+          <LabelList dataKey="real" content={topLabel("#a06d10", fs)} />
         </Bar>
-        <Customized component={AchOverlay} rows={data} />
+        <Customized component={AchOverlay} rows={data} fs={fs} />
       </BarChart>
     </ResponsiveContainer>
   );
 }
 
 // Label nilai di atas ujung batang.
-function topLabel(color: string) {
+function topLabel(color: string, fs = 1) {
   return (props: { x?: number | string; y?: number | string; width?: number | string; value?: number | string | null }) => {
     const v = props.value == null ? null : Number(props.value);
     if (v == null || !Number.isFinite(v) || Math.round(v) === 0) return null;
@@ -164,7 +169,7 @@ function topLabel(color: string) {
     const y = Number(props.y) || 0;
     const width = Number(props.width) || 0;
     return (
-      <text x={x + width / 2} y={y - 4} textAnchor="middle" fontSize={8} fontWeight={700} fill={color} style={{ fontVariantNumeric: "tabular-nums" }}>
+      <text x={x + width / 2} y={y - 4} textAnchor="middle" fontSize={Math.round(8 * fs)} fontWeight={700} fill={color} style={{ fontVariantNumeric: "tabular-nums" }}>
         {idFmt.format(v)}
       </text>
     );
@@ -175,13 +180,14 @@ function topLabel(color: string) {
 // Menerima scale sumbu dari chart sehingga posisi selaras batang.
 interface OverlayProps {
   rows?: RuasBar[];
+  fs?: number;
   xAxisMap?: Record<string, { scale?: AxisScale }>;
   yAxisMap?: Record<string, { scale?: AxisScale }>;
   offset?: { top: number; left: number; width: number; height: number };
 }
 type AxisScale = ((value: number | string) => number | undefined) & { bandwidth?: () => number; step?: () => number };
 
-function AchOverlay({ rows, xAxisMap, yAxisMap, offset }: OverlayProps) {
+function AchOverlay({ rows, fs = 1, xAxisMap, yAxisMap, offset }: OverlayProps) {
   if (!rows || !rows.length || !xAxisMap || !yAxisMap || !offset) return null;
   const xScale = xAxisMap[Object.keys(xAxisMap)[0]]?.scale;
   const yScale = yAxisMap[Object.keys(yAxisMap)[0]]?.scale;
@@ -218,11 +224,13 @@ function AchOverlay({ rows, xAxisMap, yAxisMap, offset }: OverlayProps) {
         const topBar = Math.min(yScale(d.rkap) ?? baseY, yScale(d.real) ?? baseY);
         const py = Math.max(topBar - 8, offset.top + 4);
         const text = `${d.ach}%`;
-        const pw = text.length * 6.6 + 12;
+        const badgeFs = Math.round(11 * fs);
+        const pw = text.length * 6.6 * fs + 12;
+        const ph = Math.round(16 * fs);
         return (
           <g key={`ach-${i}`}>
-            <rect x={cx - pw / 2} y={py - 12} width={pw} height={16} rx={8} fill={achFill(d.ach)} />
-            <text x={cx} y={py} textAnchor="middle" fontSize={11} fontWeight={800} fill={achInk(d.ach)}>
+            <rect x={cx - pw / 2} y={py - ph + 4} width={pw} height={ph} rx={ph / 2} fill={achFill(d.ach)} />
+            <text x={cx} y={py} textAnchor="middle" fontSize={badgeFs} fontWeight={800} fill={achInk(d.ach)}>
               {text}
             </text>
           </g>
@@ -236,7 +244,7 @@ function AchOverlay({ rows, xAxisMap, yAxisMap, offset }: OverlayProps) {
         if (l == null || r == null) return null;
         const cx = (l + r + bw) / 2;
         return (
-          <text key={`reg-${i}`} x={cx} y={baseY + 30} textAnchor="middle" fontSize={10} fontWeight={700} fill={C.region}>
+          <text key={`reg-${i}`} x={cx} y={baseY + 30} textAnchor="middle" fontSize={Math.round(10 * fs)} fontWeight={700} fill={C.region}>
             {regionLabel(b.reg)}
           </text>
         );

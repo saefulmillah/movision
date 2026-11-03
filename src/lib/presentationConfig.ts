@@ -17,6 +17,8 @@ export interface PresentationConfig {
   subtitles: Record<string, string>;
   auto: boolean;
   autoSec: number;
+  /** Pengali ukuran font slide (1 = normal). Default 1 bila absen. */
+  fontScale?: number;
 }
 
 export interface AgendaResponse {

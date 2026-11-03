@@ -57,8 +57,9 @@ export const getOdolCompanies = (p: Period & { vehicle_group?: string }) =>
   api.get<InsightsEnvelope<OdolCompanies>>(`/insights/odol/companies${qs(p)}`);
 
 // Agregator ODOL untuk slide presentasi (sadar-scope). Mengembalikan payload penuh.
-export const getOdolPresentation = (scope?: string | null) =>
-  api.get<OdolPresentation>(`/insights/odol/presentation${qs({ scope: scope && scope !== "divisi" ? scope : undefined })}`);
+// refresh=true → paksa backend ambil ulang dari partner (lewati read-through cache).
+export const getOdolPresentation = (scope?: string | null, refresh?: boolean) =>
+  api.get<OdolPresentation>(`/insights/odol/presentation${qs({ scope: scope && scope !== "divisi" ? scope : undefined, refresh })}`);
 
 // --- Kecelakaan ---
 export const getAccidentSummary = (p: Period) =>
@@ -69,9 +70,10 @@ export const getAccidentBreakdown = (p: Period & { by: string }) =>
   api.get<InsightsEnvelope<AccidentBreakdown>>(`/insights/accidents/breakdown${qs(p)}`);
 
 // Agregator Kecelakaan untuk slide presentasi (sadar-scope, 3 tahun mengikuti periode).
-export const getAccidentPresentation = (periodKey: string, scope?: string | null) =>
+// refresh=true → paksa backend ambil ulang dari partner (lewati read-through cache).
+export const getAccidentPresentation = (periodKey: string, scope?: string | null, refresh?: boolean) =>
   api.get<AccidentPresentation>(
-    `/insights/accidents/presentation${qs({ period: periodKey, scope: scope && scope !== "divisi" ? scope : undefined })}`
+    `/insights/accidents/presentation${qs({ period: periodKey, scope: scope && scope !== "divisi" ? scope : undefined, refresh })}`
   );
 
 // --- Kendaraan Bantuan ---

@@ -4,6 +4,7 @@
    Konstanta mengikuti LabaRugiPage (Konsolidasi / Per Regional / Per Ruas).
    ============================================================ */
 import type { Cell, EntityData, PeriodData } from "@/types/labaRugi";
+import { toOperationalRuas } from "@/lib/ruasAlias";
 
 export type LrView = "konsol" | "regional" | "ruas";
 
@@ -152,8 +153,9 @@ export function buildColumns(data: PeriodData, view: LrView): LrColumn[] {
     return REGIONS.filter((r) => has(r.id)).map((r) => ({ label: r.label, tint: tintOf(r.id), data: data.entities[r.id], code: r.id, realLabel: "REAL" }));
   }
   // ruas — sembunyikan PALTUNG (mengikuti default LabaRugiPage), tampilkan yang ada datanya.
+  // label = kode operasional seragam (BINBRAN→BINSA, dst.); code tetap kunci lookup data.
   return RUAS.filter((x) => x.id !== "PALTUNG" && has(x.id)).map((x) => ({
-    label: x.id,
+    label: toOperationalRuas(x.id),
     tint: tintOf(x.grp),
     data: data.entities[x.id],
     code: x.id,

@@ -4,6 +4,7 @@ import { usePresentation } from "@/context/PresentationContext";
 import { SLIDES } from "./slideRegistry";
 import { pdfSlideLabel } from "./pdfSlides";
 import { SlideView, isCoverSlide } from "./SlideView";
+import { FontSizeControl } from "./FontSizeControl";
 import { SlidePreview, type ThumbKind } from "./SlidePreview";
 import { resolveCoverUrl } from "@/lib/presentationCover";
 import brandLogos from "@/assets/presentation/brand-logos.png";
@@ -168,9 +169,19 @@ export function PresentationOverlay() {
           )}
         </div>
         <span className={styles.spacer} />
+        <FontSizeControl value={p.fontScale} onChange={p.setFontScale} variant="overlay" />
         <span className={styles.pageLabel}>
           {cur + 1} / {total}
         </span>
+        <button
+          className={styles.iconBtn}
+          onClick={() => void p.refreshSnapshot()}
+          disabled={p.snapshotRefreshing}
+          title="Muat ulang data (ambil terbaru dari sumber)"
+          aria-label="Muat ulang data"
+        >
+          <Icon name={p.snapshotRefreshing ? "loader" : "refresh-cw"} size={16} className={p.snapshotRefreshing ? styles.spin : undefined} />
+        </button>
         <button className={styles.iconBtn} onClick={toggleFullscreen} title="Layar penuh" aria-label="Layar penuh">
           <Icon name="maximize" size={16} />
         </button>

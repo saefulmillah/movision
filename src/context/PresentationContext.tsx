@@ -64,8 +64,15 @@ interface PresentationContextValue {
   cur: number;
   auto: boolean;
   autoSec: number;
+  /** Pengali ukuran font slide (1 = normal). */
+  fontScale: number;
+  setFontScale: (v: number) => void;
   matrix: RiskMatrix | null;
   snapshot: SnapshotState;
+  /** true selama muat-ulang paksa data (tombol refresh presentasi) berjalan. */
+  snapshotRefreshing: boolean;
+  /** Buang cache snapshot periode×scope aktif & ambil ulang paksa dari partner. */
+  refreshSnapshot: () => Promise<void>;
   // Dokumen PDF (tiap halaman jadi slide).
   pdfs: PdfDoc[];
   refreshPdfs: () => Promise<void>;
@@ -139,6 +146,7 @@ interface PersistState {
   subtitles: Record<string, string>;
   auto: boolean;
   autoSec: number;
+  fontScale: number;
 }
 
 // Sumber kebenaran agenda = server PER SCOPE (lihat loadScopeData). Tak ada lagi
@@ -169,6 +177,34 @@ function initialEnabled(order: string[], saved?: Record<string, boolean>): Recor
   return Object.fromEntries(order.map((id) => [id, saved?.[id] ?? true]));
 }
 
+// Rentang ukuran font slide (skala pengali) untuk slider di builder & presentasi.
+// 1 = normal (100%); maksimum dinaikkan agar teks bisa jauh lebih besar saat rapat.
+export const FONT_SCALE_MIN = 1;
+export const FONT_SCALE_MAX = 2;
+export const FONT_SCALE_STEP = 0.05;
+function clampFontScale(v: number): number {
+  if (!Number.isFinite(v)) return 1;
+  return Math.min(FONT_SCALE_MAX, Math.max(FONT_SCALE_MIN, v));
+}
+
+const ID_MONTHS = [
+  "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+  "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+];
+
+// Label periode seragam "s.d <Bulan> <Tahun>" dari kunci "YYYY-MM" (data bulanan
+// bersifat kumulatif s.d bulan tsb). Label per-modul (LR/Risiko/Pendapatan/Sentimen)
+// tidak konsisten — ada yang "s.d September 2026", ada yang "Oktober 2026" — jadi
+// dinormalkan di sini agar sama di cover slide, header, dan dropdown. Kunci non-bulanan
+// (tak cocok pola) memakai label bawaannya.
+function canonicalPeriodLabel(key: string, fallback: string): string {
+  const m = /^(\d{4})-(\d{2})$/.exec(key);
+  if (!m) return fallback;
+  const mm = Number(m[2]);
+  if (mm < 1 || mm > 12) return fallback;
+  return `s.d ${ID_MONTHS[mm - 1]} ${m[1]}`;
+}
+
 export function PresentationProvider({ children }: { children: ReactNode }) {
   const { status: authStatus } = useAuth();
   const [persisted] = useState<Partial<PersistState>>(loadPersisted);
@@ -182,9 +218,12 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
   const [cur, setCur] = useState(0);
   const [auto, setAuto] = useState(persisted.auto ?? false);
   const [autoSec, setAutoSecState] = useState(persisted.autoSec ?? 8);
+  const [fontScale, setFontScaleState] = useState(clampFontScale(persisted.fontScale ?? 1));
 
   const [matrix, setMatrix] = useState<RiskMatrix | null>(null);
   const [snapshot, setSnapshot] = useState<SnapshotState>({ loading: false, error: null, data: null });
+  // Penanda muat-ulang paksa sedang berjalan (data lama tetap tampil selama ini).
+  const [snapRefreshing, setSnapRefreshing] = useState(false);
   const [pdfs, setPdfs] = useState<PdfDoc[]>([]);
 
   const [meetingTitle, setMeetingTitle] = useState(persisted.meetingTitle ?? "Rapat Direktorat");
@@ -230,7 +269,8 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
       titles,
       subtitles,
       auto,
-      autoSec
+      autoSec,
+      fontScale
     };
     // Hanya simpan setelah agenda SCOPE AKTIF termuat (hindari menulis config
     // scope lain / default saat masih berpindah scope).
@@ -249,7 +289,7 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
         /* biarkan localStorage sbg cadangan bila server gagal */
       });
     }, 800);
-  }, [order, enabled, period, meetingTitle, meetingSubtitle, meetingDate, titles, subtitles, auto, autoSec]);
+  }, [order, enabled, period, meetingTitle, meetingSubtitle, meetingDate, titles, subtitles, auto, autoSec, fontScale]);
 
   const activeSlides = useMemo(
     () => order.filter((id) => enabled[id] && isSlideAllowedForScope(id, scope?.level)),
@@ -278,7 +318,7 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
     for (const s of sentList) byKey.set(s.key, s.label);
     for (const l of lrList) byKey.set(l.key, l.label);
     const list = [...byKey.entries()]
-      .map(([key, label]) => ({ key, label }))
+      .map(([key, label]) => ({ key, label: canonicalPeriodLabel(key, label) }))
       .sort((a, b) => (a.key < b.key ? 1 : a.key > b.key ? -1 : 0));
     setPeriods(list);
     setPeriodState((prev) => (prev && list.some((p) => p.key === prev) ? prev : list[0]?.key ?? ""));
@@ -344,6 +384,7 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
       setSubtitles(cfg.subtitles && typeof cfg.subtitles === "object" ? cfg.subtitles : {});
       if (typeof cfg.auto === "boolean") setAuto(cfg.auto);
       if (typeof cfg.autoSec === "number") setAutoSecState(cfg.autoSec);
+      setFontScaleState(clampFontScale(typeof cfg.fontScale === "number" ? cfg.fontScale : 1));
       setAgendaIsOverride(Boolean(agendaRes?.isOverride));
       agendaLoadedForRef.current = sk;
     },
@@ -441,36 +482,54 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
 
   // Snapshot di-cache per periode × scope (LR & Pendapatan difilter per scope di
   // backend; Risiko masih level-divisi sampai Fase 4, jadi tak di-scope).
-  const loadSnapshot = useCallback(async (key: string, scopeKey: string, scopeLevel?: string | null) => {
+  // force=true → lewati cache lokal DAN minta backend ambil ulang dari partner
+  // (dipakai tombol "Muat ulang data" di mode presentasi). Saat force, data lama
+  // tetap tampil (pakai flag snapRefreshing) agar slide tak berkedip kosong.
+  const loadSnapshot = useCallback(async (key: string, scopeKey: string, scopeLevel?: string | null, force = false) => {
     if (!key) {
       setSnapshot({ loading: false, error: null, data: null });
       return;
     }
     const cacheKey = `${key}::${scopeKey}`;
-    const cached = snapCache.current.get(cacheKey);
-    if (cached) {
-      setSnapshot({ loading: false, error: null, data: cached });
-      return;
+    if (!force) {
+      const cached = snapCache.current.get(cacheKey);
+      if (cached) {
+        setSnapshot({ loading: false, error: null, data: cached });
+        return;
+      }
+      setSnapshot({ loading: true, error: null, data: null });
+    } else {
+      setSnapRefreshing(true);
     }
-    setSnapshot({ loading: true, error: null, data: null });
-    // Slide regional-only (Kinerja Regional, LHR/PHR vs BP) hanya di-fetch utk scope regional.
-    const kinerjaReq = scopeLevel === "regional" ? getKinerjaRegional(key, scopeKey).catch(() => null) : Promise.resolve(null);
-    const lhrPhrReq = scopeLevel === "regional" ? getLhrPhrEval(key, scopeKey).catch(() => null) : Promise.resolve(null);
-    const accidentReq = scopeLevel === "regional" ? getAccidentPresentation(key, scopeKey).catch(() => null) : Promise.resolve(null);
-    const [lr, risk, pend, sentiment, odol, kinerja, lhrPhrEval, accident] = await Promise.all([
-      getLrPeriod(key, scopeKey).catch(() => null),
-      getRiskPeriod(key, scopeKey).catch(() => null),
-      getPendPeriod(key, scopeKey).catch(() => null),
-      getSentimentDashboard(key, scopeKey).catch(() => null),
-      getOdolPresentation(scopeKey).catch(() => null),
-      kinerjaReq,
-      lhrPhrReq,
-      accidentReq
-    ]);
-    const data: PeriodSnapshot = { lr, risk, pend, sentiment, odol, kinerja, lhrPhrEval, accident };
-    snapCache.current.set(cacheKey, data);
-    setSnapshot({ loading: false, error: null, data });
+    try {
+      // Slide regional-only (Kinerja Regional, LHR/PHR vs BP) hanya di-fetch utk scope regional.
+      // Sumber partner (ODOL & Kecelakaan) meneruskan `force` → lewati read-through cache.
+      const kinerjaReq = scopeLevel === "regional" ? getKinerjaRegional(key, scopeKey).catch(() => null) : Promise.resolve(null);
+      const lhrPhrReq = scopeLevel === "regional" ? getLhrPhrEval(key, scopeKey).catch(() => null) : Promise.resolve(null);
+      const accidentReq = scopeLevel === "regional" ? getAccidentPresentation(key, scopeKey, force).catch(() => null) : Promise.resolve(null);
+      const [lr, risk, pend, sentiment, odol, kinerja, lhrPhrEval, accident] = await Promise.all([
+        getLrPeriod(key, scopeKey).catch(() => null),
+        getRiskPeriod(key, scopeKey).catch(() => null),
+        getPendPeriod(key, scopeKey).catch(() => null),
+        getSentimentDashboard(key, scopeKey).catch(() => null),
+        getOdolPresentation(scopeKey, force).catch(() => null),
+        kinerjaReq,
+        lhrPhrReq,
+        accidentReq
+      ]);
+      const data: PeriodSnapshot = { lr, risk, pend, sentiment, odol, kinerja, lhrPhrEval, accident };
+      snapCache.current.set(cacheKey, data);
+      setSnapshot({ loading: false, error: null, data });
+    } finally {
+      if (force) setSnapRefreshing(false);
+    }
   }, []);
+
+  // Ambil ulang paksa snapshot periode×scope aktif (buang cache lokal + minta
+  // backend refresh data partner). Dipakai tombol muat-ulang di mode presentasi.
+  const refreshSnapshot = useCallback(async () => {
+    await loadSnapshot(period, scope?.key ?? "divisi", scope?.level, true);
+  }, [period, scope, loadSnapshot]);
 
   // Buang cache snapshot agar data dimuat ulang (dipakai setelah upload dataset
   // kinerja per-scope). Bila periode & scope yang dibuang = yang sedang aktif di
@@ -595,6 +654,7 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
   }, []);
   const toggleAuto = useCallback(() => setAuto((a) => !a), []);
   const setAutoSec = useCallback((sec: number) => setAutoSecState(Math.max(4, Math.min(30, sec))), []);
+  const setFontScale = useCallback((v: number) => setFontScaleState(clampFontScale(v)), []);
 
   const start = useCallback(() => {
     setCur(0);
@@ -630,8 +690,12 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
     cur,
     auto,
     autoSec,
+    fontScale,
+    setFontScale,
     matrix,
     snapshot,
+    snapshotRefreshing: snapRefreshing,
+    refreshSnapshot,
     pdfs,
     refreshPdfs,
     refreshAgenda,

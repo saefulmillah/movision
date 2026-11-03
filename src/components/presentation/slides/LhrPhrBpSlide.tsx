@@ -15,6 +15,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { EmptyState } from "@/components/ui";
 import { SlideFrame } from "@/components/presentation/SlideFrame";
 import type { LhrPhrEvalData, RuasEval, TrafficSeries } from "@/lib/lhrPhrEval";
+import { toOperationalRuas } from "@/lib/ruasAlias";
 import styles from "./LhrPhrBpSlide.module.css";
 
 /* ============================================================
@@ -76,7 +77,7 @@ export function LhrPhrBpSlide({ data, periodLabel, scopeLabel }: Props) {
         {data.ruas.map((r) => (
           <div key={r.ruas} className={styles.chip}>
             <span className={styles.dot} />
-            <span className={styles.chipName}>{r.ruas}</span>
+            <span className={styles.chipName}>{toOperationalRuas(r.ruas)}</span>
           </div>
         ))}
       </div>

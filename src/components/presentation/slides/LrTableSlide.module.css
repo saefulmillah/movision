@@ -301,7 +301,8 @@
 .rItem td {
   background: var(--lr-item-bg);
   color: var(--text-dim);
-  font-size: 12px;
+  /* Ukuran teks breakdown biaya mengikuti setelan font slide (--pfx-fs). */
+  font-size: calc(12px * var(--pfx-fs, 1));
   padding-top: 0;
   padding-bottom: 0;
   border-bottom: 0 solid var(--line);

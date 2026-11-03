@@ -1,0 +1,296 @@
+@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap");
+
+/* ============================================================================
+   Movision - Presentation — slide imersif TEMA TERANG. Peta produk: sudah
+   dibangun (kiri) → disosialisasikan hari ini (kanan, highlight).
+   ============================================================================ */
+
+.slide {
+  position: relative;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  isolation: isolate;
+  color: #16305c;
+  background:
+    radial-gradient(1100px 760px at 78% 24%, #dcebff 0%, rgba(220, 235, 255, 0) 62%),
+    linear-gradient(155deg, #f3f8ff 0%, #eef4fc 50%, #e7f0fb 100%);
+  font-family: var(--font-sans);
+}
+.slide::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-image:
+    linear-gradient(rgba(37, 99, 235, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.05) 1px, transparent 1px);
+  background-size: 46px 46px;
+  mask-image: radial-gradient(130% 100% at 60% 50%, #000 52%, transparent 100%);
+}
+.aurora { position: absolute; inset: 0; z-index: -1; overflow: hidden; }
+.blob { position: absolute; border-radius: 50%; filter: blur(85px); opacity: 0.5; will-change: transform; }
+.blob1 { width: 560px; height: 560px; right: 4%; top: -14%; background: radial-gradient(circle, #93c5fd 0%, transparent 70%); animation: drift 18s ease-in-out infinite; }
+.blob2 { width: 480px; height: 480px; left: 6%; bottom: -16%; background: radial-gradient(circle, #a5f3fc 0%, transparent 70%); opacity: 0.4; animation: drift 22s ease-in-out infinite reverse; }
+@keyframes drift { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-44px, 32px); } }
+
+/* ---- Header ---- */
+.head {
+  flex: none;
+  padding: clamp(18px, 3.4vh, 42px) clamp(32px, 4.5vw, 80px) clamp(4px, 1vh, 12px);
+  animation: fadeDown 700ms ease-out both;
+}
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  font-size: clamp(11px, 1.4vh, 14px);
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #2563eb;
+}
+.kicker::before { content: ""; width: 32px; height: 3px; border-radius: 99px; background: linear-gradient(90deg, #2563eb, #22d3ee); }
+.title {
+  margin: 8px 0 0;
+  font-size: clamp(26px, 4.4vh, 50px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.04;
+  color: #13294b;
+}
+
+/* ---- Body split ---- */
+.body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 1.4vw, 22px);
+  padding: clamp(6px, 1.4vh, 18px) clamp(32px, 4.5vw, 80px) clamp(16px, 2.6vh, 32px);
+}
+
+/* KIRI — sudah dibangun */
+.built {
+  flex: 0 0 35%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.4vh, 16px);
+  animation: slideInL 640ms cubic-bezier(0.22, 0.61, 0.36, 1) 120ms both;
+}
+.builtGrid {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(8px, 1.6vh, 20px) clamp(8px, 1vw, 18px);
+  align-content: center;
+}
+.colLabel {
+  font-size: clamp(10px, 1.3vh, 13px);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #6b7a96;
+}
+.builtItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.builtImg {
+  width: 100%;
+  height: clamp(92px, 14vh, 158px);
+  object-fit: contain;
+  filter: drop-shadow(0 16px 30px rgba(20, 50, 110, 0.28));
+  will-change: transform;
+  animation: floatBuilt 6s ease-in-out infinite var(--bd, 0s), fadeIn 700ms ease-out both;
+}
+.builtName { text-align: center; font-size: clamp(12px, 1.6vh, 16px); font-weight: 800; color: #13294b; letter-spacing: -0.01em; line-height: 1.18; }
+
+/* Jembatan */
+.bridge {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.bridgeLabel {
+  font-size: clamp(9px, 1.2vh, 12px);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #2563eb;
+  white-space: nowrap;
+}
+.chev {
+  width: 14px; height: 14px;
+  border-top: 4px solid #2563eb;
+  border-right: 4px solid #2563eb;
+  border-radius: 2px;
+  transform: rotate(45deg);
+  opacity: 0.25;
+  animation: chevFlow 1.5s ease-in-out infinite;
+}
+.chev2 { animation-delay: 0.2s; }
+.chev3 { animation-delay: 0.4s; }
+@keyframes chevFlow { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+
+/* KANAN — fokus (highlight) */
+.focus {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(5px, 1vh, 10px);
+  padding-left: clamp(8px, 1.2vw, 22px);
+  animation: fadeIn 700ms ease-out 200ms both;
+}
+
+/* ---- Sticky note: Catatan Format Prarakor ---- */
+.sticky {
+  position: absolute;
+  left: clamp(2px, 0.6vw, 18px);
+  bottom: clamp(6px, 1.6vh, 24px);
+  z-index: 6;
+  width: clamp(214px, 21vw, 286px);
+  padding: clamp(14px, 2vh, 20px) clamp(14px, 1.4vw, 20px) clamp(12px, 1.6vh, 16px);
+  background: linear-gradient(162deg, #fff6a6 0%, #ffe868 100%);
+  border-radius: 3px;
+  box-shadow: 0 18px 36px rgba(84, 72, 10, 0.28), 0 2px 6px rgba(84, 72, 10, 0.16);
+  color: #4a3d00;
+  font-family: "Caveat", var(--font-sans), cursive;
+  animation: fadeIn 700ms ease-out 520ms both, stickyFloat 6.5s ease-in-out infinite;
+}
+.stickyTape {
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  width: 88px;
+  height: 22px;
+  transform: translateX(-50%) rotate(-3deg);
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+.stickyTitle {
+  font-size: clamp(20px, 2.7vh, 27px);
+  font-weight: 700;
+  line-height: 1.02;
+  margin-bottom: 7px;
+  padding-bottom: 5px;
+  border-bottom: 2px solid rgba(74, 61, 0, 0.26);
+}
+.stickyList {
+  margin: 0;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: clamp(14.5px, 1.9vh, 18px);
+  font-weight: 600;
+  line-height: 1.2;
+}
+.stickyList li { padding-left: 2px; }
+.focusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  align-self: flex-start;
+  padding: 6px 14px;
+  border-radius: 99px;
+  font-size: clamp(10px, 1.3vh, 13px);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(90deg, #2563eb, #22d3ee);
+  background-size: 200% 100%;
+  animation: shimmer 2.6s linear infinite;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.3);
+}
+.badgeDot { width: 8px; height: 8px; border-radius: 50%; background: #fff; animation: blink 1.4s ease-in-out infinite; }
+.focusName {
+  margin: clamp(4px, 0.8vh, 10px) 0 0;
+  font-size: clamp(24px, 4vh, 44px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.02;
+  color: #13294b;
+}
+.focusDesc {
+  margin: clamp(4px, 0.8vh, 8px) 0 0;
+  max-width: 620px;
+  font-size: clamp(12px, 1.7vh, 17px);
+  font-weight: 500;
+  line-height: 1.45;
+  color: #45566f;
+}
+
+.showcase {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-top: clamp(4px, 1vh, 10px);
+}
+.glow {
+  position: absolute;
+  top: 54%; left: 50%;
+  width: 72%; height: 72%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.28) 0%, rgba(37, 99, 235, 0.1) 46%, transparent 70%);
+  filter: blur(8px);
+  animation: glowPulse 5s ease-in-out infinite;
+}
+.laptop {
+  position: absolute;
+  left: 50%; bottom: 0;
+  width: clamp(320px, 80%, 760px);
+  transform: translateX(-50%);
+  object-fit: contain;
+  filter: drop-shadow(0 22px 44px rgba(20, 50, 110, 0.32));
+  z-index: 2;
+  animation: floatHero 7s ease-in-out infinite, fadeIn 900ms ease-out 360ms both;
+}
+.tablet {
+  position: absolute;
+  right: -2%; top: -4%;
+  width: clamp(150px, 42%, 360px);
+  object-fit: contain;
+  filter: drop-shadow(0 18px 38px rgba(20, 50, 110, 0.34));
+  z-index: 3;
+  animation: floatSide 6.4s ease-in-out infinite 0.6s, fadeIn 860ms ease-out 520ms both;
+}
+
+/* ---- Keyframes ---- */
+@keyframes shimmer { to { background-position: 200% 0; } }
+@keyframes fadeDown { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideInL { from { opacity: 0; transform: translateX(-26px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes popIn { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: scale(1); } }
+@keyframes glowPulse { 0%, 100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.07); } }
+@keyframes floatHero { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-13px); } }
+@keyframes floatSide { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(13px); } }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes floatBuilt { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+@keyframes stickyFloat { 0%, 100% { transform: rotate(-5deg) translateY(0); } 50% { transform: rotate(-5deg) translateY(-7px); } }
+
+@media (max-width: 900px) { .built { flex-basis: 34%; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .blob1, .blob2, .glow, .laptop, .tablet, .builtImg, .focusBadge, .badgeDot, .built, .focus, .head, .chev, .sticky {
+    animation: none !important;
+  }
+  .sticky { transform: rotate(-5deg); }
+  .laptop { transform: translateX(-50%); }
+}
