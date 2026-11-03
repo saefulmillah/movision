@@ -32,28 +32,38 @@ export function RiskMapSlide({ matrix, risk, periodLabel, periodKey, scope, scop
   // Kunci scope regional aktif (data `risk`/prop sudah untuk scope ini).
   const regionalKey = scope?.level === "regional" ? scope.key : null;
 
-  // Opsi selector: Regional (prop) + tiap cabang di bawahnya. Hanya untuk regional.
+  // Manajemen Risiko tidak dikonsolidasikan di tingkat regional — disajikan per ruas
+  // (cabang). Tab Regional hanya ditampilkan bila regional memang punya data; bila
+  // tidak, selector langsung menampilkan ruas-ruas saja (default = ruas pertama),
+  // sehingga slide tak pernah terbuka pada state "belum ada data".
+  const regionalHasData = (risk?.risks?.length ?? 0) > 0;
+
+  // Opsi selector: [Regional bila berisi] + tiap cabang di bawahnya. Hanya untuk regional.
   const options = useMemo(() => {
     if (!regionalKey || !scope) return [];
     const cabang = flattenScopes(scopeInfo ?? null)
       .filter((s) => s.level === "cabang" && s.regionalKey === scope.regionalKey)
       .map((s) => ({ key: s.key, label: s.label }));
-    if (cabang.length === 0) return [];
-    return [{ key: regionalKey, label: scope.label }, ...cabang];
-  }, [regionalKey, scope, scopeInfo]);
+    const regionalOpt = regionalHasData ? [{ key: regionalKey, label: scope.label }] : [];
+    if (regionalOpt.length === 0 && cabang.length === 0) return [];
+    return [...regionalOpt, ...cabang];
+  }, [regionalKey, scope, scopeInfo, regionalHasData]);
   const hasSelector = options.length > 0;
 
+  // Scope yang ditampilkan pertama kali: opsi pertama (ruas pertama bila regional kosong).
+  const defaultKey = options[0]?.key ?? regionalKey ?? "divisi";
+
   // Scope yang sedang ditampilkan + cache hasil fetch cabang.
-  const [activeKey, setActiveKey] = useState<string>(regionalKey ?? "divisi");
+  const [activeKey, setActiveKey] = useState<string>(defaultKey);
   const [cache, setCache] = useState<Record<string, PeriodData | null>>({});
   const [loadingKey, setLoadingKey] = useState<string | null>(null);
 
-  // Reset saat scope regional / periode berganti.
+  // Reset ke opsi pertama saat scope regional / periode berganti.
   useEffect(() => {
-    setActiveKey(regionalKey ?? "divisi");
+    setActiveKey(defaultKey);
     setCache({});
     setLoadingKey(null);
-  }, [regionalKey, periodKey]);
+  }, [defaultKey, periodKey]);
 
   // Fetch risiko cabang saat dipilih (selain regional yang sudah ada di prop).
   useEffect(() => {
