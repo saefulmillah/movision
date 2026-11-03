@@ -73,7 +73,11 @@ type PlMetricKey = (typeof PL_METRICS)[number]["key"];
 export function RencanaPendapatanSlide({ kinerja, periodLabel, scopeLabel, fontScale = 1 }: Props) {
   const [ruasPeriod, setRuasPeriod] = useState<"mo" | "sd">("mo");
   const [plPeriod, setPlPeriod] = useState<"mo" | "sd">("mo");
-  const [plMetric, setPlMetric] = useState<PlMetricKey>("eat");
+  // Default metrik Kinerja L/R = Pendapatan (bukan EAT) agar pembukaan slide
+  // langsung menyorot pendapatan sesuai judul.
+  const [plMetric, setPlMetric] = useState<PlMetricKey>("pend_usaha");
+  // Skala ukuran font label grafik (tick & label nilai) mengikuti setelan slide.
+  const fz = (n: number) => Math.round(n * fontScale * 100) / 100;
 
   const rkkLabel = kinerja?.rkk_label || null;
   const rkkSdLabel = kinerja?.rkk_sd_label || null;
@@ -247,11 +251,11 @@ export function RencanaPendapatanSlide({ kinerja, periodLabel, scopeLabel, fontS
             <div className={`${styles.chart} ${styles.grow}`}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={ruasRows} margin={{ top: 20, right: 6, bottom: 2, left: 2 }} barCategoryGap="22%">
-                  <XAxis dataKey="name" tick={{ fontSize: 10.5, fontWeight: 700, fill: C.axis }} tickLine={false} axisLine={false} interval={0} height={16} />
+                  <XAxis dataKey="name" tick={{ fontSize: fz(10.5), fontWeight: 700, fill: C.axis }} tickLine={false} axisLine={false} interval={0} height={16} />
                   <YAxis hide domain={[0, (max: number) => max * 1.2]} />
                   <Tooltip cursor={{ fill: "rgba(148,163,184,0.1)" }} contentStyle={tipStyle} formatter={(v: number) => [numJuta(v), "RKK"]} />
                   <Bar dataKey="value" name="RKK" fill={C.teal} radius={[4, 4, 0, 0]} maxBarSize={48} isAnimationActive animationDuration={650}>
-                    <LabelList dataKey="value" content={TopLabel(numJuta, C.axis, 10.5)} />
+                    <LabelList dataKey="value" content={TopLabel(numJuta, C.axis, fz(10.5))} />
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
@@ -303,7 +307,7 @@ export function RencanaPendapatanSlide({ kinerja, periodLabel, scopeLabel, fontS
                 <CartesianGrid stroke="var(--line)" strokeDasharray="3 3" />
                 <XAxis
                   dataKey="name"
-                  tick={{ fontSize: 12, fontWeight: 700, fill: C.axis }}
+                  tick={{ fontSize: fz(12), fontWeight: 700, fill: C.axis }}
                   tickLine={{ stroke: "#94a3b8" }}
                   axisLine={{ stroke: "#94a3b8" }}
                   interval={0}
@@ -312,7 +316,7 @@ export function RencanaPendapatanSlide({ kinerja, periodLabel, scopeLabel, fontS
                 <YAxis
                   domain={[(min: number) => Math.min(0, min) * 1.25, (max: number) => Math.max(0, max) * 1.2]}
                   tickFormatter={(v: number) => idMrd.format(v)}
-                  tick={{ fontSize: 11, fontWeight: 600, fill: C.axis }}
+                  tick={{ fontSize: fz(11), fontWeight: 600, fill: C.axis }}
                   tickLine={{ stroke: "#94a3b8" }}
                   axisLine={{ stroke: "#94a3b8" }}
                   width={42}
@@ -320,10 +324,10 @@ export function RencanaPendapatanSlide({ kinerja, periodLabel, scopeLabel, fontS
                 <ReferenceLine y={0} stroke="#64748b" strokeWidth={1.75} />
                 <Tooltip cursor={{ fill: "rgba(148,163,184,0.1)" }} contentStyle={tipStyle} formatter={(v: number, n: string) => [idMrd.format(v), n]} />
                 <Bar dataKey="rkap" name="RKAP" fill={C.teal} radius={[3, 3, 0, 0]} maxBarSize={48} isAnimationActive animationDuration={650}>
-                  <LabelList dataKey="rkap" content={TopLabel((v) => idMrd.format(v), C.teal, 12)} />
+                  <LabelList dataKey="rkap" content={TopLabel((v) => idMrd.format(v), C.teal, fz(12))} />
                 </Bar>
                 <Bar dataKey="rkk" name="RKK" fill={C.rkk} radius={[3, 3, 0, 0]} maxBarSize={48} isAnimationActive animationDuration={650}>
-                  <LabelList dataKey="rkk" content={TopLabel((v) => idMrd.format(v), C.rkk, 12)} />
+                  <LabelList dataKey="rkk" content={TopLabel((v) => idMrd.format(v), C.rkk, fz(12))} />
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
