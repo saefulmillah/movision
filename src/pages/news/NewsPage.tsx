@@ -43,15 +43,23 @@ export function NewsPage() {
   const canApprove = hasPermission("news.approve");
   const canViewAll = hasRole("super_admin") || hasPermission("branch.view.all");
 
-  // Cabang yang boleh dipilih maker saat mengajukan (scope).
+  // Ruas yang boleh dipilih maker saat mengajukan (scope).
+  // Scope yang DITETAPKAN untuk user (saat pembuatan user → user_branch_scopes)
+  // selalu diprioritaskan. "Lihat semua ruas" (super_admin / branch.view.all)
+  // hanya berlaku bila user memang tak punya scope khusus, sehingga dropdown
+  // tak pernah menampilkan ruas di luar cakupan yang diberikan.
   const scopeBranches = useMemo<{ id: number; label: string }[]>(() => {
+    const assigned = (capability?.branch_scopes ?? [])
+      .map((b) => {
+        const id = Number(b.id ?? b.branch_id);
+        return { id, label: String(b.branch_code || b.branch_name || `Ruas ${id}`) };
+      })
+      .filter((b) => Number.isInteger(b.id) && b.id > 0);
+    if (assigned.length > 0) return assigned;
     if (canViewAll) {
       return branches.map((b) => ({ id: b.id, label: b.branch_code || b.branch_name || `Ruas ${b.id}` }));
     }
-    return (capability?.branch_scopes ?? []).map((b) => ({
-      id: Number(b.branch_id),
-      label: String(b.branch_name || `Ruas ${b.branch_id}`)
-    }));
+    return [];
   }, [canViewAll, branches, capability]);
 
   const [items, setItems] = useState<NewsItem[]>([]);

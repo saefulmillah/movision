@@ -34,8 +34,12 @@ export interface Capability {
 }
 
 export interface BranchScope {
-  branch_id: number | string;
-  branch_name?: string;
+  /** branch = m_ruas.id (backend mengirim field `id`). */
+  id: number;
+  branch_code?: string | null;
+  branch_name?: string | null;
+  /** Alias lama; backend tidak lagi mengirim ini. */
+  branch_id?: number | string;
   [key: string]: unknown;
 }
 
