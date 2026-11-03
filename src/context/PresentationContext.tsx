@@ -512,7 +512,7 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
         getRiskPeriod(key, scopeKey).catch(() => null),
         getPendPeriod(key, scopeKey).catch(() => null),
         getSentimentDashboard(key, scopeKey).catch(() => null),
-        getOdolPresentation(scopeKey, force).catch(() => null),
+        getOdolPresentation(scopeKey, key, force).catch(() => null),
         kinerjaReq,
         lhrPhrReq,
         accidentReq

@@ -60,11 +60,13 @@ const SEB_TITLE: Record<string, string> = { regional: "SEBARAN PER REGIONAL", ca
 interface Props {
   data: OdolPresentation | null;
   scopeLabel?: string | null;
+  /** Periode presentasi aktif (YYYY-MM) — diteruskan saat drill sebaran. */
+  periodKey?: string | null;
   /** Pengali ukuran font label grafik (1 = normal). */
   fontScale?: number;
 }
 
-export function OdolSlide({ data, scopeLabel, fontScale = 1 }: Props) {
+export function OdolSlide({ data, scopeLabel, periodKey, fontScale = 1 }: Props) {
   // Skala ukuran font label grafik mengikuti setelan slide.
   const fz = (n: number) => Math.round(n * fontScale * 100) / 100;
   // Drill sebaran: tumpukan hasil fetch sub-scope; tampilan = puncak tumpukan atau base.
@@ -77,7 +79,7 @@ export function OdolSlide({ data, scopeLabel, fontScale = 1 }: Props) {
   async function drill(key: string) {
     setDrilling(true);
     try {
-      const d = await getOdolPresentation(key);
+      const d = await getOdolPresentation(key, periodKey);
       setStack((s) => [...s, d]);
     } catch {
       /* abaikan */

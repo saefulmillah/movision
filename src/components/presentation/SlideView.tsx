@@ -234,7 +234,7 @@ export function SlideView({ slideId: key, coverBg }: SlideViewProps) {
   }
   if (key === "odol-dashboard") {
     if (p.snapshot.loading) return <StageLoader />;
-    return <OdolSlide data={p.snapshot.data?.odol ?? null} scopeLabel={scopeLabel} fontScale={p.fontScale} />;
+    return <OdolSlide data={p.snapshot.data?.odol ?? null} scopeLabel={scopeLabel} periodKey={p.period} fontScale={p.fontScale} />;
   }
   if (key === "accident-cover") {
     return (

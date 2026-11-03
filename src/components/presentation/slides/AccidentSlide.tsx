@@ -277,7 +277,13 @@ export function AccidentSlide({ data, periodLabel, scopeLabel, fontScale = 1 }: 
           {/* HERO: per lokasi | total tren */}
           <div className={styles.heroBand}>
             <div className={`${styles.card} ${styles.cLok}`}>
-              <div className={styles.ch}><h3 className={styles.cTitle}>Kejadian Kecelakaan per Lokasi</h3><span className={styles.yr}>per ruas · per tahun</span></div>
+              <div className={styles.ch}>
+                <h3 className={styles.cTitle}>Kejadian Kecelakaan per Lokasi</h3>
+                <span className={styles.legend}>
+                  {years.map((y, i) => <span key={y}><span className={styles.sw} style={{ background: yrColor(i) }} />{y}</span>)}
+                  {isPartial ? <span><span className={`${styles.sw} ${styles.swHatch}`} />s.d {mon}</span> : null}
+                </span>
+              </div>
               <div className={styles.plot}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={locData} margin={{ top: 20, right: 6, bottom: 20, left: 2 }} barGap={2} barCategoryGap="24%">

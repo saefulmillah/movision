@@ -58,8 +58,10 @@ export const getOdolCompanies = (p: Period & { vehicle_group?: string }) =>
 
 // Agregator ODOL untuk slide presentasi (sadar-scope). Mengembalikan payload penuh.
 // refresh=true → paksa backend ambil ulang dari partner (lewati read-through cache).
-export const getOdolPresentation = (scope?: string | null, refresh?: boolean) =>
-  api.get<OdolPresentation>(`/insights/odol/presentation${qs({ scope: scope && scope !== "divisi" ? scope : undefined, refresh })}`);
+export const getOdolPresentation = (scope?: string | null, period?: string | null, refresh?: boolean) =>
+  api.get<OdolPresentation>(
+    `/insights/odol/presentation${qs({ scope: scope && scope !== "divisi" ? scope : undefined, period: period || undefined, refresh })}`
+  );
 
 // --- Kecelakaan ---
 export const getAccidentSummary = (p: Period) =>
