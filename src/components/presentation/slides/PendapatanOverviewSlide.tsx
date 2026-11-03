@@ -136,9 +136,9 @@ function AchievementBars({ data, ariaLabel, fs = 1 }: { data: RuasBar[]; ariaLab
   }
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <BarChart data={data} margin={{ top: 26, right: 10, bottom: 24, left: 10 }} barGap={2} barCategoryGap="30%" role="img" aria-label={ariaLabel}>
+      <BarChart data={data} margin={{ top: 34, right: 10, bottom: 24, left: 10 }} barGap={2} barCategoryGap="30%" role="img" aria-label={ariaLabel}>
         <XAxis dataKey="ruas" tickFormatter={toOperationalRuas} tick={{ fontSize: Math.round(9 * fs), fontWeight: 700, fill: C.axis }} tickLine={false} axisLine={{ stroke: "#cbd5e1" }} interval={0} height={16} />
-        <YAxis hide domain={[0, (max: number) => max * 1.18]} />
+        <YAxis hide domain={[0, (max: number) => max * 1.24]} />
         <Tooltip
           cursor={{ fill: "rgba(148,163,184,0.1)" }}
           contentStyle={tipStyle}
@@ -216,21 +216,25 @@ function AchOverlay({ rows, fs = 1, xAxisMap, yAxisMap, offset }: OverlayProps) 
         return <line key={`sep-${i}`} x1={sx} y1={offset.top - 6} x2={sx} y2={baseY + 32} stroke={C.sep} strokeDasharray="3 3" />;
       })}
 
-      {/* Badge %ACH di atas batang tertinggi tiap ruas */}
+      {/* Badge %ACH: SELALU di atas label nilai batang tertinggi (tidak sejajar),
+          sehingga tak pernah menimpa angka — apa pun posisi horizontal & resolusi. */}
       {rows.map((d, i) => {
         const left = xScale(d.ruas);
         if (left == null) return null;
         const cx = left + bw / 2;
         const topBar = Math.min(yScale(d.rkap) ?? baseY, yScale(d.real) ?? baseY);
-        const py = Math.max(topBar - 8, offset.top + 4);
         const text = `${d.ach}%`;
         const badgeFs = Math.round(11 * fs);
-        const pw = text.length * 6.6 * fs + 12;
         const ph = Math.round(16 * fs);
+        const pw = text.length * 6.6 * fs + 12;
+        // Ruang vertikal yang dipakai label nilai di atas batang (fontSize 8*fs, offset 4px) + jeda.
+        const valLabelClear = Math.round(8 * fs) + 7;
+        // Sisi atas badge = di atas label nilai; dasar badge = topBar - valLabelClear.
+        const ry = Math.max(topBar - valLabelClear - ph, 2);
         return (
           <g key={`ach-${i}`}>
-            <rect x={cx - pw / 2} y={py - ph + 4} width={pw} height={ph} rx={ph / 2} fill={achFill(d.ach)} />
-            <text x={cx} y={py} textAnchor="middle" fontSize={badgeFs} fontWeight={800} fill={achInk(d.ach)}>
+            <rect x={cx - pw / 2} y={ry} width={pw} height={ph} rx={ph / 2} fill={achFill(d.ach)} />
+            <text x={cx} y={ry + ph / 2} textAnchor="middle" dominantBaseline="central" fontSize={badgeFs} fontWeight={800} fill={achInk(d.ach)}>
               {text}
             </text>
           </g>
