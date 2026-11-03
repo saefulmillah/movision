@@ -10,6 +10,8 @@ export interface SlideDef {
 
 export const SLIDES: Record<string, SlideDef> = {
   title: { id: "title", feature: "Pembuka", title: "Rapat Direktorat", badge: "Sampul" },
+  "eco-arsitektur": { id: "eco-arsitektur", feature: "Ekosistem", title: "Ekosistem Movision", badge: "Imersif" },
+  "control-center": { id: "control-center", feature: "Ekosistem", title: "Movision - Presentation", badge: "Imersif" },
   "lr-cover": { id: "lr-cover", feature: "Laba Rugi", title: "Laba Rugi — Pembuka", badge: "Sampul" },
   "lr-konsol": { id: "lr-konsol", feature: "Laba Rugi", title: "Konsolidasi", badge: "Tabel" },
   "lr-regional": { id: "lr-regional", feature: "Laba Rugi", title: "Per Regional", badge: "Tabel" },
@@ -33,6 +35,8 @@ export const SLIDES: Record<string, SlideDef> = {
 
 export const DEFAULT_ORDER = [
   "title",
+  "eco-arsitektur",
+  "control-center",
   "lr-cover",
   "lr-konsol",
   "lr-regional",
@@ -58,6 +62,8 @@ export const DEFAULT_ORDER = [
    berlaku untuk semua scope. "kinerja-regional" hanya untuk scope regional
    (tidak di divisi/cabang — keputusan user). */
 export const SLIDE_SCOPE_ONLY: Record<string, "divisi" | "regional" | "cabang"> = {
+  "eco-arsitektur": "divisi",
+  "control-center": "divisi",
   "kinerja-regional": "regional",
   "lhr-phr-bp": "regional",
   "rpend-cover": "regional",

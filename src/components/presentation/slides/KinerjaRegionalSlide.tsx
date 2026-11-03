@@ -5,6 +5,7 @@ import { EmptyState } from "@/components/ui";
 import { SlideFrame } from "@/components/presentation/SlideFrame";
 import type { KinerjaRegionalData, TrafficRow } from "@/lib/kinerjaRegional";
 import type { Cell, EntityData } from "@/types/labaRugi";
+import { toOperationalRuas } from "@/lib/ruasAlias";
 import styles from "./KinerjaRegionalSlide.module.css";
 
 /* ============================================================
@@ -17,6 +18,8 @@ interface Props {
   data: KinerjaRegionalData | null;
   periodLabel: string;
   scopeLabel?: string | null;
+  /** Pengali ukuran font label grafik (1 = normal). */
+  fontScale?: number;
 }
 
 const idNum = new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 });
@@ -48,7 +51,7 @@ function hppPct(ent: EntityData | undefined, idx: 0 | 1): number | null {
 const GREEN = "var(--sem-green)";
 const RED = "var(--sem-red)";
 
-export function KinerjaRegionalSlide({ data, periodLabel, scopeLabel }: Props) {
+export function KinerjaRegionalSlide({ data, periodLabel, scopeLabel, fontScale = 1 }: Props) {
   const [showSept, setShowSept] = useState(false);
 
   // Daftar entitas grafik dari `entities` yang benar-benar ada (urut mengikuti
@@ -83,13 +86,18 @@ export function KinerjaRegionalSlide({ data, periodLabel, scopeLabel }: Props) {
   const kpis = buildKpis(sd, fy);
 
   // ---- P&L panels: 5 metrik × per ruas (SD + opsional bulan) ----
-  const entities = ruasList.map((code) => ({
-    code,
-    abbr: abbrev(code),
-    name: code,
-    sd: data.entities[code] || {},
-    month: data.entities_month[code] || {}
-  }));
+  // Tampilan pakai kode operasional seragam (BINBRAN→BINSA, dst.); lookup data tetap
+  // pakai kode asli (rawCode) dari dataset kinerja.
+  const entities = ruasList.map((rawCode) => {
+    const code = toOperationalRuas(rawCode);
+    return {
+      code,
+      abbr: abbrev(code),
+      name: code,
+      sd: data.entities[rawCode] || {},
+      month: data.entities_month[rawCode] || {}
+    };
+  });
 
   const monthName = (data.month_label || "").replace(/ 20\d\d$/, "") || "Bulan";
 
@@ -195,7 +203,7 @@ export function KinerjaRegionalSlide({ data, periodLabel, scopeLabel }: Props) {
                     </span>
                   </div>
                   <div className={styles.panelChart}>
-                    <PnlMiniChart entities={entities} metric={m.key} showSept={showSept} />
+                    <PnlMiniChart entities={entities} metric={m.key} showSept={showSept} fs={fontScale} />
                   </div>
                 </div>
               );
@@ -392,7 +400,7 @@ function VBarLabel(color: string, size: number) {
   };
 }
 
-function PnlMiniChart({ entities, metric, showSept }: { entities: PnlEntity[]; metric: string; showSept: boolean }) {
+function PnlMiniChart({ entities, metric, showSept, fs = 1 }: { entities: PnlEntity[]; metric: string; showSept: boolean; fs?: number }) {
   const rows = entities.map((e) => {
     const s = cell(e.sd, metric);
     const m = cell(e.month, metric);
@@ -414,7 +422,7 @@ function PnlMiniChart({ entities, metric, showSept }: { entities: PnlEntity[]; m
   let hi = Math.max(dmax, 0) + span * 0.34;
   if (hi === 0) hi = 1;
 
-  const lblSize = showSept ? 8 : 10;
+  const lblSize = Math.round((showSept ? 8 : 10) * fs);
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -424,7 +432,7 @@ function PnlMiniChart({ entities, metric, showSept }: { entities: PnlEntity[]; m
         barGap={showSept ? 1 : 2}
         barCategoryGap={showSept ? "12%" : "22%"}
       >
-        <XAxis dataKey="abbr" tick={{ fontSize: 10, fontWeight: 700, fill: "var(--text-muted)" }} tickLine={false} axisLine={false} interval={0} height={15} />
+        <XAxis dataKey="abbr" tick={{ fontSize: Math.round(10 * fs), fontWeight: 700, fill: "var(--text-muted)" }} tickLine={false} axisLine={false} interval={0} height={15} />
         <YAxis hide domain={[lo, hi]} />
         <ReferenceLine y={0} stroke="var(--line)" strokeWidth={1} />
         <Tooltip
@@ -483,7 +491,7 @@ function TrafficTable({ title, rows, empty }: { title: string; rows: TrafficRow[
               const pill = good ? GREEN : RED;
               return (
                 <div key={r.ruas} className={styles.tblRow}>
-                  <span className={styles.ruasName}>{r.ruas}</span>
+                  <span className={styles.ruasName}>{toOperationalRuas(r.ruas)}</span>
                   <span className={styles.r}>{num(r.rkap)}</span>
                   <span className={styles.r}>{num(r.real)}</span>
                   <span className={styles.rPill}>

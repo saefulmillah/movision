@@ -5,6 +5,7 @@ import { EmptyState } from "@/components/ui";
 import { SlideFrame } from "@/components/presentation/SlideFrame";
 import type { KinerjaRegionalData } from "@/lib/kinerjaRegional";
 import type { Cell, EntityData } from "@/types/labaRugi";
+import { toOperationalRuas } from "@/lib/ruasAlias";
 import styles from "./RencanaPendapatanSlide.module.css";
 
 /* ============================================================
@@ -19,6 +20,8 @@ interface Props {
   kinerja: KinerjaRegionalData | null;
   periodLabel: string;
   scopeLabel?: string | null;
+  /** Pengali ukuran font (dipakai untuk KPI Cards Kinerja). */
+  fontScale?: number;
 }
 
 const idNum = new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 });
@@ -40,7 +43,8 @@ function cell(ent: EntityData | undefined, acc: string): Cell {
   return (ent && ent[acc]) || [null, null];
 }
 function prettyRuas(id: string): string {
-  const s = id.replace(/[_-]+/g, " ").trim();
+  // Seragamkan ke kode operasional (BINTAN→BINSA, dst.) sebelum dirapikan.
+  const s = toOperationalRuas(id).replace(/[_-]+/g, " ").trim();
   return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 }
 // "OKTOBER 2026" → "Oktober 2026"; "SD OKTOBER 2026" → "S.d Oktober 2026".
@@ -66,7 +70,7 @@ const PL_METRICS = [
 ] as const;
 type PlMetricKey = (typeof PL_METRICS)[number]["key"];
 
-export function RencanaPendapatanSlide({ kinerja, periodLabel, scopeLabel }: Props) {
+export function RencanaPendapatanSlide({ kinerja, periodLabel, scopeLabel, fontScale = 1 }: Props) {
   const [ruasPeriod, setRuasPeriod] = useState<"mo" | "sd">("mo");
   const [plPeriod, setPlPeriod] = useState<"mo" | "sd">("mo");
   const [plMetric, setPlMetric] = useState<PlMetricKey>("eat");
@@ -266,7 +270,7 @@ export function RencanaPendapatanSlide({ kinerja, periodLabel, scopeLabel }: Pro
           </div>
 
           {/* Lapis 1 — KPI Total Konsol per metrik (sekaligus selektor metrik) */}
-          <div className={styles.kpiRow} role="tablist" aria-label="Pilih metrik Laba Rugi">
+          <div className={styles.kpiRow} role="tablist" aria-label="Pilih metrik Laba Rugi" style={{ "--pfx-fs": fontScale } as CSSProperties}>
             {kpiCards.map((k) => {
               const on = plMetric === k.key;
               return (

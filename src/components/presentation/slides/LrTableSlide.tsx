@@ -1,4 +1,5 @@
 import { Fragment, useMemo, useState } from "react";
+import type { CSSProperties } from "react";
 import { EmptyState } from "@/components/ui";
 import { SlideFrame } from "@/components/presentation/SlideFrame";
 import type { BreakdownItem, EntityData, PeriodData } from "@/types/labaRugi";
@@ -21,6 +22,8 @@ interface LrTableSlideProps {
   periodLabel: string;
   /** Label scope aktif (regional/cabang); null/undefined untuk divisi. */
   scopeLabel?: string | null;
+  /** Pengali ukuran font (dipakai untuk teks breakdown biaya). */
+  fontScale?: number;
 }
 
 type Period = "konsol" | "month" | "sd";
@@ -47,7 +50,7 @@ interface Group {
   span: number; // 2 (collapsed) atau 4 (expanded)
 }
 
-export function LrTableSlide({ view, data, periodLabel, scopeLabel }: LrTableSlideProps) {
+export function LrTableSlide({ view, data, periodLabel, scopeLabel, fontScale = 1 }: LrTableSlideProps) {
   const isGrouped = view !== "konsol";
   const [expanded, setExpanded] = useState<Record<string, boolean>>({}); // breakdown vertikal per akun
   const [monthOpen, setMonthOpen] = useState<Record<string, boolean>>({}); // periode-ini per entitas
@@ -151,7 +154,7 @@ export function LrTableSlide({ view, data, periodLabel, scopeLabel }: LrTableSli
           />
         </div>
       ) : (
-        <div className={styles.tableWrap}>
+        <div className={styles.tableWrap} style={{ "--pfx-fs": fontScale } as CSSProperties}>
           <table className={`${styles.table} ${isGrouped ? styles.grouped : ""}`}>
             <thead>
               <tr>

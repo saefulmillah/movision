@@ -1,0 +1,96 @@
+.wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 8px;
+}
+.glyph {
+  font-weight: 800;
+  line-height: 1;
+  opacity: 0.85;
+}
+.glyphSm {
+  font-size: 10px;
+}
+.glyphLg {
+  font-size: 17px;
+}
+
+/* Slider (skala pengali font). Track tipis + thumb bulat, lintas-browser. */
+.range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 120px;
+  height: 16px; /* area sentuh */
+  background: transparent;
+  cursor: pointer;
+  margin: 0;
+}
+.range:focus-visible {
+  outline: 2px solid var(--brand, #2d6cdf);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 999px;
+}
+.range::-moz-range-track {
+  height: 4px;
+  border-radius: 999px;
+}
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -5px; /* center thumb di track 4px */
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--brand, #2d6cdf);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+.range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--brand, #2d6cdf);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.value {
+  min-width: 40px;
+  text-align: right;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Varian overlay (panggung gelap, token presentasi). */
+.overlay {
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  color: var(--text-muted);
+}
+.overlay .range::-webkit-slider-runnable-track {
+  background: var(--line-strong);
+}
+.overlay .range::-moz-range-track {
+  background: var(--line-strong);
+}
+
+/* Varian builder (latar terang). */
+.builder {
+  background: #eef1f6;
+  border: 1px solid #d7dce5;
+  color: #64748b;
+}
+.builder .range::-webkit-slider-runnable-track {
+  background: #d7dce5;
+}
+.builder .range::-moz-range-track {
+  background: #d7dce5;
+}

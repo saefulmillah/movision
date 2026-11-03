@@ -60,9 +60,13 @@ const SEB_TITLE: Record<string, string> = { regional: "SEBARAN PER REGIONAL", ca
 interface Props {
   data: OdolPresentation | null;
   scopeLabel?: string | null;
+  /** Pengali ukuran font label grafik (1 = normal). */
+  fontScale?: number;
 }
 
-export function OdolSlide({ data, scopeLabel }: Props) {
+export function OdolSlide({ data, scopeLabel, fontScale = 1 }: Props) {
+  // Skala ukuran font label grafik mengikuti setelan slide.
+  const fz = (n: number) => Math.round(n * fontScale * 100) / 100;
   // Drill sebaran: tumpukan hasil fetch sub-scope; tampilan = puncak tumpukan atau base.
   const [stack, setStack] = useState<OdolPresentation[]>([]);
   const [drilling, setDrilling] = useState(false);
@@ -155,18 +159,18 @@ export function OdolSlide({ data, scopeLabel }: Props) {
                 <ResponsiveContainer width="100%" height="100%">
                   <ComposedChart data={trend} margin={{ top: 22, right: 8, bottom: 2, left: 2 }} barGap={2} barCategoryGap="24%">
                     <CartesianGrid vertical={false} stroke={C.gLine} strokeDasharray="3 3" />
-                    <XAxis dataKey="label" tick={{ fontSize: 11, fill: C.muted }} tickLine={false} axisLine={{ stroke: "#e4e9ef" }} />
-                    <YAxis yAxisId="l" tick={{ fontSize: 10, fill: C.faint }} width={44} tickLine={false} axisLine={false} tickFormatter={(v) => compact(v)} />
-                    <YAxis yAxisId="r" orientation="right" domain={[0, "auto"]} tick={{ fontSize: 10, fill: C.faint }} width={34} tickLine={false} axisLine={false} unit="%" />
+                    <XAxis dataKey="label" tick={{ fontSize: fz(11), fill: C.muted }} tickLine={false} axisLine={{ stroke: "#e4e9ef" }} />
+                    <YAxis yAxisId="l" tick={{ fontSize: fz(10), fill: C.faint }} width={44} tickLine={false} axisLine={false} tickFormatter={(v) => compact(v)} />
+                    <YAxis yAxisId="r" orientation="right" domain={[0, "auto"]} tick={{ fontSize: fz(10), fill: C.faint }} width={34} tickLine={false} axisLine={false} unit="%" />
                     <Tooltip contentStyle={tip} formatter={(v: number, n: string) => [n === "% ODOL" ? pct(v) : fmt(v), n]} />
                     <Bar yAxisId="l" dataKey="normal" name="Normal" fill={C.navy} radius={[3, 3, 0, 0]} maxBarSize={26} isAnimationActive animationDuration={700}>
-                      <LabelList dataKey="normal" position="top" formatter={(v: number) => compact(v)} style={{ fontSize: 8.5, fontWeight: 700, fill: C.navy }} />
+                      <LabelList dataKey="normal" position="top" formatter={(v: number) => compact(v)} style={{ fontSize: fz(8.5), fontWeight: 700, fill: C.navy }} />
                     </Bar>
                     <Bar yAxisId="l" dataKey="odol" name="ODOL" fill={C.red} radius={[3, 3, 0, 0]} maxBarSize={26} isAnimationActive animationDuration={700}>
-                      <LabelList dataKey="odol" position="top" formatter={(v: number) => compact(v)} style={{ fontSize: 8.5, fontWeight: 700, fill: C.red }} />
+                      <LabelList dataKey="odol" position="top" formatter={(v: number) => compact(v)} style={{ fontSize: fz(8.5), fontWeight: 700, fill: C.red }} />
                     </Bar>
                     <Line yAxisId="r" type="monotone" dataKey="pct" name="% ODOL" stroke={C.line} strokeWidth={2.6} dot={{ r: 3, fill: C.line, strokeWidth: 0 }} connectNulls isAnimationActive animationDuration={900}>
-                      <LabelList dataKey="pct" position="top" offset={10} formatter={(v: number) => (v == null ? "" : pct(v, 0))} style={{ fontSize: 9.5, fontWeight: 800, fill: C.line }} />
+                      <LabelList dataKey="pct" position="top" offset={10} formatter={(v: number) => (v == null ? "" : pct(v, 0))} style={{ fontSize: fz(9.5), fontWeight: 800, fill: C.line }} />
                     </Line>
                   </ComposedChart>
                 </ResponsiveContainer>

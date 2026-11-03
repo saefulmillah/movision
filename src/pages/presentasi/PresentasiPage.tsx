@@ -9,6 +9,7 @@ import { parsePdfSlide, pdfSlideLabel } from "@/components/presentation/pdfSlide
 import { isCustomCover } from "@/components/presentation/customCover";
 import { SlidePreview, type ThumbKind } from "@/components/presentation/SlidePreview";
 import { formatDateId } from "@/components/presentation/SlideView";
+import { FontSizeControl } from "@/components/presentation/FontSizeControl";
 import { flattenScopes } from "@/lib/presentationScope";
 import { countPagesOfFile, deletePdf, uploadPdf, type PdfDoc } from "@/lib/presentationPdf";
 import {
@@ -714,6 +715,10 @@ export function PresentasiPage() {
                     </span>
                   )}
                 </div>
+              </div>
+              <div className={styles.field}>
+                <span className={styles.fieldLabel}>Ukuran Teks</span>
+                <FontSizeControl value={p.fontScale} onChange={p.setFontScale} variant="builder" />
               </div>
               </AccordionSection>
             </div>
