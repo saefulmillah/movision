@@ -8,7 +8,9 @@ import {
   uploadSentiment,
   flushPeriod,
   upsertRecommendation,
-  deleteRecommendation
+  deleteRecommendation,
+  markIrrelevant,
+  unmarkIrrelevant
 } from "@/lib/sentiment";
 import { getPresentationScopes, flattenScopes, type PresentationScope, type PresentationScopesResponse } from "@/lib/presentationScope";
 import type { RecoStatus, SentimentIssue, SentimentScopeData } from "@/types/sentiment";
@@ -84,6 +86,7 @@ export function SentimenPage() {
   const [flushing, setFlushing] = useState(false);
   const [drafts, setDrafts] = useState<Record<string, RecoDraft>>({});
   const [savingKey, setSavingKey] = useState<string | null>(null);
+  const [hidingKey, setHidingKey] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   // Hanya admin lingkup-penuh (divisi) yang mengunggah raw lintas-scope.
@@ -236,6 +239,39 @@ export function SentimenPage() {
     }
   }
 
+  async function hideIssue(issue: SentimentIssue) {
+    if (!scope || !period) return;
+    if (
+      !window.confirm(
+        `Tandai isu "${issue.title}" sebagai TIDAK RELEVAN untuk lingkup ${scope.label}?\n\n` +
+          "Isu ini akan disembunyikan dari agregat, grafik, dan slide presentasi lingkup ini saja. " +
+          "Lingkup lain (mis. ruas yang benar) dan divisi tetap menampilkannya. Bisa dipulihkan."
+      )
+    )
+      return;
+    setHidingKey(issue.key);
+    try {
+      await markIrrelevant(period, scope.key, issue.key, issue.title);
+      toast.success("Isu disembunyikan", "Tidak lagi dihitung pada lingkup ini.");
+      refresh();
+    } catch (err) {
+      toast.error("Gagal menandai", err instanceof Error ? err.message : "Terjadi kesalahan");
+    } finally {
+      setHidingKey(null);
+    }
+  }
+
+  async function restoreIssue(issueKey: string) {
+    if (!scope || !period) return;
+    try {
+      await unmarkIrrelevant(period, scope.key, issueKey);
+      toast.success("Isu dipulihkan", "Kembali dihitung pada lingkup ini.");
+      refresh();
+    } catch (err) {
+      toast.error("Gagal memulihkan", err instanceof Error ? err.message : "Terjadi kesalahan");
+    }
+  }
+
   const empty = !data || data.total === 0;
 
   return (
@@ -363,13 +399,52 @@ export function SentimenPage() {
                           <Button size="sm" variant="primary" icon={savingKey === it.key ? "loader" : "save"} disabled={savingKey === it.key} onClick={() => void saveReco(it)}>
                             Simpan
                           </Button>
-                          <Button size="sm" variant="ghost" iconOnly icon="trash-2" title="Kosongkan" onClick={() => void clearReco(it)} />
+                          <Button size="sm" variant="ghost" iconOnly icon="trash-2" title="Kosongkan tindak lanjut" onClick={() => void clearReco(it)} />
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            iconOnly
+                            icon={hidingKey === it.key ? "loader" : "eye-off"}
+                            title="Tandai tidak relevan — sembunyikan dari lingkup ini (mis. salah tag ruas)"
+                            disabled={hidingKey === it.key}
+                            onClick={() => void hideIssue(it)}
+                          />
                         </div>
                       )}
                     </div>
                   </div>
                 );
               })}
+            </div>
+          )}
+
+          {data!.irrelevant.length > 0 && (
+            <div className={styles.hiddenBox}>
+              <div className={styles.hiddenHead}>
+                <span className={styles.hiddenTitle}>Isu Disembunyikan (Tidak Relevan)</span>
+                <span className={styles.hiddenSub}>
+                  Tidak dihitung pada lingkup {scope?.label} — mis. salah tag ruas. Lingkup lain & divisi tetap memakainya.
+                </span>
+              </div>
+              <div className={styles.hiddenList}>
+                {data!.irrelevant.map((h) => (
+                  <div key={h.issue_key} className={styles.hiddenChip}>
+                    <span className={styles.hiddenChipText} title={h.issue_title ?? h.issue_key}>
+                      {h.issue_title ?? h.issue_key}
+                    </span>
+                    {canWrite && (
+                      <button
+                        type="button"
+                        className={styles.hiddenRestore}
+                        title="Pulihkan isu ini"
+                        onClick={() => void restoreIssue(h.issue_key)}
+                      >
+                        Pulihkan
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </>

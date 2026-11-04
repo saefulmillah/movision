@@ -6,6 +6,7 @@ import type {
   SentimentDashboard,
   SentimentUploadResult,
   SentimentRecommendation,
+  SentimentIrrelevant,
   UpsertRecoInput
 } from "@/types/sentiment";
 
@@ -71,4 +72,38 @@ export async function upsertRecommendation(periodKey: string, scope: string | nu
 
 export function deleteRecommendation(id: number): Promise<unknown> {
   return api.delete(`/sentiment/recommendations/${id}`);
+}
+
+// --- Isu "tidak relevan" (pengecualian per lingkup) ---
+
+/** Daftar isu yang disembunyikan untuk periode × lingkup (untuk pemulihan). */
+export async function listIrrelevant(periodKey: string, scope?: string | null): Promise<SentimentIrrelevant[]> {
+  const data = await api.get<{ irrelevant?: SentimentIrrelevant[] }>(
+    `/sentiment/${encodeURIComponent(periodKey)}/irrelevant${sq(scope)}`
+  );
+  return data?.irrelevant ?? [];
+}
+
+/** Tandai sebuah isu "tidak relevan" → disaring dari agregat/slide lingkup ini. WRITE. */
+export function markIrrelevant(
+  periodKey: string,
+  scope: string | null | undefined,
+  issueKey: string,
+  issueTitle: string
+): Promise<SentimentIrrelevant> {
+  return api.post<SentimentIrrelevant>(
+    `/sentiment/${encodeURIComponent(periodKey)}/irrelevant${sq(scope)}`,
+    { issue_key: issueKey, issue_title: issueTitle }
+  );
+}
+
+/** Pulihkan isu yang disembunyikan. WRITE. */
+export function unmarkIrrelevant(
+  periodKey: string,
+  scope: string | null | undefined,
+  issueKey: string
+): Promise<unknown> {
+  const params = new URLSearchParams({ issue_key: issueKey });
+  if (scope && scope !== "divisi") params.set("scope", scope);
+  return api.delete(`/sentiment/${encodeURIComponent(periodKey)}/irrelevant?${params.toString()}`);
 }
