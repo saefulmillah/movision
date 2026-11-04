@@ -102,11 +102,17 @@ export function KinerjaRegionalSlide({ data, periodLabel, scopeLabel, fontScale 
   const monthName = (data.month_label || "").replace(/ 20\d\d$/, "") || "Bulan";
 
   // ---- Ringkasan regional (konsol SD realisasi) ----
+  // Warna metrik laba MENGIKUTI TANDA: hijau bila >= 0, merah bila < 0, putih bila
+  // tak ada data. (Dulu warna di-hardcode → EAT selalu merah walau positif.)
+  const sdEbitda = cell(sd, "ebitda")[1];
+  const sdLabaOp = cell(sd, "laba_operasi")[1];
+  const sdEat = cell(sd, "eat")[1];
+  const profitColor = (v: number | null | undefined) => (v == null ? "#fff" : v < 0 ? "#ff8f93" : "#7fd4a8");
   const summary = [
     { k: "Total Pendapatan", v: num(cell(sd, "pend_usaha")[1]), color: "#fff" },
-    { k: "Total EBITDA", v: num(cell(sd, "ebitda")[1]), color: "#7fd4a8" },
-    { k: "Total Laba Operasi", v: num(cell(sd, "laba_operasi")[1]), color: "#7fd4a8" },
-    { k: "Total EAT", v: num(cell(sd, "eat")[1]), color: "#ff8f93" }
+    { k: "Total EBITDA", v: num(sdEbitda), color: profitColor(sdEbitda) },
+    { k: "Total Laba Operasi", v: num(sdLabaOp), color: profitColor(sdLabaOp) },
+    { k: "Total EAT", v: num(sdEat), color: profitColor(sdEat) }
   ];
 
   return (
