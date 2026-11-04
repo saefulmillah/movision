@@ -1,0 +1,37 @@
+/* Tombol export + panggung render luar-layar untuk rasterisasi slide → PDF.
+   Panggung dirender nyata (bukan display:none) agar bisa di-capture, tetapi
+   digeser jauh ke kiri layar sehingga tak terlihat & tak mengganggu interaksi. */
+
+.exportHost {
+  position: fixed;
+  left: -20000px;
+  top: 0;
+  z-index: -1;
+  pointer-events: none;
+  /* Jangan memengaruhi layout halaman builder. */
+  contain: strict;
+}
+
+/* Satu panggung slide 16:9 (1280×720) — slide mengisi penuh, sama seperti
+   mode presentasi (overlay .stageData/.stageCover). */
+.capture {
+  width: 1280px;
+  height: 720px;
+  overflow: hidden;
+  background: var(--surface-1);
+  display: flex;
+}
+.capture > * {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Matikan animasi masuk agar slide ter-capture pada keadaan final (bukan
+   di tengah fade-up). Animasi chart Recharts ditangani dengan jeda settle. */
+.capture :global(.pfx-stagger) > *,
+.capture :global(.pfx-fade-up) {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}

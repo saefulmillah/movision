@@ -37,6 +37,14 @@ export interface SentimentIssue {
   date: string | null;
 }
 
+/** Isu yang ditandai "tidak relevan" (disembunyikan) untuk satu lingkup. */
+export interface SentimentIrrelevant {
+  id: number;
+  issue_key: string;
+  issue_title: string | null;
+  created_at: string;
+}
+
 export interface SentimentRecommendation {
   id: number;
   issue_key: string;
@@ -70,6 +78,8 @@ export interface SentimentScopeData {
   positives: SentimentIssue[];
   narrative: string;
   recommendations: SentimentRecommendation[];
+  /** Isu yang disembunyikan (tidak relevan) untuk lingkup ini. */
+  irrelevant: SentimentIrrelevant[];
 }
 
 /** Kartu status satu anak-scope (Slide Peta Wilayah). */

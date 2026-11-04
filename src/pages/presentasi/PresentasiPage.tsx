@@ -10,6 +10,7 @@ import { isCustomCover } from "@/components/presentation/customCover";
 import { SlidePreview, type ThumbKind } from "@/components/presentation/SlidePreview";
 import { formatDateId } from "@/components/presentation/SlideView";
 import { FontSizeControl } from "@/components/presentation/FontSizeControl";
+import { PdfExportButton } from "@/components/presentation/PdfExportButton";
 import { flattenScopes } from "@/lib/presentationScope";
 import { countPagesOfFile, deletePdf, uploadPdf, type PdfDoc } from "@/lib/presentationPdf";
 import {
@@ -733,6 +734,7 @@ export function PresentasiPage() {
               <span className={styles.gridHeadCount}>
                 {p.activeSlides.length} dari {p.order.length} slide aktif
               </span>
+              <PdfExportButton className={styles.exportBtn} />
               <div className={styles.viewToggle} role="group" aria-label="Mode tampilan agenda">
                 <button
                   type="button"
