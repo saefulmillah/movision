@@ -86,6 +86,14 @@
   text-transform: uppercase;
   color: var(--text-faint);
 }
+/* Tombol export PDF (ikon saja) — di kiri toggle Normal/Compact, tinggi senada. */
+.exportBtn {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+}
+
 .startBtn {
   flex: none;
   height: 42px;

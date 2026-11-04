@@ -21,6 +21,8 @@
     "@radix-ui/react-tooltip": "^1.2.16",
     "@vis.gl/react-google-maps": "^1.9.0",
     "hls.js": "^1.7.1",
+    "jspdf": "^2.5.2",
+    "modern-screenshot": "^4.7.0",
     "pdfjs-dist": "^4.10.38",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
