@@ -43,3 +43,26 @@
     animation: none;
   }
 }
+
+/* ============================================================================
+   Tooltip Recharts di slide mana pun (semua grafik memakai <Tooltip> default di
+   dalam SlideFrame → kelas global `.pfx-slide`). Dibuat MENONJOL seperti anotasi
+   callout pada slide Kecelakaan: kotak ber-border tegas + bayangan, JUDUL (kategori
+   yang disorot) hitam-tebal, dan NILAI data tebal. `!important` dipakai untuk
+   menimpa `contentStyle` inline per-grafik agar seragam. Ter-scope ke `.pfx-slide`
+   sehingga tak mengubah grafik di halaman non-slide.
+   ============================================================================ */
+.pfx-slide .recharts-default-tooltip {
+  border: 1px solid #16202e !important;
+  border-radius: 8px !important;
+  box-shadow: 0 6px 20px rgba(16, 32, 46, 0.18) !important;
+  padding: 6px 10px !important;
+}
+.pfx-slide .recharts-tooltip-label {
+  color: #16202e !important;
+  font-weight: 800 !important;
+  margin-bottom: 2px !important;
+}
+.pfx-slide .recharts-tooltip-item-value {
+  font-weight: 700;
+}

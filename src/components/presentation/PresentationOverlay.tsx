@@ -225,7 +225,6 @@ export function PresentationOverlay() {
                   coverBg={coverBg}
                   cover={isCoverSlide(id)}
                   kind={kindFor(id)}
-                  live={false}
                   hintCaption={false}
                 />
                 <span className={styles.filmCaption} title={dotLabel(id)}>{dotLabel(id)}</span>

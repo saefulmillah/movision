@@ -136,7 +136,7 @@ function AchievementBars({ data, ariaLabel, fs = 1 }: { data: RuasBar[]; ariaLab
   }
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <BarChart data={data} margin={{ top: 34, right: 10, bottom: 24, left: 10 }} barGap={2} barCategoryGap="30%" role="img" aria-label={ariaLabel}>
+      <BarChart data={data} margin={{ top: 44, right: 10, bottom: 24, left: 10 }} barGap={2} barCategoryGap="30%" role="img" aria-label={ariaLabel}>
         <XAxis dataKey="ruas" tickFormatter={toOperationalRuas} tick={{ fontSize: Math.round(9 * fs), fontWeight: 700, fill: C.axis }} tickLine={false} axisLine={{ stroke: "#cbd5e1" }} interval={0} height={16} />
         <YAxis hide domain={[0, (max: number) => max * 1.24]} />
         <Tooltip
@@ -160,7 +160,12 @@ function AchievementBars({ data, ariaLabel, fs = 1 }: { data: RuasBar[]; ariaLab
   );
 }
 
-// Label nilai di atas ujung batang.
+// Label nilai di atas ujung batang. Dibuat MIRING (-40°) sehingga angka yang lebar
+// tidak lagi bertabrakan horizontal dengan label batang di sebelahnya: tiap label
+// menjadi garis diagonal tipis (anchor di ujung bawah, tepat di atas tengah batang,
+// memanjang ke kanan-atas). Ruang vertikal yang dipakainya diperhitungkan oleh
+// badge %ACH (lihat valLabelClear di AchOverlay) agar tak saling timpa.
+const LABEL_TILT = -40;
 function topLabel(color: string, fs = 1) {
   return (props: { x?: number | string; y?: number | string; width?: number | string; value?: number | string | null }) => {
     const v = props.value == null ? null : Number(props.value);
@@ -168,8 +173,10 @@ function topLabel(color: string, fs = 1) {
     const x = Number(props.x) || 0;
     const y = Number(props.y) || 0;
     const width = Number(props.width) || 0;
+    const cx = x + width / 2;
+    const ty = y - 4;
     return (
-      <text x={x + width / 2} y={y - 4} textAnchor="middle" fontSize={Math.round(8 * fs)} fontWeight={700} fill={color} style={{ fontVariantNumeric: "tabular-nums" }}>
+      <text x={cx} y={ty} textAnchor="start" transform={`rotate(${LABEL_TILT} ${cx} ${ty})`} fontSize={Math.round(8 * fs)} fontWeight={700} fill={color} style={{ fontVariantNumeric: "tabular-nums" }}>
         {idFmt.format(v)}
       </text>
     );
@@ -227,8 +234,10 @@ function AchOverlay({ rows, fs = 1, xAxisMap, yAxisMap, offset }: OverlayProps) 
         const badgeFs = Math.round(11 * fs);
         const ph = Math.round(16 * fs);
         const pw = text.length * 6.6 * fs + 12;
-        // Ruang vertikal yang dipakai label nilai di atas batang (fontSize 8*fs, offset 4px) + jeda.
-        const valLabelClear = Math.round(8 * fs) + 7;
+        // Ruang vertikal yang dipakai label nilai MIRING di atas batang: angka dirotasi
+        // -40° sehingga menjulang ke atas ~sin(40°)×lebar teks; disediakan ruang lega
+        // agar badge selalu berada di atas label apa pun panjang angkanya.
+        const valLabelClear = Math.round(20 * fs) + 6;
         // Sisi atas badge = di atas label nilai; dasar badge = topBar - valLabelClear.
         const ry = Math.max(topBar - valLabelClear - ph, 2);
         return (
