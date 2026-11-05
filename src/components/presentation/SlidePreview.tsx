@@ -1,13 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
-import { SlideView } from "./SlideView";
+import { useSlideThumb } from "./SlideThumbProvider";
 import { parsePdfSlide } from "./pdfSlides";
 import { loadPdfDocument } from "@/lib/presentationPdf";
 import styles from "./SlidePreview.module.css";
-
-/** Ukuran render dasar slide (16:9) sebelum diperkecil ke lebar kartu. */
-const BASE_W = 1200;
-const BASE_H = 675;
 
 /** Jenis skematik ringan (dipakai saat kartu TIDAK dipilih). */
 export type ThumbKind = "cover" | "table" | "matrix" | "chart" | "kpi" | "pdf";
@@ -18,21 +14,21 @@ interface SlidePreviewProps {
   coverBg: string | null;
   /** true bila slide bertipe sampul (full-bleed) — buang border kotak. */
   cover?: boolean;
-  /** Jenis skematik saat tidak live. */
+  /** Jenis skematik/placeholder per jenis slide. */
   kind: ThumbKind;
-  /** true → render isi slide NYATA (WYSIWYG, berat); false → skematik ringan. */
-  live: boolean;
   /** false → sembunyikan teks "Klik untuk preview" (cukup ikon mata, mis. mode compact). */
   hintCaption?: boolean;
 }
 
 /**
- * Thumbnail kartu agenda. Default menampilkan **skematik ringan** per jenis
- * slide (murah, tanpa data). Saat `live` (kartu dipilih) menampilkan **isi slide
- * nyata** (WYSIWYG) — {@link SlideView} dirender pada ukuran tetap lalu diperkecil
- * dengan transform. Hanya satu kartu live pada satu waktu → beban chart terbatas.
+ * Thumbnail kartu agenda — RINGAN sepenuhnya (tidak pernah merender chart hidup):
+ * PDF → `PdfThumb` (gambar resolusi rendah, cache); slide sampul → `CoverThumb`
+ * (gambar sampul diperkecil); slide data (grafik/tabel/peta/KPI) → `SnapshotThumb`
+ * (gambar hasil rasterisasi sekali via {@link useSlideThumb}, skematik sbg
+ * placeholder). Preview nyata dibuka langsung di MODE PRESENTASI (klik thumbnail),
+ * bukan lagi di dalam kartu.
  */
-export function SlidePreview({ slideId, coverBg, cover, kind, live, hintCaption = true }: SlidePreviewProps) {
+export function SlidePreview({ slideId, coverBg, cover, kind, hintCaption = true }: SlidePreviewProps) {
   // PDF selalu tampil nyata (halaman asli), tapi via renderer thumbnail RINGAN
   // (resolusi rendah + cache), bukan PdfPageSlide layar-penuh.
   if (kind === "pdf") {
@@ -43,45 +39,59 @@ export function SlidePreview({ slideId, coverBg, cover, kind, live, hintCaption 
       </div>
     );
   }
-  if (live) {
-    return <LivePreview slideId={slideId} coverBg={coverBg} cover={cover} />;
-  }
+  // Semua slide (termasuk SAMPUL): tampilkan thumbnail GAMBAR hasil rasterisasi
+  // slide ASLI (sekali, di-cache) — ringan karena hanya <img> statis. Selama belum
+  // siap, pakai skematik (untuk sampul = gambar sampul) sebagai placeholder.
+  return <SnapshotThumb slideId={slideId} kind={kind} coverBg={coverBg} cover={cover} hintCaption={hintCaption} />;
+}
+
+/** Thumbnail berupa gambar hasil rasterisasi slide asli (via SlideThumbProvider);
+ *  selama belum siap, tampilkan skematik ringan sebagai placeholder. */
+function SnapshotThumb({
+  slideId,
+  kind,
+  coverBg,
+  cover,
+  hintCaption
+}: {
+  slideId: string;
+  kind: ThumbKind;
+  coverBg: string | null;
+  cover?: boolean;
+  hintCaption: boolean;
+}) {
+  // Hanya rasterisasi saat kartu TERLIHAT (atau mendekat) → cegah ledakan kerja di
+  // awal: kartu di luar layar tak ikut di-generate sampai di-scroll.
+  const boxRef = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = boxRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setVisible(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "300px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  const img = useSlideThumb(slideId, visible);
   return (
-    <div className={`${styles.box} ${cover ? styles.boxCover : ""}`} aria-hidden="true">
-      <Schematic kind={kind} coverBg={coverBg} />
+    <div ref={boxRef} className={`${styles.box} ${cover ? styles.boxCover : ""}`} aria-hidden="true">
+      {img ? (
+        <img src={img} alt="" className={styles.snapImg} loading="lazy" decoding="async" draggable={false} />
+      ) : (
+        <Schematic kind={kind} coverBg={coverBg} />
+      )}
       <div className={styles.hint}>
         <Icon name="eye" size={18} />
         {hintCaption && <span className={styles.hintText}>Klik untuk preview</span>}
       </div>
-    </div>
-  );
-}
-
-/** Preview WYSIWYG (berat) — hanya untuk kartu terpilih. */
-function LivePreview({ slideId, coverBg, cover }: Omit<SlidePreviewProps, "kind" | "live">) {
-  const boxRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(0);
-
-  useEffect(() => {
-    const el = boxRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver(() => {
-      const w = el.clientWidth;
-      if (w) setScale(w / BASE_W);
-    });
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-
-  return (
-    <div ref={boxRef} className={`${styles.box} ${cover ? styles.boxCover : ""}`} aria-hidden="true">
-      {scale > 0 ? (
-        <div className={styles.stage} style={{ width: BASE_W, height: BASE_H, transform: `scale(${scale})` }}>
-          <SlideView slideId={slideId} coverBg={coverBg} />
-        </div>
-      ) : (
-        <div className={styles.skeleton} />
-      )}
     </div>
   );
 }
@@ -223,8 +233,11 @@ const MATRIX_TINT = [
 /* Cache thumbnail PDF (dataURL JPEG) per `pdfId:page`, dibagi semua kartu →
    render sekali, dipakai ulang saat scroll/urut/pilih. */
 const PDF_THUMB_CACHE = new Map<string, string>();
-/** Lebar render thumbnail PDF (px). Kecil → ringan; cukup tajam untuk kartu. */
-const PDF_THUMB_WIDTH = 360;
+/** Lebar render thumbnail PDF (px). Sengaja KECIL → kompresi maksimal (thumbnail
+    kartu saja; slide PDF layar-penuh tetap resolusi tinggi via PdfPageSlide). */
+const PDF_THUMB_WIDTH = 220;
+/** Kualitas JPEG thumbnail PDF — rendah agar sangat ringan. */
+const PDF_THUMB_QUALITY = 0.5;
 
 /**
  * Preview halaman PDF versi RINGAN untuk thumbnail: render pdf.js pada resolusi
@@ -268,7 +281,7 @@ function PdfThumb({ pdfId, page }: { pdfId: number; page: number }) {
             task = pg.render({ canvasContext: ctx, viewport });
             await task.promise;
             if (!alive) return;
-            const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
+            const dataUrl = canvas.toDataURL("image/jpeg", PDF_THUMB_QUALITY);
             PDF_THUMB_CACHE.set(key, dataUrl);
             if (alive) setUrl(dataUrl);
           } catch {
@@ -293,7 +306,7 @@ function PdfThumb({ pdfId, page }: { pdfId: number; page: number }) {
   return (
     <div ref={ref} className={styles.pdfThumb}>
       {url ? (
-        <img src={url} alt="" className={styles.pdfThumbImg} loading="lazy" decoding="async" />
+        <img src={url} alt="" className={styles.pdfThumbImg} loading="lazy" decoding="async" draggable={false} />
       ) : failed ? (
         <div className={styles.pdfThumbState}>
           <Icon name="file-x" size={20} />

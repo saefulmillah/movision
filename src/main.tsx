@@ -8,6 +8,7 @@ import { TicketsProvider } from "@/context/TicketsContext";
 import { BranchProvider } from "@/context/BranchContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { PresentationProvider } from "@/context/PresentationContext";
+import { SlideThumbProvider } from "@/components/presentation/SlideThumbProvider";
 import { TooltipProvider, ToastProvider } from "@/components/ui";
 
 import { applySettings, loadSettings } from "@/lib/settings";
@@ -30,7 +31,9 @@ createRoot(document.getElementById("root")!).render(
                 <BranchProvider>
                   <TicketsProvider>
                     <PresentationProvider>
-                      <App />
+                      <SlideThumbProvider>
+                        <App />
+                      </SlideThumbProvider>
                     </PresentationProvider>
                   </TicketsProvider>
                 </BranchProvider>

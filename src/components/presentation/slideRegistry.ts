@@ -29,7 +29,7 @@ export const SLIDES: Record<string, SlideDef> = {
   "odol-cover": { id: "odol-cover", feature: "ODOL", title: "ODOL — Pembuka", badge: "Sampul" },
   "odol-dashboard": { id: "odol-dashboard", feature: "ODOL", title: "Dashboard ODOL", badge: "Dashboard" },
   "accident-cover": { id: "accident-cover", feature: "Kecelakaan", title: "Kecelakaan — Pembuka", badge: "Sampul" },
-  "accident-dashboard": { id: "accident-dashboard", feature: "Kecelakaan", title: "Data Kecelakaan Regional", badge: "Dashboard" },
+  "accident-dashboard": { id: "accident-dashboard", feature: "Kecelakaan", title: "Data Kecelakaan", badge: "Dashboard" },
   closing: { id: "closing", feature: "Penutup", title: "Terima Kasih", badge: "Sampul" }
 };
 
@@ -58,22 +58,27 @@ export const DEFAULT_ORDER = [
   "closing"
 ];
 
-/* Slide yang hanya berlaku pada tingkat scope tertentu. Slide di luar peta ini
-   berlaku untuk semua scope. "kinerja-regional" hanya untuk scope regional
-   (tidak di divisi/cabang — keputusan user). */
-export const SLIDE_SCOPE_ONLY: Record<string, "divisi" | "regional" | "cabang"> = {
+type ScopeLevel = "divisi" | "regional" | "cabang";
+
+/* Slide yang hanya berlaku pada tingkat scope tertentu (satu level atau daftar
+   level). Slide di luar peta ini berlaku untuk semua scope. "kinerja-regional"
+   hanya untuk scope regional (tidak di divisi/cabang — keputusan user).
+   Kecelakaan berlaku di divisi (agregat semua ruas) & regional. */
+export const SLIDE_SCOPE_ONLY: Record<string, ScopeLevel | ScopeLevel[]> = {
   "eco-arsitektur": "divisi",
   "control-center": "divisi",
   "kinerja-regional": "regional",
   "lhr-phr-bp": "regional",
   "rpend-cover": "regional",
   "rpend-tol": "regional",
-  "accident-cover": "regional",
-  "accident-dashboard": "regional"
+  "accident-cover": ["divisi", "regional"],
+  "accident-dashboard": ["divisi", "regional"]
 };
 
 /** Apakah slide `id` boleh tampil pada scope dengan level `level`? */
 export function isSlideAllowedForScope(id: string, level?: string | null): boolean {
   const only = SLIDE_SCOPE_ONLY[id];
-  return !only || level === only;
+  if (!only) return true;
+  const allowed = Array.isArray(only) ? only : [only];
+  return allowed.includes(level as ScopeLevel);
 }

@@ -38,7 +38,7 @@ export function SlideFrame({ title, subtitle, rightMeta, scopeLabel, footnote, f
         {rightMeta ? <span className={styles.rightMeta}>{rightMeta}</span> : null}
       </div>
 
-      <div className={`${styles.content} ${flush ? styles.flush : ""} ${stagger ? "pfx-stagger" : ""}`}>{children}</div>
+      <div className={`${styles.content} pfx-slide ${flush ? styles.flush : ""} ${stagger ? "pfx-stagger" : ""}`}>{children}</div>
 
       {hasFootnote ? <div className={styles.footnote}>{footnote}</div> : null}
     </div>

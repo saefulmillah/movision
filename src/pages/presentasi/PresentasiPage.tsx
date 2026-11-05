@@ -13,6 +13,8 @@ import { FontSizeControl } from "@/components/presentation/FontSizeControl";
 import { PdfExportButton } from "@/components/presentation/PdfExportButton";
 import { flattenScopes } from "@/lib/presentationScope";
 import { countPagesOfFile, deletePdf, uploadPdf, type PdfDoc } from "@/lib/presentationPdf";
+import { compressImageFile } from "@/lib/imageCompress";
+import { invalidateSlideThumbs } from "@/components/presentation/SlideThumbProvider";
 import {
   deleteCover,
   getCoverMeta,
@@ -83,12 +85,8 @@ export function PresentasiPage() {
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [coverBusy, setCoverBusy] = useState(false);
 
-  // Kartu terpilih → tampilkan preview isi slide NYATA (WYSIWYG). Kartu lain
-  // memakai skematik ringan agar builder tetap ringan (hanya 1 slide "hidup").
-  const [selected, setSelected] = useState<string | null>(null);
-
   // Pilih-banyak: seleksi untuk menggeser beberapa slide bersamaan (drag) atau
-  // mengaktifkan/menonaktifkan secara massal. Independen dari `selected` (preview).
+  // mengaktifkan/menonaktifkan secara massal (independen dari aksi preview).
   const [picked, setPicked] = useState<Set<string>>(() => new Set());
   const togglePick = (id: string) =>
     setPicked((prev) => {
@@ -219,18 +217,12 @@ export function PresentasiPage() {
   }, []);
 
   // Segarkan periode, scope, lalu agenda+PDF (atomik per scope) tiap builder dibuka.
-  const { refreshPeriods, refreshAgenda, refreshScopes, ensureSnapshot } = p;
+  const { refreshPeriods, refreshAgenda, refreshScopes } = p;
   useEffect(() => {
     void refreshPeriods();
     void refreshScopes();
     void refreshAgenda();
   }, [refreshPeriods, refreshScopes, refreshAgenda]);
-
-  // Muat snapshot HANYA saat ada kartu dipilih (preview WYSIWYG). Builder yang
-  // baru dibuka tidak memicu fetch; cache dibagi dengan mode presentasi.
-  useEffect(() => {
-    if (selected) ensureSnapshot();
-  }, [ensureSnapshot, selected, p.period, p.scope]);
 
   // Muat metadata + pratinjau gambar sampul scope aktif.
   useEffect(() => {
@@ -325,8 +317,12 @@ export function PresentasiPage() {
     if (!file) return;
     setCoverBusy(true);
     try {
-      await uploadCover(file, scopeKey);
+      // Kompres moderat sebelum simpan: ringankan unggah & muat cover, tetap tajam
+      // untuk latar layar penuh (bukan dikecilkan ekstrim seperti thumbnail kartu).
+      const toUpload = await compressImageFile(file, { maxDim: 1920, quality: 0.82, mime: "image/jpeg" });
+      await uploadCover(toUpload, scopeKey);
       invalidateCoverUrl(scopeKey);
+      invalidateSlideThumbs(); // sampul berubah → thumbnail slide sampul diraster ulang
       const meta = await getCoverMeta(scopeKey);
       setCoverMeta(meta);
       setCoverPreview(meta ? await resolveCoverUrl(scopeKey) : null);
@@ -345,6 +341,7 @@ export function PresentasiPage() {
     try {
       await deleteCover(coverMeta.id);
       invalidateCoverUrl(scopeKey);
+      invalidateSlideThumbs(); // sampul dihapus → thumbnail slide sampul diraster ulang
       setCoverMeta(null);
       setCoverPreview(null);
       toast.success("Gambar sampul dihapus", "Semua slide sampul kembali ke foto bawaan.");
@@ -848,7 +845,13 @@ export function PresentasiPage() {
               e.stopPropagation();
               commitReorder();
             };
-            const selectItem = () => setSelected(id);
+            // Klik thumbnail = "preview": buka langsung MODE PRESENTASI pada slide
+            // ini bila aktif (tanpa render WYSIWYG berat di kartu). Slide nonaktif
+            // tak ada di presentasi → abaikan.
+            const previewItem = () => {
+              const idx = p.activeSlides.indexOf(id);
+              if (idx >= 0) p.startAt(idx);
+            };
             const removeItem = () => {
               if (isCustom) {
                 p.removeCoverSlide(id);
@@ -874,13 +877,12 @@ export function PresentasiPage() {
                 {viewMode === "compact" ? (
                   <div
                     className={`${styles.compact} ${isCover ? styles.compactCover : ""} ${
-                      selected === id ? styles.compactSelected : ""
-                    } ${isPicked ? styles.compactPicked : ""} ${on ? "" : styles.compactOff} ${
+                      isPicked ? styles.compactPicked : ""
+                    } ${on ? "" : styles.compactOff} ${
                       dragIdx === idx ? styles.compactDragging : ""
                     } ${movedId === id ? styles.compactMoved : ""}`}
                     data-card-id={id}
                     draggable
-                    onClick={selectItem}
                     onDragStart={onStart}
                     onDragOver={onOver}
                     onDrop={onDropItem}
@@ -907,13 +909,24 @@ export function PresentasiPage() {
                         <Icon name="grip-vertical" size={15} />
                       </span>
                     </div>
-                    <div className={styles.compactThumb}>
+                    <div
+                      className={styles.compactThumb}
+                      role="button"
+                      tabIndex={0}
+                      title="Klik untuk mempratinjau di mode presentasi"
+                      onClick={previewItem}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          previewItem();
+                        }
+                      }}
+                    >
                       <SlidePreview
                         slideId={id}
                         coverBg={coverPreview}
                         cover={isCover}
                         kind={thumbKind}
-                        live={selected === id}
                         hintCaption={false}
                       />
                     </div>
@@ -924,9 +937,34 @@ export function PresentasiPage() {
                         <span className={styles.compactNum}>{idx + 1}</span>
                         <span className={styles.compactBadge}>{def.badge}</span>
                       </div>
-                      <span className={styles.compactTitle} title={effTitle}>
-                        {effTitle}
-                      </span>
+                      <textarea
+                        className={styles.compactTitle}
+                        defaultValue={effTitle}
+                        key={`${id}:${p.titles[id] ?? ""}`}
+                        rows={1}
+                        draggable={false}
+                        ref={(el) => {
+                          if (el) {
+                            el.style.height = "auto";
+                            el.style.height = `${el.scrollHeight}px`;
+                          }
+                        }}
+                        onInput={(e) => {
+                          const el = e.currentTarget;
+                          el.style.height = "auto";
+                          el.style.height = `${el.scrollHeight}px`;
+                        }}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onBlur={(e) => p.setSlideTitle(id, e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            (e.target as HTMLTextAreaElement).blur();
+                          }
+                        }}
+                        aria-label={`Judul slide ${idx + 1}`}
+                        title="Klik untuk mengubah judul"
+                      />
                       <span className={styles.compactFeat}>
                         {isCustom ? p.subtitles[id] || "Slide sampul" : def.feature}
                       </span>
@@ -981,13 +1019,12 @@ export function PresentasiPage() {
                 ) : (
               <div
                 className={`${styles.card} ${isCover ? styles.cardCover : ""} ${
-                  selected === id ? styles.cardSelected : ""
-                } ${isPicked ? styles.cardPicked : ""} ${on ? "" : styles.cardOff} ${
+                  isPicked ? styles.cardPicked : ""
+                } ${on ? "" : styles.cardOff} ${
                   dragIdx === idx ? styles.cardDragging : ""
                 } ${movedId === id ? styles.cardMoved : ""}`}
                 data-card-id={id}
                 draggable
-                onClick={selectItem}
                 onDragStart={onStart}
                 onDragOver={onOver}
                 onDrop={onDropItem}
@@ -1014,13 +1051,24 @@ export function PresentasiPage() {
                   </button>
                 </div>
 
-                <div className={styles.cardThumb}>
+                <div
+                  className={styles.cardThumb}
+                  role="button"
+                  tabIndex={0}
+                  title="Klik untuk mempratinjau di mode presentasi"
+                  onClick={previewItem}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      previewItem();
+                    }
+                  }}
+                >
                   <SlidePreview
                     slideId={id}
                     coverBg={coverPreview}
                     cover={isCover}
                     kind={thumbKind}
-                    live={selected === id}
                   />
                 </div>
 

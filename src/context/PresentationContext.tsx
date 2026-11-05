@@ -127,6 +127,8 @@ interface PresentationContextValue {
   toggleAuto: () => void;
   setAutoSec: (sec: number) => void;
   start: () => void;
+  /** Mulai presentasi langsung pada slide aktif indeks `index` (mis. klik thumbnail). */
+  startAt: (index: number) => void;
   exit: () => void;
   next: (wrap?: boolean) => void;
   prev: () => void;
@@ -504,9 +506,13 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
     try {
       // Slide regional-only (Kinerja Regional, LHR/PHR vs BP) hanya di-fetch utk scope regional.
       // Sumber partner (ODOL & Kecelakaan) meneruskan `force` → lewati read-through cache.
+      // Kecelakaan tersedia di divisi (agregat semua ruas) & regional — selaras SLIDE_SCOPE_ONLY.
       const kinerjaReq = scopeLevel === "regional" ? getKinerjaRegional(key, scopeKey).catch(() => null) : Promise.resolve(null);
       const lhrPhrReq = scopeLevel === "regional" ? getLhrPhrEval(key, scopeKey).catch(() => null) : Promise.resolve(null);
-      const accidentReq = scopeLevel === "regional" ? getAccidentPresentation(key, scopeKey, force).catch(() => null) : Promise.resolve(null);
+      const accidentReq =
+        scopeLevel === "regional" || scopeLevel === "divisi"
+          ? getAccidentPresentation(key, scopeKey, force).catch(() => null)
+          : Promise.resolve(null);
       const [lr, risk, pend, sentiment, odol, kinerja, lhrPhrEval, accident] = await Promise.all([
         getLrPeriod(key, scopeKey).catch(() => null),
         getRiskPeriod(key, scopeKey).catch(() => null),
@@ -660,6 +666,10 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
     setCur(0);
     setMode("present");
   }, []);
+  const startAt = useCallback((index: number) => {
+    setCur(Math.max(0, index));
+    setMode("present");
+  }, []);
   const exit = useCallback(() => setMode("builder"), []);
 
   const nextRef = useRef<number>(0);
@@ -731,6 +741,7 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
     toggleAuto,
     setAutoSec,
     start,
+    startAt,
     exit,
     next,
     prev,

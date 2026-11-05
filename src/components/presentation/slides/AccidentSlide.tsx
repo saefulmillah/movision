@@ -4,6 +4,7 @@ import {
   ResponsiveContainer, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, LabelList, Cell, Customized
 } from "recharts";
 import { SlideFrame } from "@/components/presentation/SlideFrame";
+import { toOperationalRuas } from "@/lib/ruasAlias";
 import type { AccidentPresentation } from "@/types/insights";
 import styles from "./AccidentSlide.module.css";
 
@@ -103,7 +104,7 @@ export function AccidentSlide({ data, periodLabel, scopeLabel, fontScale = 1 }: 
 
   if (!data || !hasData) {
     return (
-      <SlideFrame title="Data Kecelakaan Regional" subtitle={periodLabel} scopeLabel={scopeLabel} flush stagger={false}>
+      <SlideFrame title="Data Kecelakaan" subtitle={periodLabel} scopeLabel={scopeLabel} flush stagger={false}>
         <div className={styles.slide}>
           <div className={styles.emptyBox}>
             <div className={styles.emptyTitle}>Belum ada data kecelakaan</div>
@@ -154,8 +155,13 @@ export function AccidentSlide({ data, periodLabel, scopeLabel, fontScale = 1 }: 
   ];
 
   // --- data per kartu ---
-  const locData = data.per_location.slice(0, 7).map((l) => {
-    const row: Record<string, number | string> = { label: l.label };
+  // Label sumbu-X memakai KODE RUAS operasional (mis. TERPEKA, ATP, BINSA) — ringkas
+  // & konsisten lintas slide — bukan nama lokasi panjang. [[ruas-naming-canonical]]
+  const locCode = (l: { key: string; label: string }) => toOperationalRuas(l.key || l.label);
+  // Tampilkan SEMUA lokasi/cabang (diurut terbanyak di backend), bukan hanya top-N,
+  // agar seluruh ruas lingkup terlihat (mis. 13 cabang di divisi).
+  const locData = data.per_location.map((l) => {
+    const row: Record<string, number | string> = { label: locCode(l) };
     for (const y of l.by_year) row[String(y.year)] = y.count;
     return row;
   });
@@ -170,7 +176,7 @@ export function AccidentSlide({ data, periodLabel, scopeLabel, fontScale = 1 }: 
   // --- takeaway (diturunkan dari data) ---
   const locDeltas = data.per_location.map((l) => {
     const cur = l.by_year[nY - 1]?.count ?? 0, prev = l.by_year[nY - 2]?.count ?? 0;
-    return { label: l.label, cur, prev, delta: cur - prev };
+    return { label: locCode(l), cur, prev, delta: cur - prev };
   });
   const locTop = [...locDeltas].sort((a, b) => b.delta - a.delta)[0];
   const causeTop = causeData[0];
@@ -236,7 +242,7 @@ export function AccidentSlide({ data, periodLabel, scopeLabel, fontScale = 1 }: 
 
   return (
     <SlideFrame
-      title="Data Kecelakaan Regional"
+      title="Data Kecelakaan"
       subtitle={`Data s.d ${data.period.report_month_label ?? ""} ${data.period.year}`.trim()}
       scopeLabel={scopeLabel}
       flush
@@ -261,7 +267,7 @@ export function AccidentSlide({ data, periodLabel, scopeLabel, fontScale = 1 }: 
           {/* KPI strip */}
           <div className={styles.kpis}>
             {kpis.map((k) => (
-              <div key={k.lab} className={`${styles.kpi} ${k.dir === "bad" ? styles.kBad : k.dir === "good" ? styles.kGood : ""}`}>
+              <div key={k.lab} className={styles.kpi}>
                 <span className={styles.kpiLab}>{k.lab}</span>
                 <div className={styles.kpiVal}><span className={styles.kpiBig}>{k.big}</span><span className={styles.kpiUnit}>{k.unit}</span></div>
                 {k.delta ? (
@@ -413,7 +419,7 @@ export function AccidentSlide({ data, periodLabel, scopeLabel, fontScale = 1 }: 
               </div>
               <div className={styles.plot}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={rateData} margin={{ top: 22, right: 20, bottom: 22, left: 6 }}>
+                  <LineChart data={rateData} margin={{ top: 22, right: 24, bottom: 22, left: 24 }}>
                     <CartesianGrid vertical={false} stroke={C.grid} strokeDasharray="3 3" />
                     <XAxis dataKey="label" tick={YearTick(true)} tickLine={false} axisLine={{ stroke: C.line }} height={34} interval={0} />
                     <YAxis hide domain={[0, "auto"]} />
