@@ -418,6 +418,52 @@ export function SentimenPage() {
             </div>
           )}
 
+          {data!.positives.length > 0 && (
+            <>
+              <div className={styles.sectionTitle}>
+                Apresiasi Publik Teratas
+                <span>
+                  Isu positif yang tampil di slide presentasi lingkup ini. Jika kontennya tidak relevan dengan Hutama Karya
+                  (mis. salah tag ruas), tandai tidak relevan — slide otomatis memakai apresiasi berikutnya.
+                </span>
+              </div>
+              <div className={styles.recoList}>
+                {data!.positives.map((it, i) => (
+                  <div key={it.key} className={styles.recoCard}>
+                    <div className={styles.recoHead}>
+                      <span className={styles.recoRank}>#{i + 1}</span>
+                      <div className={styles.recoIssue}>
+                        <div className={styles.recoTitle}>{it.title}</div>
+                        <div className={styles.recoStat}>
+                          {fmt(it.positive)} sentimen positif · Jangkauan {compact(it.reach)}
+                          {it.link && (
+                            <>
+                              {" · "}
+                              <a href={it.link} target="_blank" rel="noopener noreferrer" className={styles.recoLink}>sumber</a>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      {canWrite && (
+                        <div className={styles.recoActions}>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            iconOnly
+                            icon={hidingKey === it.key ? "loader" : "eye-off"}
+                            title="Tandai tidak relevan — sembunyikan dari lingkup ini (mis. konteks bukan Hutama Karya / salah tag ruas)"
+                            disabled={hidingKey === it.key}
+                            onClick={() => void hideIssue(it)}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
           {data!.irrelevant.length > 0 && (
             <div className={styles.hiddenBox}>
               <div className={styles.hiddenHead}>
