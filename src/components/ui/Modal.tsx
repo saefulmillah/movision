@@ -17,7 +17,10 @@ export function Modal({ open, onOpenChange, title, footer, children, width }: Mo
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className={styles.overlay} />
-        <Dialog.Content className={styles.content} style={width ? { width } : undefined}>
+        <Dialog.Content
+          className={styles.content}
+          style={width ? { width: `min(${width}px, calc(100vw - 2 * var(--sp-4)))` } : undefined}
+        >
           {title && (
             <div className={styles.head}>
               <Dialog.Title className={styles.title}>{title}</Dialog.Title>

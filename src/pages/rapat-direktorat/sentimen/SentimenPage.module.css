@@ -258,3 +258,18 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 640px) {
+  .page {
+    padding: 16px 0;
+  }
+  .header {
+    flex-wrap: wrap;
+  }
+  .title {
+    font-size: 20px;
+  }
+  .hiddenChipText {
+    max-width: 60vw;
+  }
+}

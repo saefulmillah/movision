@@ -62,6 +62,50 @@ export function PresentationOverlay() {
     return () => document.removeEventListener("keydown", onKey);
   }, [mode, next, prev, ctxExit, overviewOpen]);
 
+  // Auto-lanskap — mode presentasi dirancang untuk layar lebar. Pada ponsel
+  // (portrait sempit) saat mulai presentasi, coba masuk layar penuh lalu kunci
+  // orientasi ke lanskap. Desktop & sebagian browser (mis. iOS Safari) tidak
+  // mendukung penguncian → error diabaikan dan CSS jaring pengaman tetap dipakai.
+  useEffect(() => {
+    if (mode !== "present") return;
+    const portraitPhone =
+      typeof window !== "undefined" &&
+      window.matchMedia("(max-width: 640px) and (orientation: portrait)").matches;
+    if (!portraitPhone) return;
+
+    const el = rootRef.current;
+    const orientation = (typeof screen !== "undefined" ? screen.orientation : undefined) as
+      | (ScreenOrientation & {
+          lock?: (o: "landscape" | "portrait" | "any" | "natural") => Promise<void>;
+          unlock?: () => void;
+        })
+      | undefined;
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        if (el && !document.fullscreenElement) await el.requestFullscreen?.();
+      } catch {
+        /* sebagian browser menolak fullscreen tanpa gestur langsung → abaikan */
+      }
+      if (cancelled) return;
+      try {
+        await orientation?.lock?.("landscape");
+      } catch {
+        /* perangkat/desktop tak mendukung penguncian orientasi → abaikan */
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      try {
+        orientation?.unlock?.();
+      } catch {
+        /* abaikan */
+      }
+    };
+  }, [mode]);
+
   // Auto-advance — restart tiap ganti slide / ubah setelan.
   useEffect(() => {
     if (mode !== "present" || !auto || total === 0) return;
@@ -169,7 +213,9 @@ export function PresentationOverlay() {
           )}
         </div>
         <span className={styles.spacer} />
-        <FontSizeControl value={p.fontScale} onChange={p.setFontScale} variant="overlay" />
+        <span className={styles.headFontCtl}>
+          <FontSizeControl value={p.fontScale} onChange={p.setFontScale} variant="overlay" />
+        </span>
         <span className={styles.pageLabel}>
           {cur + 1} / {total}
         </span>

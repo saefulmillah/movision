@@ -102,6 +102,31 @@
   font-weight: 700;
 }
 
+/* ---------- Responsif header — layar kecil ---------- */
+@media (max-width: 640px) {
+  .page {
+    padding: var(--sp-4);
+  }
+  /* Header membungkus: identitas di baris atas, tombol mulai full-width di bawah. */
+  .header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .spacer {
+    display: none;
+  }
+  .headText {
+    flex: 1 1 auto;
+  }
+  .countBox {
+    align-items: flex-start;
+  }
+  .startBtn {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+}
+
 .spacer {
   flex: 1 1 auto;
 }

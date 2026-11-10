@@ -445,6 +445,50 @@
   color: var(--sem-red);
 }
 
+/* ============================================================
+   Responsif — layar kecil (ponsel/tablet kecil).
+   Daftar + panel detail yang semula berdampingan menjadi bertumpuk,
+   dan seluruh area body ikut menggulir vertikal.
+   ============================================================ */
+@media (max-width: 860px) {
+  .body {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  /* Beri tinggi tetap agar tabel tak kolaps saat panel detail tampil. */
+  .tableCard {
+    flex: none;
+    min-height: 60vh;
+  }
+  .detailPanel {
+    width: 100%;
+    flex: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .header {
+    gap: var(--sp-3);
+  }
+  /* Kotak cari & filter melebar penuh agar mudah disentuh. */
+  .search {
+    width: 100%;
+  }
+  .header form {
+    flex: 1 1 100%;
+  }
+  .filter {
+    flex: 1 1 auto;
+  }
+  .tableCard {
+    min-height: 54vh;
+  }
+  /* Footer aksi detail menumpuk bila sempit. */
+  .detailFooter {
+    flex-wrap: wrap;
+  }
+}
+
 /* Keyframes lokal (CSS Modules meng-hash referensi animasi). */
 @keyframes slideInRight { from { opacity: 0; transform: translateX(34px); } to { opacity: 1; transform: none; } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

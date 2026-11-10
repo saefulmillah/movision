@@ -10,6 +10,8 @@ import styles from "./TopBar.module.css";
 
 interface TopBarProps {
   openTickets: number;
+  /** Buka drawer sidebar di layar kecil. */
+  onMenuClick?: () => void;
 }
 
 function findMenuName(nodes: MenuNode[], pathname: string): string | null {
@@ -23,7 +25,7 @@ function findMenuName(nodes: MenuNode[], pathname: string): string | null {
   return null;
 }
 
-export function TopBar({ openTickets }: TopBarProps) {
+export function TopBar({ openTickets, onMenuClick }: TopBarProps) {
   const { theme, toggleTheme } = useTheme();
   const { menus } = useAuth();
   const { status: sseStatus } = useSse();
@@ -37,15 +39,25 @@ export function TopBar({ openTickets }: TopBarProps) {
 
   return (
     <header className={styles.topbar}>
+      <button
+        className={styles.menuBtn}
+        onClick={onMenuClick}
+        title="Buka menu"
+        aria-label="Buka menu"
+        type="button"
+      >
+        <Icon name="menu" size={20} />
+      </button>
+
       <span className={styles.title}>{title}</span>
 
-      <BranchPicker />
+      <BranchPicker className={styles.branchTrigger} />
 
       <span className={styles.spacer} />
 
       <span className={styles.sse} data-status={sseConnected ? "online" : "offline"}>
         <span className={styles.sseDot} />
-        {sseLabel}
+        <span className={styles.sseLabel}>{sseLabel}</span>
       </span>
 
       <span className={styles.sep} />

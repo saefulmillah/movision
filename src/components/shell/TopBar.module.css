@@ -16,6 +16,27 @@
   white-space: nowrap;
 }
 
+/* Pemilih ruas (global) di topbar — izinkan menyusut di flex. */
+.branchTrigger {
+  min-width: 0;
+}
+
+/* Tombol hamburger — hanya tampil di layar kecil (lihat media query). */
+.menuBtn {
+  display: none;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  margin-left: -6px;
+  border-radius: var(--r-md);
+  color: var(--text-dim);
+}
+.menuBtn:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
 .branchPicker {
   display: flex;
   align-items: center;
@@ -121,6 +142,42 @@
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 600;
+}
+
+/* ============================================================
+   Responsif — kondensasi topbar di layar kecil.
+   ============================================================ */
+@media (max-width: 860px) {
+  .topbar {
+    gap: var(--sp-3);
+    padding: 0 var(--sp-4);
+  }
+  .menuBtn {
+    display: grid;
+  }
+  /* Judul boleh menyusut & terpotong agar tak mendorong elemen lain keluar. */
+  .title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: var(--fs-lg);
+  }
+  /* Batasi lebar pemilih ruas agar muat berbagi ruang dengan judul. */
+  .branchTrigger {
+    max-width: 44vw;
+  }
+}
+
+@media (max-width: 560px) {
+  /* Sembunyikan info sekunder; sisakan ruang untuk judul + aksi utama. */
+  .sseLabel,
+  .sep,
+  .clock {
+    display: none;
+  }
+  .sse {
+    gap: 0;
+  }
 }
 
 /* Keyframes lokal (CSS Modules meng-hash referensi animasi; definisi lokal agar cocok). */
