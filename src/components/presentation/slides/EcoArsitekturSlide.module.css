@@ -56,14 +56,14 @@
 /* ---- Header ---- */
 .head {
   flex: none;
-  padding: clamp(16px, 3vh, 36px) clamp(28px, 4vw, 72px) clamp(2px, 0.8vh, 10px);
+  padding: clamp(16px, 3cqh, 36px) clamp(28px, 4cqw, 72px) clamp(2px, 0.8cqh, 10px);
   animation: fadeDown 700ms ease-out both;
 }
 .kicker {
   display: inline-flex;
   align-items: center;
   gap: 11px;
-  font-size: clamp(11px, 1.4vh, 14px);
+  font-size: clamp(11px, 1.4cqh, 14px);
   font-weight: 800;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -77,7 +77,7 @@
 }
 .title {
   margin: 8px 0 0;
-  font-size: clamp(24px, 4.2vh, 46px);
+  font-size: clamp(24px, 4.2cqh, 46px);
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1.04;
@@ -85,15 +85,15 @@
 }
 .legend {
   display: flex;
-  gap: clamp(14px, 2vw, 30px);
-  margin-top: clamp(6px, 1.1vh, 14px);
+  gap: clamp(14px, 2cqw, 30px);
+  margin-top: clamp(6px, 1.1cqh, 14px);
   flex-wrap: wrap;
 }
 .lg {
   display: inline-flex;
   align-items: center;
   gap: 9px;
-  font-size: clamp(11px, 1.4vh, 14px);
+  font-size: clamp(11px, 1.4cqh, 14px);
   font-weight: 600;
   color: #51607a;
 }
@@ -104,8 +104,8 @@
 /* ---- Tombol banding tata letak (sementara) ---- */
 .toggle {
   position: absolute;
-  top: clamp(14px, 2.2vh, 28px);
-  right: clamp(18px, 2.6vw, 44px);
+  top: clamp(14px, 2.2cqh, 28px);
+  right: clamp(18px, 2.6cqw, 44px);
   z-index: 6;
   display: inline-flex;
   align-items: center;
@@ -135,7 +135,7 @@
   position: relative;
   flex: 1 1 auto;
   min-height: 0;
-  padding: clamp(2px, 1vh, 8px) clamp(14px, 2vw, 40px) clamp(2px, 1vh, 8px);
+  padding: clamp(2px, 1cqh, 8px) clamp(14px, 2cqw, 40px) clamp(2px, 1cqh, 8px);
 }
 .svg { width: 100%; height: 100%; display: block; overflow: visible; }
 
@@ -293,7 +293,7 @@
 /* ---- Footer ---- */
 .foot {
   flex: none;
-  padding: clamp(4px, 1vh, 12px) clamp(28px, 4vw, 72px) clamp(12px, 2vh, 24px);
+  padding: clamp(4px, 1cqh, 12px) clamp(28px, 4cqw, 72px) clamp(12px, 2cqh, 24px);
   animation: fadeDown 800ms ease-out 0.3s both;
 }
 .sapNote {
@@ -302,7 +302,7 @@
   gap: 10px;
   padding: 8px 16px;
   border-radius: 12px;
-  font-size: clamp(11px, 1.5vh, 15px);
+  font-size: clamp(11px, 1.5cqh, 15px);
   font-weight: 500;
   color: #40506b;
   background: #ffffff;

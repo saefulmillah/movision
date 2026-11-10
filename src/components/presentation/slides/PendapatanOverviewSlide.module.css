@@ -9,7 +9,7 @@
      header + progress + footer + padding stageWrap) agar dua grafik menskala
      ke ruang tersisa tanpa scroll — panggung memakai margin:auto sehingga tidak
      memberi tinggi definit sendiri. */
-  height: calc(100vh - 172px);
+  height: calc(100cqh - 172px);
   min-height: 0;
   overflow: hidden;
 }
@@ -52,7 +52,7 @@
 
 .kpiWrap {
   flex: none;
-  margin-bottom: clamp(8px, 1.2vh, 16px);
+  margin-bottom: clamp(8px, 1.2cqh, 16px);
 }
 
 /* ---------- 2 grafik ---------- */
@@ -61,7 +61,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: clamp(8px, 1.2vh, 14px);
+  gap: clamp(8px, 1.2cqh, 14px);
 }
 .chartPanel {
   flex: 1 1 0;
@@ -73,7 +73,7 @@
   background: var(--surface-1);
   border: 1px solid var(--line);
   border-radius: 0;
-  padding: clamp(6px, 1vh, 12px) clamp(10px, 1.2vw, 18px);
+  padding: clamp(6px, 1cqh, 12px) clamp(10px, 1.2cqw, 18px);
 }
 .chartBody {
   flex: 1 1 auto;

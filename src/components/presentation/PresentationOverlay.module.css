@@ -206,6 +206,33 @@
   min-height: 0;
 }
 
+/* Panggung berskala: kanvas 1280×720 di-tengah & di-skala "contain" agar seluruh
+   slide terlihat di layar pendek (mis. ponsel lanskap). Lihat ScaledSlide. */
+.scaleBox {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.scaleCanvas {
+  flex: none;
+  width: 1280px;
+  height: 720px;
+  /* Kontainer ukuran utk satuan cqh/cqw slide (relatif kanvas, bukan viewport). */
+  container-type: size;
+  transform-origin: center center;
+  display: flex;
+  background: var(--surface-1);
+}
+.scaleCanvas > * {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+}
+
 /* Slide sampul: foto latar edge-to-edge (tanpa padding/kolom terbatas). */
 .stageWrapCover {
   padding: 0;

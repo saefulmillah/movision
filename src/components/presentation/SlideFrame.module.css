@@ -10,10 +10,10 @@
 .titleBar {
   display: flex;
   align-items: baseline;
-  gap: clamp(8px, 1vw, 16px);
+  gap: clamp(8px, 1cqw, 16px);
   flex: none;
   margin: 0;
-  padding: clamp(9px, 1.4vh, 16px) clamp(10px, 1.3vw, 24px);
+  padding: clamp(9px, 1.4cqh, 16px) clamp(10px, 1.3cqw, 24px);
   background: var(--surface-1);
   border: none;
   border-radius: 0;
@@ -26,19 +26,19 @@
   letter-spacing: -0.01em;
   line-height: 1.05;
   color: var(--text);
-  font-size: clamp(18px, 2.6vh, 34px);
+  font-size: clamp(18px, 2.6cqh, 34px);
 }
 .subtitle {
-  font-size: clamp(11px, 1.5vh, 17px);
+  font-size: clamp(11px, 1.5cqh, 17px);
   font-weight: 500;
   color: var(--text-muted);
 }
 .scopeTag {
-  padding: 2px clamp(7px, 0.7vw, 12px);
+  padding: 2px clamp(7px, 0.7cqw, 12px);
   border-radius: 999px;
   background: color-mix(in srgb, var(--st-blue) 16%, transparent);
   color: var(--st-blue);
-  font-size: clamp(10px, 1.3vh, 15px);
+  font-size: clamp(10px, 1.3cqh, 15px);
   font-weight: 700;
   white-space: nowrap;
 }
@@ -46,7 +46,7 @@
   flex: 1 1 auto;
 }
 .rightMeta {
-  font-size: clamp(10px, 1.4vh, 16px);
+  font-size: clamp(10px, 1.4cqh, 16px);
   font-weight: 500;
   color: var(--text-muted);
   white-space: nowrap;
@@ -58,7 +58,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  padding: clamp(8px, 1.3vh, 16px) clamp(10px, 1.3vw, 24px);
+  padding: clamp(8px, 1.3cqh, 16px) clamp(10px, 1.3cqw, 24px);
 }
 .flush {
   padding: 0;
@@ -67,10 +67,10 @@
 /* ---- Strip keterangan: garis atas tipis + teks slate ---- */
 .footnote {
   flex: none;
-  margin: 0 clamp(10px, 1.3vw, 24px);
+  margin: 0 clamp(10px, 1.3cqw, 24px);
   border-top: 1px solid var(--line);
-  padding: clamp(5px, 0.9vh, 10px) 0;
-  font-size: clamp(10px, 1.3vh, 14px);
+  padding: clamp(5px, 0.9cqh, 10px) 0;
+  font-size: clamp(10px, 1.3cqh, 14px);
   line-height: 1.35;
   color: var(--sem-slate);
 }

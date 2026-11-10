@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { usePresentation } from "@/context/PresentationContext";
 import { SLIDES } from "./slideRegistry";
@@ -11,6 +11,46 @@ import brandLogos from "@/assets/presentation/brand-logos.png";
 import movisionMark from "@/assets/presentation/movision-mark.webp";
 import "@/styles/presentation-anim.css";
 import styles from "./PresentationOverlay.module.css";
+
+/* Kanvas desain slide (16:9) — SAMA dengan panggung rasterisasi thumbnail & PDF.
+   Slide memakai satuan cqh/cqw relatif kanvas ini, lalu di-skala agar muat. */
+const CANVAS_W = 1280;
+const CANVAS_H = 720;
+
+/**
+ * Bungkus slide data pada kanvas desain tetap (1280×720) lalu `transform: scale`
+ * agar "contain" di area yang tersedia — seperti proyektor. Menjamin seluruh isi
+ * slide terlihat (tidak terpotong) di layar pendek (mis. ponsel lanskap), dengan
+ * proporsi persis seperti desktop/ekspor. Di layar lebar, skala ≈ 1.
+ */
+function ScaledSlide({ children }: { children: ReactNode }) {
+  const boxRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+
+  // useLayoutEffect: ukur & set skala SEBELUM paint pertama → tak ada kedip
+  // (slide tak sempat tampil skala 1 lalu menyusut).
+  useLayoutEffect(() => {
+    const el = boxRef.current;
+    if (!el) return;
+    const compute = () => {
+      const w = el.clientWidth;
+      const h = el.clientHeight;
+      if (w > 0 && h > 0) setScale(Math.min(w / CANVAS_W, h / CANVAS_H));
+    };
+    compute();
+    const ro = new ResizeObserver(compute);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  return (
+    <div ref={boxRef} className={styles.scaleBox}>
+      <div className={styles.scaleCanvas} style={{ transform: `scale(${scale})` }}>
+        {children}
+      </div>
+    </div>
+  );
+}
 
 export function PresentationOverlay() {
   const p = usePresentation();
@@ -246,7 +286,9 @@ export function PresentationOverlay() {
           <div key={key} className={`${styles.stage} ${styles.stageCover}`}>{renderSlide()}</div>
         </div>
       ) : (
-        <div key={key} className={`${styles.stageWrap} ${styles.stageData}`}>{renderSlide()}</div>
+        <div key={key} className={`${styles.stageWrap} ${styles.stageData}`}>
+          <ScaledSlide>{renderSlide()}</ScaledSlide>
+        </div>
       )}
 
       <footer className={`${styles.footer} ${overviewOpen ? styles.footerFilm : ""}`}>
