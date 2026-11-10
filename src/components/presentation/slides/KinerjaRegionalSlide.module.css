@@ -13,28 +13,28 @@
   flex: none;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: clamp(6px, 0.7vw, 12px);
-  margin-bottom: clamp(8px, 1.1vh, 14px);
+  gap: clamp(6px, 0.7cqw, 12px);
+  margin-bottom: clamp(8px, 1.1cqh, 14px);
 }
 .kpiCard {
   background: var(--surface-1);
   border: 1px solid var(--line);
   border-radius: 10px;
-  padding: clamp(8px, 1vh, 14px) clamp(9px, 0.9vw, 15px);
+  padding: clamp(8px, 1cqh, 14px) clamp(9px, 0.9cqw, 15px);
   display: flex;
   flex-direction: column;
-  gap: clamp(4px, 0.6vh, 8px);
+  gap: clamp(4px, 0.6cqh, 8px);
   min-width: 0;
 }
 .kpiLabel {
   font-weight: 700;
-  font-size: clamp(11px, 1.3vh, 15px);
+  font-size: clamp(11px, 1.3cqh, 15px);
   color: var(--st-blue);
   letter-spacing: 0.01em;
 }
 .kpiValue {
   font-weight: 800;
-  font-size: clamp(18px, 2.7vh, 32px);
+  font-size: clamp(18px, 2.7cqh, 32px);
   line-height: 1;
   color: var(--text);
   font-variant-numeric: tabular-nums;
@@ -51,7 +51,7 @@
 .kpiSub {
   display: flex;
   justify-content: space-between;
-  font-size: clamp(9px, 1.1vh, 12px);
+  font-size: clamp(9px, 1.1cqh, 12px);
 }
 .kpiSub > span:first-child {
   color: var(--text-muted);
@@ -77,12 +77,12 @@
 }
 .kpiVsPct {
   font-weight: 800;
-  font-size: clamp(12px, 1.5vh, 17px);
+  font-size: clamp(12px, 1.5cqh, 17px);
   font-variant-numeric: tabular-nums;
 }
 .kpiVsLabel {
   font-weight: 600;
-  font-size: clamp(8px, 0.9vh, 10px);
+  font-size: clamp(8px, 0.9cqh, 10px);
   color: var(--text-muted);
   letter-spacing: 0.03em;
 }
@@ -94,14 +94,14 @@
   display: grid;
   /* P&L sengaja dilebarkan (korban lebar LHR/PHR) agar batang & label terbaca. */
   grid-template-columns: 2.5fr 0.85fr;
-  gap: clamp(8px, 1vw, 14px);
+  gap: clamp(8px, 1cqw, 14px);
 }
 
 .pnlCard {
   background: var(--surface-1);
   border: 1px solid var(--line);
   border-radius: 10px;
-  padding: clamp(8px, 1.1vh, 16px) clamp(10px, 1vw, 18px);
+  padding: clamp(8px, 1.1cqh, 16px) clamp(10px, 1cqw, 18px);
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -115,12 +115,12 @@
 }
 .pnlTitle {
   font-weight: 800;
-  font-size: clamp(13px, 1.6vh, 17px);
+  font-size: clamp(13px, 1.6cqh, 17px);
   color: var(--st-blue);
   letter-spacing: 0.02em;
 }
 .pnlSub {
-  font-size: clamp(10px, 1.1vh, 12px);
+  font-size: clamp(10px, 1.1cqh, 12px);
   color: var(--text-muted);
   font-weight: 500;
   margin-top: 2px;
@@ -135,7 +135,7 @@
   cursor: pointer;
   font-family: inherit;
   font-weight: 700;
-  font-size: clamp(10px, 1.1vh, 12px);
+  font-size: clamp(10px, 1.1cqh, 12px);
   padding: 6px 13px;
   border-radius: 7px;
   background: var(--surface-2, color-mix(in srgb, var(--line) 40%, transparent));
@@ -153,7 +153,7 @@
   flex: none;
   display: flex;
   align-items: center;
-  gap: clamp(8px, 1vw, 15px);
+  gap: clamp(8px, 1cqw, 15px);
   flex-wrap: wrap;
   margin-top: 8px;
 }
@@ -162,7 +162,7 @@
   align-items: center;
   gap: 6px;
   font-weight: 600;
-  font-size: clamp(10px, 1.1vh, 12px);
+  font-size: clamp(10px, 1.1cqh, 12px);
   color: var(--text-muted);
 }
 .sw {
@@ -173,7 +173,7 @@
 }
 .entKey {
   margin-left: auto;
-  font-size: clamp(8px, 0.9vh, 10px);
+  font-size: clamp(8px, 0.9cqh, 10px);
   font-weight: 600;
   color: var(--text-muted);
   letter-spacing: 0.02em;
@@ -186,7 +186,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-auto-rows: 1fr;
-  gap: clamp(7px, 0.9vh, 12px);
+  gap: clamp(7px, 0.9cqh, 12px);
   margin-top: 10px;
 }
 .panel {
@@ -207,7 +207,7 @@
 }
 .panelLabel {
   font-weight: 800;
-  font-size: clamp(10px, 1.2vh, 13px);
+  font-size: clamp(10px, 1.2cqh, 13px);
   color: var(--text);
   letter-spacing: 0.01em;
 }
@@ -218,7 +218,7 @@
 }
 .panelAch {
   font-weight: 800;
-  font-size: clamp(9px, 1vh, 11px);
+  font-size: clamp(9px, 1cqh, 11px);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -238,7 +238,7 @@
 .summary {
   background: linear-gradient(140deg, #16315d, #23457f);
   border-radius: 9px;
-  padding: clamp(9px, 1.1vh, 14px) clamp(10px, 1vw, 15px);
+  padding: clamp(9px, 1.1cqh, 14px) clamp(10px, 1cqw, 15px);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -247,7 +247,7 @@
 }
 .summaryTitle {
   font-weight: 800;
-  font-size: clamp(10px, 1.2vh, 13px);
+  font-size: clamp(10px, 1.2cqh, 13px);
   letter-spacing: 0.03em;
   color: #9fc3d6;
 }
@@ -260,13 +260,13 @@
   padding-bottom: 5px;
 }
 .summaryRow > span:first-child {
-  font-size: clamp(9px, 1.05vh, 12px);
+  font-size: clamp(9px, 1.05cqh, 12px);
   font-weight: 600;
   color: #c7d6ea;
 }
 .summaryRow > span:last-child {
   font-weight: 800;
-  font-size: clamp(12px, 1.5vh, 16px);
+  font-size: clamp(12px, 1.5cqh, 16px);
   font-variant-numeric: tabular-nums;
 }
 
@@ -274,7 +274,7 @@
 .sideCol {
   display: flex;
   flex-direction: column;
-  gap: clamp(8px, 1vw, 14px);
+  gap: clamp(8px, 1cqw, 14px);
   min-height: 0;
 }
 .tblCard {
@@ -283,14 +283,14 @@
   background: var(--surface-1);
   border: 1px solid var(--line);
   border-radius: 10px;
-  padding: clamp(9px, 1.1vh, 15px) clamp(10px, 1vw, 18px);
+  padding: clamp(9px, 1.1cqh, 15px) clamp(10px, 1cqw, 18px);
   display: flex;
   flex-direction: column;
 }
 .tblTitle {
   flex: none;
   font-weight: 800;
-  font-size: clamp(12px, 1.4vh, 15px);
+  font-size: clamp(12px, 1.4cqh, 15px);
   color: var(--st-blue);
   letter-spacing: 0.02em;
 }
@@ -299,7 +299,7 @@
   display: grid;
   place-items: center;
   color: var(--text-muted);
-  font-size: clamp(11px, 1.2vh, 13px);
+  font-size: clamp(11px, 1.2cqh, 13px);
   font-weight: 500;
 }
 .tblBody {
@@ -320,7 +320,7 @@
 .tblHeadRow {
   margin-top: 9px;
   padding-bottom: 6px;
-  font-size: clamp(8px, 1vh, 10px);
+  font-size: clamp(8px, 1cqh, 10px);
   font-weight: 700;
   color: var(--text-muted);
   letter-spacing: 0.04em;
@@ -330,13 +330,13 @@
 }
 .ruasName {
   font-weight: 700;
-  font-size: clamp(11px, 1.25vh, 14px);
+  font-size: clamp(11px, 1.25cqh, 14px);
   color: var(--text);
 }
 .r {
   text-align: right;
   font-weight: 600;
-  font-size: clamp(11px, 1.25vh, 14px);
+  font-size: clamp(11px, 1.25cqh, 14px);
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
@@ -346,7 +346,7 @@
 }
 .pill {
   font-weight: 800;
-  font-size: clamp(10px, 1.15vh, 12px);
+  font-size: clamp(10px, 1.15cqh, 12px);
   padding: 3px 8px;
   border-radius: 6px;
   min-width: 50px;

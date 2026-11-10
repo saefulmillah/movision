@@ -16,6 +16,9 @@
 .capture {
   width: 1280px;
   height: 720px;
+  /* Kontainer ukuran: slide memakai satuan cqh/cqw relatif kanvas 1280×720 ini
+     (bukan viewport), agar thumbnail konsisten dgn runtime & PDF. */
+  container-type: size;
   overflow: hidden;
   background: var(--surface-1);
   display: flex;

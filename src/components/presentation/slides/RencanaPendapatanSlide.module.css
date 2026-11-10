@@ -18,7 +18,7 @@
   align-items: center;
   gap: 7px;
   font-weight: 600;
-  font-size: clamp(11px, 1.3vh, 14px);
+  font-size: clamp(11px, 1.3cqh, 14px);
   color: var(--text-muted);
 }
 .sw {
@@ -34,13 +34,13 @@
   display: grid;
   /* Kolom kanan (Kinerja L/R per Ruas) dilebarkan agar grafik lebih lega. */
   grid-template-columns: 0.68fr 1.32fr;
-  gap: clamp(10px, 1vw, 16px);
+  gap: clamp(10px, 1cqw, 16px);
 }
 
 .leftCol {
   display: flex;
   flex-direction: column;
-  gap: clamp(10px, 1vh, 14px);
+  gap: clamp(10px, 1cqh, 14px);
   min-height: 0;
 }
 
@@ -49,7 +49,7 @@
   border: 1px solid var(--line);
   border-radius: 14px;
   box-shadow: 0 1px 4px rgba(16, 42, 67, 0.07);
-  padding: clamp(12px, 1.3vh, 18px) clamp(13px, 1vw, 20px);
+  padding: clamp(12px, 1.3cqh, 18px) clamp(13px, 1cqw, 20px);
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -67,12 +67,12 @@
 }
 .cardTitle {
   font-weight: 800;
-  font-size: clamp(14px, 1.6vh, 17px);
+  font-size: clamp(14px, 1.6cqh, 17px);
   color: var(--st-blue);
   letter-spacing: 0.02em;
 }
 .cardSub {
-  font-size: clamp(10px, 1.1vh, 12px);
+  font-size: clamp(10px, 1.1cqh, 12px);
   color: var(--text-muted);
   font-weight: 600;
   margin-top: 1px;
@@ -80,10 +80,10 @@
 
 /* ---- Blok 1: Tol & Lainnya ---- */
 .revGroup {
-  margin-top: clamp(11px, 1.4vh, 17px);
+  margin-top: clamp(11px, 1.4cqh, 17px);
 }
 .revGroup:first-of-type {
-  margin-top: clamp(9px, 1.1vh, 13px);
+  margin-top: clamp(9px, 1.1cqh, 13px);
 }
 /* Label periode — gaya soft/tinted (teks aksen + latar transparan tipis),
    lebih kalem & menyatu dgn tema card (bukan chip terisi penuh). */
@@ -133,13 +133,13 @@
 }
 .revLabel {
   font-weight: 600;
-  font-size: clamp(11px, 1.3vh, 13.5px);
+  font-size: clamp(11px, 1.3cqh, 13.5px);
   color: var(--text);
 }
 .r {
   text-align: right;
   font-weight: 600;
-  font-size: clamp(11px, 1.3vh, 13.5px);
+  font-size: clamp(11px, 1.3cqh, 13.5px);
   color: var(--text-dim);
   font-variant-numeric: tabular-nums;
 }
@@ -162,7 +162,7 @@
    span sederhana, satu baris, sudut membulat. */
 .pill {
   font-weight: 800;
-  font-size: clamp(10px, 1.15vh, 12px);
+  font-size: clamp(10px, 1.15cqh, 12px);
   color: #fff;
   padding: 3px 9px;
   border-radius: 6px;
@@ -183,7 +183,7 @@
   cursor: pointer;
   font-family: inherit;
   font-weight: 700;
-  font-size: clamp(10px, 1.1vh, 12px);
+  font-size: clamp(10px, 1.1cqh, 12px);
   padding: 6px 12px;
   border-radius: 7px;
 }
@@ -191,8 +191,8 @@
 .kpiRow {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: clamp(5px, 0.5vw, 8px);
-  margin-top: clamp(10px, 1.2vh, 14px);
+  gap: clamp(5px, 0.5cqw, 8px);
+  margin-top: clamp(10px, 1.2cqh, 14px);
   flex: none;
 }
 .kpiCard {
@@ -202,7 +202,7 @@
   cursor: pointer;
   font-family: inherit;
   text-align: left;
-  padding: clamp(6px, 0.8vh, 9px) clamp(7px, 0.6vw, 10px);
+  padding: clamp(6px, 0.8cqh, 9px) clamp(7px, 0.6cqw, 10px);
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -219,7 +219,7 @@
 }
 .kpiName {
   /* Ukuran teks KPI Cards Kinerja mengikuti setelan font slide (--pfx-fs). */
-  font-size: calc(clamp(8.5px, 1vh, 10.5px) * var(--pfx-fs, 1));
+  font-size: calc(clamp(8.5px, 1cqh, 10.5px) * var(--pfx-fs, 1));
   font-weight: 700;
   color: var(--text-muted);
   letter-spacing: 0.01em;
@@ -229,13 +229,13 @@
 }
 .kpiVal {
   font-weight: 800;
-  font-size: calc(clamp(14px, 1.9vh, 20px) * var(--pfx-fs, 1));
+  font-size: calc(clamp(14px, 1.9cqh, 20px) * var(--pfx-fs, 1));
   color: var(--text);
   font-variant-numeric: tabular-nums;
   line-height: 1.05;
 }
 .kpiDelta {
-  font-size: calc(clamp(8px, 0.92vh, 10px) * var(--pfx-fs, 1));
+  font-size: calc(clamp(8px, 0.92cqh, 10px) * var(--pfx-fs, 1));
   font-weight: 700;
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
@@ -251,16 +251,16 @@
 
 /* Judul di dalam grafik (lapis 2) & judul ringkasan (lapis 3) */
 .chartTitle {
-  margin-top: clamp(6px, 0.8vh, 10px);
-  font-size: clamp(10px, 1.15vh, 12.5px);
+  margin-top: clamp(6px, 0.8cqh, 10px);
+  font-size: clamp(10px, 1.15cqh, 12.5px);
   font-weight: 700;
   color: var(--text-dim);
   letter-spacing: 0.01em;
   flex: none;
 }
 .summaryHead {
-  margin-top: clamp(8px, 1vh, 12px);
-  font-size: clamp(10px, 1.15vh, 12.5px);
+  margin-top: clamp(8px, 1cqh, 12px);
+  font-size: clamp(10px, 1.15cqh, 12.5px);
   font-weight: 800;
   color: var(--st-blue);
   letter-spacing: 0.02em;
@@ -272,7 +272,7 @@
   position: relative;
   min-height: 0;
   width: 100%;
-  margin-top: clamp(6px, 0.8vh, 10px);
+  margin-top: clamp(6px, 0.8cqh, 10px);
 }
 .chart.grow {
   flex: 1 1 auto;
@@ -282,14 +282,14 @@
 .summary {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: clamp(8px, 0.9vw, 12px);
-  margin-top: clamp(6px, 0.8vh, 10px);
+  gap: clamp(8px, 0.9cqw, 12px);
+  margin-top: clamp(6px, 0.8cqh, 10px);
   flex: none;
 }
 .summaryCard {
   background: var(--surface-2, color-mix(in srgb, var(--line) 22%, transparent));
   border-radius: 11px;
-  padding: clamp(9px, 1vh, 13px) clamp(11px, 0.9vw, 16px);
+  padding: clamp(9px, 1cqh, 13px) clamp(11px, 0.9cqw, 16px);
 }
 .summaryPeriod {
   font-weight: 700;
@@ -313,7 +313,7 @@
 }
 .summaryVal {
   font-weight: 800;
-  font-size: clamp(16px, 2vh, 20px);
+  font-size: clamp(16px, 2cqh, 20px);
   font-variant-numeric: tabular-nums;
   line-height: 1.1;
 }
