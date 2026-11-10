@@ -10,6 +10,10 @@ interface SidebarProps {
   open: boolean;
   onToggle: () => void;
   openTickets: number;
+  /** Drawer terbuka di layar kecil (off-canvas). */
+  mobileOpen?: boolean;
+  /** Tutup drawer di layar kecil. */
+  onMobileClose?: () => void;
 }
 
 const STORAGE_KEY = "tollsentra.sidebar.groups";
@@ -48,7 +52,7 @@ function readStoredGroups(): Record<string, boolean> {
   return {};
 }
 
-export function Sidebar({ open, onToggle, openTickets }: SidebarProps) {
+export function Sidebar({ open, onToggle, openTickets, mobileOpen = false, onMobileClose }: SidebarProps) {
   const { menus, capability, logout } = useAuth();
   const location = useLocation();
 
@@ -137,7 +141,10 @@ export function Sidebar({ open, onToggle, openTickets }: SidebarProps) {
   };
 
   return (
-    <aside className={`${styles.sidebar} ${open ? "" : styles.collapsed}`} data-collapsed={!open}>
+    <aside
+      className={`${styles.sidebar} ${open ? "" : styles.collapsed} ${mobileOpen ? styles.mobileOpen : ""}`}
+      data-collapsed={!open}
+    >
       <div className={styles.header}>
         <div className={styles.brand}>
           <span className={styles.brandMark} style={{ background: "#fff", overflow: "hidden" }}>
@@ -154,6 +161,14 @@ export function Sidebar({ open, onToggle, openTickets }: SidebarProps) {
         </div>
         <button className={styles.collapseBtn} onClick={onToggle} title="Lipat menu" aria-label="Lipat menu">
           <Icon name={open ? "panel-left-close" : "panel-left-open"} size={18} />
+        </button>
+        <button
+          className={styles.mobileCloseBtn}
+          onClick={onMobileClose}
+          title="Tutup menu"
+          aria-label="Tutup menu"
+        >
+          <Icon name="x" size={19} />
         </button>
       </div>
 

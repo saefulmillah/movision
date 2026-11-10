@@ -77,6 +77,12 @@
   font-size: 12.5px;
   color: var(--text-muted);
 }
+/* Pembungkus kontrol ukuran font — transparan sebagai item flex (disembunyikan
+   di layar sempit lewat media query di bawah). */
+.headFontCtl {
+  display: inline-flex;
+  align-items: center;
+}
 .iconBtn {
   display: grid;
   place-items: center;
@@ -417,4 +423,52 @@
   background: var(--surface-3);
   color: var(--text);
   border-color: var(--st-blue);
+}
+
+/* ============================================================
+   Responsif — layar sempit (ponsel portrait).
+   Mode presentasi dirancang lanskap; saat start kami mencoba mengunci
+   orientasi ke lanskap (lihat PresentationOverlay.tsx). Aturan ini jadi
+   jaring pengaman bila orientasi tak bisa dikunci (mis. iOS Safari):
+   kontrol inti (navigasi, layar penuh, keluar) tetap terjangkau.
+   Di lanskap lebar > 640px sehingga chrome penuh tetap tampil.
+   ============================================================ */
+@media (max-width: 640px) {
+  .header {
+    gap: 8px;
+    padding: 0 10px;
+    height: 48px;
+  }
+  /* Sembunyikan info & kontrol sekunder; pastikan Muat ulang, Layar penuh, dan
+     Keluar tetap muat & terjangkau. Skala font bisa diatur di builder. */
+  .brand,
+  .sep,
+  .periodWrap,
+  .pageLabel,
+  .headFontCtl {
+    display: none;
+  }
+
+  .footer {
+    gap: 10px;
+    padding: 0 10px;
+  }
+  /* Dots dapat digulir horizontal bila slide banyak. */
+  .dots {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding: 0 2px;
+    scrollbar-width: none;
+  }
+  .dots::-webkit-scrollbar {
+    display: none;
+  }
+  /* Auto-play, pemisah, dan logo korporat disembunyikan agar nav inti muat. */
+  .footSep,
+  .autoBtn,
+  .brandLogo {
+    display: none;
+  }
 }

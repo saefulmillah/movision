@@ -5,8 +5,12 @@ import { useBranch } from "@/context/BranchContext";
 
 const ALL = "all";
 
+interface BranchPickerProps {
+  className?: string;
+}
+
 /** Pemilih ruas aktif (global). "Semua Ruas" = tanpa filter. */
-export function BranchPicker() {
+export function BranchPicker({ className }: BranchPickerProps = {}) {
   const { branches, activeBranchId, setActiveBranch } = useBranch();
 
   const options = useMemo<SelectOption[]>(
@@ -16,6 +20,7 @@ export function BranchPicker() {
 
   return (
     <Select
+      className={className}
       icon="git-fork"
       ariaLabel="Pilih ruas aktif"
       value={activeBranchId == null ? ALL : String(activeBranchId)}

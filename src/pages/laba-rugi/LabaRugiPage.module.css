@@ -365,6 +365,20 @@
   color: var(--text-muted);
 }
 
+/* ---------- Responsif — layar kecil ---------- */
+@media (max-width: 640px) {
+  .header {
+    align-items: flex-start;
+  }
+  .title {
+    font-size: var(--fs-xl);
+  }
+  /* Toolbar boleh membungkus: pita pita (pills) menggulir, opsi turun ke bawah. */
+  .toolbar {
+    flex-wrap: wrap;
+  }
+}
+
 /* ---------- Mode layar penuh ---------- */
 /* Saat elemen halaman masuk fullscreen, beri padding + background agar tidak
    mepet ke tepi layar dan konten tetap bisa digulir. */

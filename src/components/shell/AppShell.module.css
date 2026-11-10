@@ -27,3 +27,39 @@
   min-height: 0;
   overflow: hidden;
 }
+
+/* Latar gelap di belakang drawer sidebar pada layar kecil. */
+.backdrop {
+  display: none;
+}
+
+/* ============================================================
+   Responsif — layar kecil (tablet & ponsel)
+   Sidebar menjadi drawer off-canvas; padding konten diperkecil.
+   ============================================================ */
+@media (max-width: 860px) {
+  .content {
+    padding: var(--sp-5);
+  }
+  .backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    background: rgba(9, 16, 30, 0.55);
+    backdrop-filter: blur(1px);
+    animation: fadeIn var(--t-fade);
+  }
+}
+
+@media (max-width: 560px) {
+  .content {
+    padding: var(--sp-4);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
