@@ -13,29 +13,38 @@ import "@/styles/presentation-anim.css";
 import styles from "./PresentationOverlay.module.css";
 
 /* Kanvas desain slide (16:9) — SAMA dengan panggung rasterisasi thumbnail & PDF.
-   Slide memakai satuan cqh/cqw relatif kanvas ini, lalu di-skala agar muat. */
+   Dipakai hanya pada mode "scale" (layar pendek). */
 const CANVAS_W = 1280;
 const CANVAS_H = 720;
+/* Bila tinggi panggung ≥ ambang ini, slide MENGISI PENUH panggung (seperti
+   desktop semula, tanpa letterbox). Di bawahnya (mis. ponsel lanskap yang
+   pendek), slide memakai kanvas 16:9 lalu di-skala agar seluruh isi muat. */
+const FILL_MIN_H = 560;
 
 /**
- * Bungkus slide data pada kanvas desain tetap (1280×720) lalu `transform: scale`
- * agar "contain" di area yang tersedia — seperti proyektor. Menjamin seluruh isi
- * slide terlihat (tidak terpotong) di layar pendek (mis. ponsel lanskap), dengan
- * proporsi persis seperti desktop/ekspor. Di layar lebar, skala ≈ 1.
+ * Panggung slide data adaptif:
+ *  - Panggung cukup tinggi (desktop/tablet) → slide MENGISI PENUH panggung
+ *    (fluid, tanpa gap kiri-kanan) — sama seperti sebelum penskalaan.
+ *  - Panggung pendek (ponsel lanskap) → slide dirender di kanvas desain 16:9
+ *    (1280×720) lalu `transform: scale` agar "contain", sehingga seluruh isi
+ *    slide tetap terlihat (tidak terpotong).
+ * Satuan cqh/cqw slide selalu relatif kanvas (fillCanvas/scaleCanvas = kontainer
+ * ukuran), bukan viewport.
  */
 function ScaledSlide({ children }: { children: ReactNode }) {
   const boxRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(1);
+  const [state, setState] = useState<{ fill: boolean; scale: number }>({ fill: true, scale: 1 });
 
-  // useLayoutEffect: ukur & set skala SEBELUM paint pertama → tak ada kedip
-  // (slide tak sempat tampil skala 1 lalu menyusut).
+  // useLayoutEffect: ukur & set SEBELUM paint pertama → tak ada kedip.
   useLayoutEffect(() => {
     const el = boxRef.current;
     if (!el) return;
     const compute = () => {
       const w = el.clientWidth;
       const h = el.clientHeight;
-      if (w > 0 && h > 0) setScale(Math.min(w / CANVAS_W, h / CANVAS_H));
+      if (w <= 0 || h <= 0) return;
+      if (h >= FILL_MIN_H) setState({ fill: true, scale: 1 });
+      else setState({ fill: false, scale: Math.min(w / CANVAS_W, h / CANVAS_H) });
     };
     compute();
     const ro = new ResizeObserver(compute);
@@ -45,7 +54,10 @@ function ScaledSlide({ children }: { children: ReactNode }) {
 
   return (
     <div ref={boxRef} className={styles.scaleBox}>
-      <div className={styles.scaleCanvas} style={{ transform: `scale(${scale})` }}>
+      <div
+        className={state.fill ? styles.fillCanvas : styles.scaleCanvas}
+        style={state.fill ? undefined : { transform: `scale(${state.scale})` }}
+      >
         {children}
       </div>
     </div>
