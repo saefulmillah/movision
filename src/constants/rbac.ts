@@ -80,7 +80,7 @@ export function roleLabel(code: string): string {
 export const MODULE_CODES = [
   "ruas", "gerbang", "gerbang_alias", "segmen_gerbang", "od_gerbang", "tariff", "speed_analytics", "kamera",
   "vehicle", "vehicle_type", "wim", "vms", "fo", "rakom", "cuaca", "tariff_import", "monitoring_rekonsiliasi",
-  "laba_rugi", "manajemen_risiko", "pendapatan"
+  "laba_rugi", "manajemen_risiko", "pendapatan", "app_analytics"
 ];
 
 export const PERMISSION_CODES = [

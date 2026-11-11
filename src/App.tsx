@@ -19,6 +19,7 @@ import { KecelakaanPage } from "@/pages/operasional/KecelakaanPage";
 import { KendaraanBantuanPage } from "@/pages/operasional/KendaraanBantuanPage";
 import { PeralatanPage } from "@/pages/operasional/PeralatanPage";
 import { PresentasiPage } from "@/pages/presentasi/PresentasiPage";
+import { AnalyticsPage } from "@/pages/analytics/AnalyticsPage";
 import { PresentationOverlay } from "@/components/presentation/PresentationOverlay";
 import { UsersPage } from "@/pages/users/UsersPage";
 import { AksesPage } from "@/pages/admin/akses/AksesPage";
@@ -113,6 +114,15 @@ export default function App() {
           element={<RequireModule module="insights"><PeralatanPage /></RequireModule>}
         />
         <Route path="/presentasi" element={<PresentasiPage />} />
+        <Route
+          path="/informasi-publik/analitik-aplikasi"
+          element={
+            <RequireModule module="app_analytics">
+              <AnalyticsPage />
+            </RequireModule>
+          }
+        />
+        <Route path="/analytics" element={<Navigate to="/informasi-publik/analitik-aplikasi" replace />} />
         <Route
           path="/wim"
           element={
