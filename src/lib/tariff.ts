@@ -5,6 +5,7 @@ import type {
   TariffCommitResult,
   TariffGrid,
   TariffImportOptions,
+  TariffIntegration,
   TariffMeta,
   TariffPreviewItem,
   TariffPreviewResult,
@@ -88,9 +89,14 @@ export function getImportSession(importSessionId: string): Promise<Record<string
   return api.get<Record<string, unknown>>(`/admin/tariff/import/sessions/${encodeURIComponent(importSessionId)}`);
 }
 
-/** Unduh template .xlsx per ruas (terisi data existing) langsung ke browser. */
-export async function downloadTariffTemplate(branchId: number, isOpen?: number): Promise<void> {
-  const q = buildQuery({ branch_id: branchId, is_open: isOpen });
+export function getTariffIntegration(branchId: number): Promise<TariffIntegration> {
+  return api.get<TariffIntegration>(`/admin/tariff/integration${buildQuery({ branch_id: branchId })}`);
+}
+
+/** Unduh template .xlsx (terisi data existing) langsung ke browser.
+ *  scope "integrated" = matriks seluruh jaringan terintegrasi. */
+export async function downloadTariffTemplate(branchId: number, isOpen?: number, scope?: "branch" | "integrated"): Promise<void> {
+  const q = buildQuery({ branch_id: branchId, is_open: isOpen, scope });
   const token = getToken();
   const res = await fetch(`${BASE_URL}/admin/tariff/template${q}`, {
     headers: token ? { Authorization: `Bearer ${token}` } : {}

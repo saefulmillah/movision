@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import type { CSSProperties, DragEvent } from "react";
 import { Button, Icon, Select, Switch, useToast } from "@/components/ui";
 import type { SelectOption } from "@/components/ui";
-import { GOLONGAN_LABEL, commitTariffImport, downloadTariffTemplate, getImportSession, listTariffBranches, previewTariffImport } from "@/lib/tariff";
-import type { TariffBranch, TariffImportAction, TariffPreviewItem, TariffPreviewResult } from "@/types/tariff";
+import { GOLONGAN_LABEL, commitTariffImport, downloadTariffTemplate, getImportSession, getTariffIntegration, listTariffBranches, previewTariffImport } from "@/lib/tariff";
+import type { TariffBranch, TariffImportAction, TariffIntegration, TariffPreviewItem, TariffPreviewResult } from "@/types/tariff";
 import mstyles from "@/pages/modules.module.css";
 import styles from "./tarif.module.css";
 
@@ -31,6 +31,8 @@ export function UploadTarifWizard({ onCommitted }: { onCommitted?: () => void })
   const [branches, setBranches] = useState<TariffBranch[]>([]);
   const [tplBranch, setTplBranch] = useState("");
   const [downloading, setDownloading] = useState(false);
+  const [integration, setIntegration] = useState<TariffIntegration | null>(null);
+  const [scope, setScope] = useState<"branch" | "integrated">("branch");
 
   useEffect(() => {
     listTariffBranches().then((b) => {
@@ -39,12 +41,24 @@ export function UploadTarifWizard({ onCommitted }: { onCommitted?: () => void })
     }).catch(() => setBranches([]));
   }, []);
 
+  // Deteksi apakah ruas bagian jaringan terintegrasi.
+  useEffect(() => {
+    if (!tplBranch) { setIntegration(null); return; }
+    let alive = true;
+    setScope("branch");
+    getTariffIntegration(Number(tplBranch))
+      .then((info) => { if (alive) setIntegration(info); })
+      .catch(() => { if (alive) setIntegration(null); });
+    return () => { alive = false; };
+  }, [tplBranch]);
+
   async function downloadTemplate() {
     if (!tplBranch) return;
     setDownloading(true);
     try {
-      await downloadTariffTemplate(Number(tplBranch), Number(isOpen));
-      toast.success("Template diunduh", "Template berisi data tarif existing ruas tersebut.");
+      const integrated = scope === "integrated";
+      await downloadTariffTemplate(Number(tplBranch), integrated ? undefined : Number(isOpen), integrated ? "integrated" : "branch");
+      toast.success("Template diunduh", integrated ? "Template matriks seluruh jaringan terintegrasi." : "Template berisi tarif existing ruas tersebut.");
     } catch (e) {
       toast.error("Gagal mengunduh template", e instanceof Error ? e.message : undefined);
     } finally {
@@ -162,12 +176,33 @@ export function UploadTarifWizard({ onCommitted }: { onCommitted?: () => void })
             <span className={styles.optLabel}>Ruas</span>
             <Select value={tplBranch} onValueChange={setTplBranch} options={branchTplOptions} placeholder="Pilih ruas" ariaLabel="Ruas template" />
           </div>
-          <div className={styles.opt} style={{ minWidth: 150 }}>
-            <span className={styles.optLabel}>Tipe sistem</span>
-            <Select value={isOpen} onValueChange={setIsOpen} options={[{ value: "1", label: "Terbuka" }, { value: "0", label: "Tertutup" }]} ariaLabel="Tipe template" />
-          </div>
+          {integration?.integrated && (
+            <div className={styles.opt} style={{ minWidth: 210 }}>
+              <span className={styles.optLabel}>Lingkup</span>
+              <Select
+                value={scope}
+                onValueChange={(v) => setScope(v as "branch" | "integrated")}
+                options={[
+                  { value: "branch", label: "Ruas ini saja" },
+                  { value: "integrated", label: `Jaringan terintegrasi (${integration.branch_ids.length} ruas)` }
+                ]}
+                ariaLabel="Lingkup template"
+              />
+            </div>
+          )}
+          {scope === "branch" && (
+            <div className={styles.opt} style={{ minWidth: 150 }}>
+              <span className={styles.optLabel}>Tipe sistem</span>
+              <Select value={isOpen} onValueChange={setIsOpen} options={[{ value: "1", label: "Terbuka" }, { value: "0", label: "Tertutup" }]} ariaLabel="Tipe template" />
+            </div>
+          )}
           <Button variant="secondary" icon="download" onClick={downloadTemplate} disabled={!tplBranch || downloading}>{downloading ? "Mengunduh…" : "Unduh Template"}</Button>
         </div>
+        {integration?.integrated && scope === "integrated" && (
+          <div className={styles.panelSub} style={{ marginTop: 10, marginBottom: 0 }}>
+            Matriks gabungan gerbang: {integration.branches.map((b) => b.branch_name || b.branch_code).filter(Boolean).join(", ")}.
+          </div>
+        )}
       </div>
 
       {/* Step 1: file + opsi */}

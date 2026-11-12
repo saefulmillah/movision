@@ -13,6 +13,13 @@ export interface TariffGate {
   gate_name: string | null;
 }
 
+export interface TariffIntegration {
+  base_branch_id: number | null;
+  integrated: boolean;
+  branch_ids: number[];
+  branches: TariffBranch[];
+}
+
 export interface TariffRow {
   id: number;
   origin_gate_id: number | null;
