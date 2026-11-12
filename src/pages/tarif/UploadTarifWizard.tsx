@@ -47,7 +47,12 @@ export function UploadTarifWizard({ onCommitted }: { onCommitted?: () => void })
     let alive = true;
     setScope("branch");
     getTariffIntegration(Number(tplBranch))
-      .then((info) => { if (alive) setIntegration(info); })
+      .then((info) => {
+        if (!alive) return;
+        setIntegration(info);
+        // Auto-isi tipe sistem dari data ruas (tetap bisa diubah manual).
+        if (info.default_is_open !== null && info.default_is_open !== undefined) setIsOpen(String(info.default_is_open));
+      })
       .catch(() => { if (alive) setIntegration(null); });
     return () => { alive = false; };
   }, [tplBranch]);

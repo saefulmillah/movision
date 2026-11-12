@@ -18,6 +18,8 @@ export interface TariffIntegration {
   integrated: boolean;
   branch_ids: number[];
   branches: TariffBranch[];
+  /** Tipe sistem terdeteksi dari data (1=terbuka, 0=tertutup, null=tak ada data). */
+  default_is_open: number | null;
 }
 
 export interface TariffRow {
