@@ -170,7 +170,7 @@ export function MatriksTarifPage() {
           </div>
         </div>
       ) : branchId === "all" ? (
-        <div className={mstyles.body}>
+        <div className={mstyles.body} style={{ display: "grid", placeItems: "center" }}>
           <EmptyState icon="grid-3x3" title="Pilih ruas" description="Mode grid menampilkan matriks per ruas. Pilih satu ruas untuk melihat pivot gerbang asal × tujuan." />
         </div>
       ) : (
