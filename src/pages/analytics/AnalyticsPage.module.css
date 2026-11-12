@@ -1,0 +1,157 @@
+/* Halaman Analitik Mozy — pelengkap insights.module.css (token tema aplikasi). */
+
+.grid3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.span2 { grid-column: span 2; }
+
+.muted { color: var(--text-muted); font-size: 12px; }
+.note { margin: 8px 0 0; font-size: 12px; color: var(--text); }
+.stack { display: flex; flex-direction: column; gap: 20px; }
+.scrollX { overflow-x: auto; }
+.chartSm { width: 100%; height: 180px; }
+
+/* Catatan sumber data di bawah panel */
+.source {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.liveBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+  color: var(--sem-green);
+  background: color-mix(in srgb, var(--sem-green) 14%, transparent);
+}
+.warnBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--sem-amber);
+  background: color-mix(in srgb, var(--sem-amber) 14%, transparent);
+}
+.warnNote {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 12px 0 0;
+  font-size: 12px;
+  color: var(--sem-amber);
+}
+
+/* Chip realtime */
+.realtime {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface-1);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+}
+.realtime b { font-variant-numeric: tabular-nums; }
+.dot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sem-green);
+}
+.dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: inherit;
+  animation: ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+.dot[data-stale="true"] { background: var(--sem-amber); }
+.dot[data-stale="true"]::after { animation: none; }
+@keyframes ping {
+  75%, 100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* Batang horizontal (peringkat) */
+.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.hbar { min-width: 0; }
+.hbarRow { display: flex; align-items: baseline; gap: 8px; font-size: 13px; color: var(--text); margin-bottom: 5px; }
+.hbarLabel { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hbarValue { margin-left: auto; flex-shrink: 0; font-weight: 700; font-variant-numeric: tabular-nums; }
+.hbarRow > :last-child:not(.hbarValue) { margin-left: auto; }
+
+.inlineBar { display: flex; align-items: center; gap: 8px; }
+
+.linkBtn {
+  margin-top: 10px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--st-blue);
+  cursor: pointer;
+}
+.linkBtn:hover { text-decoration: underline; }
+
+/* Heatmap jam sibuk */
+.heatmap { min-width: 640px; }
+.heatRow { display: flex; align-items: center; gap: 3px; margin-bottom: 3px; }
+.heatDay { width: 36px; flex-shrink: 0; font-size: 11px; color: var(--text-muted); }
+.heatCell { flex: 1; height: 26px; border-radius: 4px; }
+.heatCell[data-active="true"] { box-shadow: inset 0 0 0 2px var(--text); }
+.heatHour { flex: 1; text-align: center; font-size: 10px; color: var(--text-faint); font-variant-numeric: tabular-nums; }
+.heatLegend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.heatLegend span { width: 112px; height: 8px; border-radius: 999px; }
+
+/* Cohort retensi */
+.cohort { width: 100%; min-width: 420px; margin-top: 12px; border-collapse: collapse; font-size: 12px; color: var(--text); }
+.cohort th { font-size: 11px; font-weight: 600; color: var(--text-muted); text-align: left; padding-bottom: 6px; }
+.cohort td { padding: 2px; }
+.cohort td:first-child { padding-right: 8px; white-space: nowrap; }
+.cohortCell { padding: 4px 0; border-radius: 6px; text-align: center; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* Audiens */
+.audience { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 24px; }
+.groupTitle { margin: 0 0 8px; font-size: 12px; font-weight: 600; color: var(--text-muted); }
+
+/* Stabilitas */
+.statBox { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+.statLabel { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 12px; color: var(--text-muted); }
+.statValue { margin: 4px 0 2px; font-size: 26px; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; }
+.statBox p:last-child { margin: 0; }
+
+@media (max-width: 1200px) {
+  .grid3 { grid-template-columns: 1fr; }
+  .span2 { grid-column: auto; }
+}
+@media (max-width: 700px) {
+  .audience { grid-template-columns: 1fr; }
+}
