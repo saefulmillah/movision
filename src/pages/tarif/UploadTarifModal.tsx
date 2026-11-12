@@ -45,14 +45,13 @@ export function UploadTarifModal({ open, onClose, onCommitted }: Props) {
   const [previewing, setPreviewing] = useState(false);
   const [result, setResult] = useState<TariffPreviewResult | null>(null);
   const [committing, setCommitting] = useState(false);
-  const [commitStatus, setCommitStatus] = useState("");
 
   useEffect(() => { listTariffBranches().then((b) => { setBranches(b); if (b.length > 0) setTplBranch(String(b[0].id)); }).catch(() => setBranches([])); }, []);
 
   // Reset wizard tiap kali modal dibuka.
   useEffect(() => {
     if (!open) return;
-    setStep("upload"); setFile(null); setResult(null); setPreviewing(false); setCommitting(false); setCommitStatus("");
+    setStep("upload"); setFile(null); setResult(null); setPreviewing(false); setCommitting(false);
     if (fileRef.current) fileRef.current.value = "";
   }, [open]);
 
@@ -107,24 +106,28 @@ export function UploadTarifModal({ open, onClose, onCommitted }: Props) {
   async function pollStatus(sessionId: string, tries = 0) {
     try {
       const s = await getImportSession(sessionId);
-      const status = String((s as { status?: string }).status || "").toUpperCase();
-      setCommitStatus(status || "MEMPROSES");
+      // Status ada di session.status (getTariffImportSessionStatus membungkus { session }).
+      const raw = (s as { session?: { status?: string }; status?: string });
+      const status = String(raw.session?.status || raw.status || "").toUpperCase();
       if (status === "COMMITTED") { setCommitting(false); setStep("done"); toast.success("Tarif tersimpan"); onCommitted?.(); return; }
       if (status === "FAILED") { setCommitting(false); toast.error("Import gagal", "Commit tarif gagal diproses."); return; }
     } catch { /* abaikan error polling sementara */ }
-    if (tries < 20) setTimeout(() => void pollStatus(sessionId, tries + 1), 1500);
-    else setCommitting(false);
+    if (tries < 40) setTimeout(() => void pollStatus(sessionId, tries + 1), 1500);
+    else {
+      setCommitting(false);
+      toast.error("Masih diproses", "Commit tarif belum selesai. Coba muat ulang Matriks Tarif beberapa saat lagi.");
+    }
   }
 
   async function doCommit() {
     if (!result) return;
-    setCommitting(true); setCommitStatus("MEMPROSES");
+    setCommitting(true);
     try { await commitTariffImport(result.import_session_id); void pollStatus(result.import_session_id); }
     catch (e) { setCommitting(false); toast.error("Gagal menyimpan", e instanceof Error ? e.message : undefined); }
   }
 
   function startOver() {
-    setStep("upload"); setFile(null); setResult(null); setCommitStatus("");
+    setStep("upload"); setFile(null); setResult(null);
     if (fileRef.current) fileRef.current.value = "";
   }
 
@@ -141,7 +144,7 @@ export function UploadTarifModal({ open, onClose, onCommitted }: Props) {
     ) : step === "review" ? (
       <>
         <Button variant="ghost" icon="arrow-left" onClick={() => setStep("upload")}>Kembali</Button>
-        <Button variant="primary" icon="save" onClick={doCommit} disabled={!result?.success || committing}>{committing ? `Menyimpan… ${commitStatus}` : "Simpan ke Database"}</Button>
+        <Button variant="primary" icon="save" onClick={doCommit} disabled={!result?.success || committing}>{committing ? "Menyimpan…" : "Simpan ke Database"}</Button>
       </>
     ) : (
       <>
