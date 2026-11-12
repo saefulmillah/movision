@@ -20,11 +20,16 @@ import { KendaraanBantuanPage } from "@/pages/operasional/KendaraanBantuanPage";
 import { PeralatanPage } from "@/pages/operasional/PeralatanPage";
 import { PresentasiPage } from "@/pages/presentasi/PresentasiPage";
 import { AnalyticsPage } from "@/pages/analytics/AnalyticsPage";
+import { DataTablePage } from "@/components/data-table/DataTablePage";
+import {
+  ruasConfig, gerbangConfig, kameraConfig, vmsConfig, cuacaConfig, foConfig, rakomConfig, wimSiteConfig
+} from "@/pages/master-data/configs";
+import { JaringanPage } from "@/pages/master-data/JaringanPage";
+import { WimMonitoringPage } from "@/pages/wim/WimMonitoringPage";
 import { PresentationOverlay } from "@/components/presentation/PresentationOverlay";
 import { UsersPage } from "@/pages/users/UsersPage";
 import { AksesPage } from "@/pages/admin/akses/AksesPage";
 import { SettingsPage } from "@/pages/settings/SettingsPage";
-import { PlaceholderPage } from "@/pages/PlaceholderPage";
 import { ForbiddenPage } from "@/pages/ForbiddenPage";
 import { useAuth } from "@/context/AuthContext";
 
@@ -123,16 +128,20 @@ export default function App() {
           }
         />
         <Route path="/analytics" element={<Navigate to="/informasi-publik/analitik-aplikasi" replace />} />
-        <Route
-          path="/wim"
-          element={
-            <PlaceholderPage
-              icon="scale"
-              title="Monitoring WIM"
-              description="Pemantauan Weigh-in-Motion per site. Layar ini di luar lingkup fase ini; layer WIM tetap tampil di Peta dan kartu ringkasan di Dashboard."
-            />
-          }
-        />
+        {/* ============ Data Induk (master data) ============ */}
+        <Route path="/master-data/ruas" element={<RequireModule module="ruas"><DataTablePage config={ruasConfig} /></RequireModule>} />
+        <Route path="/master-data/gerbang" element={<RequireModule module="gerbang"><DataTablePage config={gerbangConfig} /></RequireModule>} />
+        <Route path="/master-data/kamera" element={<RequireModule module="kamera"><DataTablePage config={kameraConfig} /></RequireModule>} />
+        <Route path="/master-data/vms" element={<RequireModule module="vms"><DataTablePage config={vmsConfig} /></RequireModule>} />
+        <Route path="/master-data/cuaca" element={<RequireModule module="cuaca"><DataTablePage config={cuacaConfig} /></RequireModule>} />
+        <Route path="/master-data/fo" element={<RequireModule module="fo"><DataTablePage config={foConfig} /></RequireModule>} />
+        <Route path="/master-data/jaringan" element={<RequireModule module="fo"><JaringanPage /></RequireModule>} />
+        <Route path="/master-data/rakom" element={<RequireModule module="rakom"><DataTablePage config={rakomConfig} /></RequireModule>} />
+
+        {/* ============ WIM ============ */}
+        <Route path="/wim/sites" element={<RequireModule module="wim"><DataTablePage config={wimSiteConfig} /></RequireModule>} />
+        <Route path="/wim/monitoring" element={<RequirePermission permission="asset.view"><WimMonitoringPage /></RequirePermission>} />
+        <Route path="/wim" element={<Navigate to="/wim/monitoring" replace />} />
         <Route
           path="/admin/users"
           element={
