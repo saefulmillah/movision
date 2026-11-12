@@ -26,6 +26,8 @@ import {
 } from "@/pages/master-data/configs";
 import { JaringanPage } from "@/pages/master-data/JaringanPage";
 import { WimMonitoringPage } from "@/pages/wim/WimMonitoringPage";
+import { MatriksTarifPage } from "@/pages/tarif/MatriksTarifPage";
+import { UploadTarifPage } from "@/pages/tarif/UploadTarifPage";
 import { PresentationOverlay } from "@/components/presentation/PresentationOverlay";
 import { UsersPage } from "@/pages/users/UsersPage";
 import { AksesPage } from "@/pages/admin/akses/AksesPage";
@@ -118,6 +120,8 @@ export default function App() {
           path="/operasional/peralatan"
           element={<RequireModule module="insights"><PeralatanPage /></RequireModule>}
         />
+        <Route path="/tarif/matriks" element={<RequireModule module="tariff"><MatriksTarifPage /></RequireModule>} />
+        <Route path="/tarif/upload" element={<RequireModule module="tariff"><UploadTarifPage /></RequireModule>} />
         <Route path="/presentasi" element={<PresentasiPage />} />
         <Route
           path="/informasi-publik/analitik-aplikasi"
