@@ -46,8 +46,8 @@ export function deleteUser(id: number): Promise<unknown> {
 }
 
 /* ---- Admin menus ---- */
-export function fetchAdminMenus(): Promise<AdminMenu[]> {
-  return api.get<AdminMenu[]>("/admin/menus");
+export function fetchAdminMenus(app?: string): Promise<AdminMenu[]> {
+  return api.get<AdminMenu[]>(app ? `/admin/menus?app=${encodeURIComponent(app)}` : "/admin/menus");
 }
 
 export async function createMenu(body: Partial<AdminMenu>): Promise<AdminMenu> {
@@ -60,4 +60,15 @@ export async function updateMenu(id: number, body: Partial<AdminMenu>): Promise<
 
 export function deleteMenu(id: number): Promise<unknown> {
   return api.delete(`/admin/menus/${id}`);
+}
+
+/** Item urutan untuk reorder massal (drag-and-drop). */
+export interface MenuReorderItem {
+  id: number;
+  parent_id: number | null;
+  display_order: number;
+}
+
+export function reorderMenus(items: MenuReorderItem[]): Promise<unknown> {
+  return api.put("/admin/menus/reorder", { items });
 }

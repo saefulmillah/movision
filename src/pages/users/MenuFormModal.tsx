@@ -16,6 +16,10 @@ interface MenuFormModalProps {
   menus: AdminMenu[];
   onClose: () => void;
   onSaved: () => void;
+  /** App pemilik menu baru (mis. "tollsentra"); submenu mewarisi app induk di backend. */
+  appCode?: string;
+  /** Prefill menu induk saat menambah submenu dari kategori tertentu. */
+  defaultParentId?: number | null;
 }
 
 interface FormState {
@@ -53,7 +57,7 @@ function toForm(m: AdminMenu | null): FormState {
 
 const opt = (v: string): SelectOption => ({ value: v, label: v });
 
-export function MenuFormModal({ open, mode, menu, menus, onClose, onSaved }: MenuFormModalProps) {
+export function MenuFormModal({ open, mode, menu, menus, onClose, onSaved, appCode, defaultParentId }: MenuFormModalProps) {
   const toast = useToast();
   const [form, setForm] = useState<FormState>(() => toForm(menu));
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -61,10 +65,16 @@ export function MenuFormModal({ open, mode, menu, menus, onClose, onSaved }: Men
 
   useEffect(() => {
     if (open) {
-      setForm(toForm(menu));
+      const base = toForm(menu);
+      // Saat menambah submenu dari sebuah kategori, prefill induk & tipe.
+      if (mode === "create" && !menu && defaultParentId != null) {
+        base.isCategory = false;
+        base.parent_id = String(defaultParentId);
+      }
+      setForm(base);
       setErrors({});
     }
-  }, [open, menu]);
+  }, [open, menu, mode, defaultParentId]);
 
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -96,6 +106,8 @@ export function MenuFormModal({ open, mode, menu, menus, onClose, onSaved }: Men
       required_access_level: form.gate === "module" ? form.required_access_level : "none",
       is_active: form.is_active ? 1 : 0
     };
+
+    if (mode === "create" && appCode) body.app_code = appCode;
 
     setSaving(true);
     try {

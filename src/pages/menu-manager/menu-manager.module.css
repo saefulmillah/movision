@@ -1,0 +1,200 @@
+/* Manajemen Menu: pohon kategori → submenu dengan drag-and-drop. */
+
+.tree {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 8px;
+}
+
+/* ---------- Kategori ---------- */
+.cat {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: var(--r-2xl, 16px);
+  background: var(--surface-2);
+  overflow: hidden;
+  transition: box-shadow var(--t-fast);
+}
+/* Garis sisip tanpa menggeser layout */
+.cat[data-over-before="true"] { box-shadow: 0 -3px 0 var(--st-blue, #3b82f6); }
+.cat[data-over-after="true"] { box-shadow: 0 3px 0 var(--st-blue, #3b82f6); }
+
+.catHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  background: var(--surface-3);
+  border-bottom: 1px solid var(--line-soft, var(--line));
+  cursor: grab;
+  user-select: none;
+}
+.catHead:active { cursor: grabbing; }
+.cat[data-collapsed="true"] .catHead { border-bottom: none; }
+
+.collapseBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: var(--r-sm, 6px);
+  flex: none;
+  transition: color var(--t-fast), background var(--t-fast);
+}
+.collapseBtn:hover { color: var(--text); background: var(--surface-1); }
+
+.countChip {
+  font-size: var(--fs-micro);
+  color: var(--text-muted);
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex: none;
+}
+
+.catMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.catName {
+  font-weight: 650;
+  font-size: var(--fs-sm);
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- Submenu ---------- */
+.children {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px 12px 30px;
+  min-height: 20px;
+}
+.bodyOver {
+  background: color-mix(in srgb, var(--st-blue, #3b82f6) 7%, transparent);
+  outline: 1.5px dashed color-mix(in srgb, var(--st-blue, #3b82f6) 55%, transparent);
+  outline-offset: -4px;
+  border-radius: var(--r-lg, 12px);
+}
+
+.child {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg, 12px);
+  background: var(--surface-1);
+  cursor: grab;
+  transition: border-color var(--t-fast), box-shadow var(--t-fast), background var(--t-fast);
+}
+.child:hover { border-color: var(--line-strong, var(--line)); }
+.child:active { cursor: grabbing; }
+.child[data-over-before="true"] { box-shadow: 0 -3px 0 var(--st-blue, #3b82f6); }
+.child[data-over-after="true"] { box-shadow: 0 3px 0 var(--st-blue, #3b82f6); }
+
+.childMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.childName {
+  font-weight: 550;
+  font-size: var(--fs-sm);
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.code {
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  color: var(--text-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.grip {
+  display: inline-flex;
+  color: var(--text-faint);
+  flex: none;
+}
+.catHead:hover .grip,
+.child:hover .grip { color: var(--text-muted); }
+
+.ghost { opacity: 0.4; }
+
+.empty {
+  padding: 12px;
+  text-align: center;
+  font-size: var(--fs-xs);
+  color: var(--text-faint);
+  border: 1.5px dashed var(--line);
+  border-radius: var(--r-lg, 12px);
+}
+
+/* ---------- Chips gate ---------- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  white-space: nowrap;
+  flex: none;
+}
+.chipBlue { background: color-mix(in srgb, var(--st-blue, #3b82f6) 16%, transparent); color: var(--st-blue, #3b82f6); }
+.chipAmber { background: color-mix(in srgb, var(--sem-amber, #f59e0b) 18%, transparent); color: var(--sem-amber, #f59e0b); }
+.chipGray { background: var(--surface-3); color: var(--text-muted); }
+
+/* ---------- Aksi baris ---------- */
+.actions {
+  display: inline-flex;
+  gap: 2px;
+  flex: none;
+  opacity: 0;
+  transition: opacity var(--t-fast);
+}
+.catHead:hover .actions,
+.child:hover .actions,
+.actions:focus-within { opacity: 1; }
+
+/* ---------- Tag perubahan tertunda ---------- */
+.dirtyTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--sem-amber, #f59e0b);
+  background: color-mix(in srgb, var(--sem-amber, #f59e0b) 14%, transparent);
+}
+
+.confirmText { font-size: var(--fs-sm); color: var(--text-dim); line-height: 1.6; }
+.warn { color: var(--sem-amber, #f59e0b); font-size: var(--fs-xs); }
+
+@media (max-width: 720px) {
+  .chip { display: none; }
+  .actions { opacity: 1; }
+}

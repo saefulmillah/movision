@@ -3,25 +3,22 @@ import { Button, Input, Tabs } from "@/components/ui";
 import type { TabItem } from "@/components/ui";
 import { useBranch } from "@/context/BranchContext";
 import { usePolling } from "@/lib/usePolling";
-import { fetchAdminMenus, fetchUsers } from "@/lib/users";
+import { fetchUsers } from "@/lib/users";
 import { listRoles } from "@/lib/access";
 import { UsersTab } from "./UsersTab";
 import { RolesTab } from "./RolesTab";
-import { MenusTab } from "./MenusTab";
 import styles from "./users.module.css";
 
-type TabKey = "users" | "roles" | "menus";
+type TabKey = "users" | "roles";
 
 const TABS: TabItem[] = [
   { value: "users", label: "Pengguna", icon: "users" },
-  { value: "roles", label: "Role & Permission", icon: "shield" },
-  { value: "menus", label: "Hak Akses Menu", icon: "list-tree" }
+  { value: "roles", label: "Role & Permission", icon: "shield" }
 ];
 
 export function UsersPage() {
   const { branches } = useBranch();
   const usersQ = usePolling(fetchUsers, 0);
-  const menusQ = usePolling(fetchAdminMenus, 0);
   const rolesQ = usePolling(listRoles, 0);
 
   const [tab, setTab] = useState<TabKey>("users");
@@ -29,7 +26,6 @@ export function UsersPage() {
   const [createFor, setCreateFor] = useState<null | TabKey>(null);
 
   const users = usersQ.data ?? [];
-  const menus = menusQ.data ?? [];
   const roleLabels = useMemo(
     () => Object.fromEntries((rolesQ.data ?? []).map((r) => [r.role_code, r.role_name])),
     [rolesQ.data]
@@ -46,22 +42,16 @@ export function UsersPage() {
     );
   }, [users, query]);
 
-  const filteredMenus = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return menus;
-    return menus.filter((m) => m.menu_name.toLowerCase().includes(q) || m.menu_code.toLowerCase().includes(q));
-  }, [menus, query]);
-
   return (
     <div className={styles.page}>
       <div className={styles.header}>
         <Tabs value={tab} onValueChange={(v) => setTab(v as TabKey)} items={TABS} />
         <span className={styles.headSpacer} />
-        {tab !== "roles" && (
+        {tab === "users" && (
           <Input
             wrapClassName={styles.search}
             icon="search"
-            placeholder={tab === "users" ? "Cari nama, username, email…" : "Cari menu…"}
+            placeholder="Cari nama, username, email…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -69,11 +59,6 @@ export function UsersPage() {
         {tab === "users" && (
           <Button variant="primary" icon="plus" onClick={() => setCreateFor("users")}>
             Tambah Pengguna
-          </Button>
-        )}
-        {tab === "menus" && (
-          <Button variant="primary" icon="plus" onClick={() => setCreateFor("menus")}>
-            Tambah Menu
           </Button>
         )}
       </div>
@@ -90,15 +75,6 @@ export function UsersPage() {
         />
       )}
       {tab === "roles" && <RolesTab users={users} />}
-      {tab === "menus" && (
-        <MenusTab
-          menus={filteredMenus}
-          loading={menusQ.loading}
-          onRefresh={menusQ.refresh}
-          openCreate={createFor === "menus"}
-          onCreateHandled={() => setCreateFor(null)}
-        />
-      )}
     </div>
   );
 }

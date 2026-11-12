@@ -42,6 +42,7 @@ export interface UserFormValues {
 export interface AdminMenu {
   id: number;
   menu_code: string;
+  app_code?: string;
   menu_name: string;
   icon: string | null;
   route_path: string | null;

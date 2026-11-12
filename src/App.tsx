@@ -29,6 +29,7 @@ import { WimMonitoringPage } from "@/pages/wim/WimMonitoringPage";
 import { MatriksTarifPage } from "@/pages/tarif/MatriksTarifPage";
 import { PresentationOverlay } from "@/components/presentation/PresentationOverlay";
 import { UsersPage } from "@/pages/users/UsersPage";
+import { MenuManagerPage } from "@/pages/menu-manager/MenuManagerPage";
 import { AksesPage } from "@/pages/admin/akses/AksesPage";
 import { SettingsPage } from "@/pages/settings/SettingsPage";
 import { ForbiddenPage } from "@/pages/ForbiddenPage";
@@ -151,6 +152,14 @@ export default function App() {
           element={
             <RequireRole role="super_admin">
               <UsersPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/admin/menu"
+          element={
+            <RequireRole role="super_admin">
+              <MenuManagerPage />
             </RequireRole>
           }
         />
