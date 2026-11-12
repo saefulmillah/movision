@@ -15,7 +15,8 @@ function actClass(a: TariffImportAction): string {
   return a === "INSERT" ? styles.actINSERT : a === "UPDATE" ? styles.actUPDATE : a === "SKIP" ? styles.actSKIP : styles.actERROR;
 }
 
-export function UploadTarifPage() {
+/** Wizard upload tarif — dipakai di dalam Modal dari halaman Matriks Tarif. */
+export function UploadTarifWizard({ onCommitted }: { onCommitted?: () => void }) {
   const toast = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
@@ -81,6 +82,7 @@ export function UploadTarifPage() {
         setCommitted(true);
         setCommitting(false);
         toast.success("Tarif tersimpan", "Import berhasil di-commit.");
+        onCommitted?.();
         return;
       }
       if (status === "FAILED") {
@@ -123,102 +125,93 @@ export function UploadTarifPage() {
   const gridStyle = { gridTemplateColumns: PREVIEW_COLS } as CSSProperties;
 
   return (
-    <div className={mstyles.page} style={{ overflowY: "auto" }}>
-      <div className={mstyles.header}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-          <strong style={{ fontSize: "var(--fs-md)" }}>Upload Tarif</strong>
-          <span className={mstyles.muted} style={{ fontSize: "var(--fs-xs)" }}>Unggah file .xlsx matriks tarif, validasi, lalu simpan.</span>
+    <div className={styles.wizard}>
+      {/* Step 1: file + opsi */}
+      <div className={styles.panel}>
+        <div className={styles.panelTitle}>1. Pilih file & opsi</div>
+        <div className={styles.panelSub}>Format .xlsx, maksimal 10 MB. Sheet "Tarif" atau "Sheet1".</div>
+
+        <input ref={fileRef} type="file" accept=".xlsx" hidden onChange={(e) => pickFile(e.target.files?.[0] ?? null)} />
+        <div
+          className={styles.dropzone}
+          data-drag={drag || undefined}
+          onClick={() => fileRef.current?.click()}
+          onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
+          onDragLeave={() => setDrag(false)}
+          onDrop={onDrop}
+        >
+          <div className={styles.dropIcon}><Icon name="upload-cloud" size={30} /></div>
+          <div className={styles.dropText}>Klik untuk memilih, atau seret file ke sini</div>
+          <div className={styles.dropHint}>.xlsx · maks 10 MB</div>
+          {file && <div className={styles.fileChip}><Icon name="file-spreadsheet" size={15} /> {file.name} <button type="button" onClick={(e) => { e.stopPropagation(); reset(); }} style={{ border: "none", background: "none", cursor: "pointer", color: "var(--text-muted)", display: "inline-flex" }}><Icon name="x" size={14} /></button></div>}
+        </div>
+
+        <div className={styles.optRow}>
+          <div className={styles.opt}>
+            <span className={styles.optLabel}>Tipe sistem</span>
+            <Select value={isOpen} onValueChange={setIsOpen} options={[{ value: "1", label: "Terbuka" }, { value: "0", label: "Tertutup" }]} ariaLabel="Tipe sistem" />
+          </div>
+          <div className={styles.opt}>
+            <span className={styles.optLabel}>Mode deteksi</span>
+            <Select value={tariffMode || "auto"} onValueChange={(v) => setTariffMode(v === "auto" ? "" : v)} options={[{ value: "auto", label: "Otomatis" }, { value: "open_branch", label: "Open branch" }, { value: "closed_branch", label: "Closed branch" }]} ariaLabel="Mode" />
+          </div>
+          <div className={styles.opt}>
+            <span className={styles.optLabel}>Opsi</span>
+            <label className={styles.check}><Switch checked={genReverse} onCheckedChange={setGenReverse} ariaLabel="Generate reverse OD" /> Buat OD balik otomatis</label>
+            <label className={styles.check}><Switch checked={allowSameOD} onCheckedChange={setAllowSameOD} ariaLabel="Allow same origin destination" /> Izinkan asal = tujuan</label>
+          </div>
+        </div>
+
+        <div className={styles.wizardFoot} style={{ marginTop: 16 }}>
+          <Button variant="primary" icon="scan-line" onClick={doPreview} disabled={!file || previewing}>{previewing ? "Memvalidasi…" : "Validasi File"}</Button>
         </div>
       </div>
 
-      <div className={styles.wizard}>
-        {/* Step 1: file + opsi */}
+      {/* Step 2: hasil validasi */}
+      {result && s && (
         <div className={styles.panel}>
-          <div className={styles.panelTitle}>1. Pilih file & opsi</div>
-          <div className={styles.panelSub}>Format .xlsx, maksimal 10 MB. Sheet "Tarif" atau "Sheet1".</div>
+          <div className={styles.panelTitle}>2. Hasil validasi</div>
+          <div className={styles.panelSub}>Mode terdeteksi: <b>{s.tariff_mode}</b> · {result.import_session_id}</div>
 
-          <input ref={fileRef} type="file" accept=".xlsx" hidden onChange={(e) => pickFile(e.target.files?.[0] ?? null)} />
-          <div
-            className={styles.dropzone}
-            data-drag={drag || undefined}
-            onClick={() => fileRef.current?.click()}
-            onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
-            onDragLeave={() => setDrag(false)}
-            onDrop={onDrop}
-          >
-            <div className={styles.dropIcon}><Icon name="upload-cloud" size={30} /></div>
-            <div className={styles.dropText}>Klik untuk memilih, atau seret file ke sini</div>
-            <div className={styles.dropHint}>.xlsx · maks 10 MB</div>
-            {file && <div className={styles.fileChip}><Icon name="file-spreadsheet" size={15} /> {file.name} <button type="button" onClick={(e) => { e.stopPropagation(); reset(); }} style={{ border: "none", background: "none", cursor: "pointer", color: "var(--text-muted)", display: "inline-flex" }}><Icon name="x" size={14} /></button></div>}
+          <div className={`${styles.banner} ${result.success ? styles.bannerOk : styles.bannerErr}`}>
+            <Icon name={result.success ? "circle-check" : "circle-alert"} size={16} />
+            {result.message}
           </div>
 
-          <div className={styles.optRow}>
-            <div className={styles.opt}>
-              <span className={styles.optLabel}>Tipe sistem</span>
-              <Select value={isOpen} onValueChange={setIsOpen} options={[{ value: "1", label: "Terbuka" }, { value: "0", label: "Tertutup" }]} ariaLabel="Tipe sistem" />
-            </div>
-            <div className={styles.opt}>
-              <span className={styles.optLabel}>Mode deteksi</span>
-              <Select value={tariffMode || "auto"} onValueChange={(v) => setTariffMode(v === "auto" ? "" : v)} options={[{ value: "auto", label: "Otomatis" }, { value: "open_branch", label: "Open branch" }, { value: "closed_branch", label: "Closed branch" }]} ariaLabel="Mode" />
-            </div>
-            <div className={styles.opt}>
-              <span className={styles.optLabel}>Opsi</span>
-              <label className={styles.check}><Switch checked={genReverse} onCheckedChange={setGenReverse} ariaLabel="Generate reverse OD" /> Buat OD balik otomatis</label>
-              <label className={styles.check}><Switch checked={allowSameOD} onCheckedChange={setAllowSameOD} ariaLabel="Allow same origin destination" /> Izinkan asal = tujuan</label>
-            </div>
+          <div className={styles.summary}>
+            {[
+              { label: "Total Baris", value: s.total_rows, color: "var(--text)" },
+              { label: "Valid", value: s.valid_count, color: "var(--sem-green, #22c55e)" },
+              { label: "Insert", value: s.insert_count, color: "var(--sem-green, #22c55e)" },
+              { label: "Update", value: s.update_count, color: "var(--sem-amber, #f59e0b)" },
+              { label: "Skip", value: s.skip_count, color: "var(--text-muted)" },
+              { label: "Error", value: s.error_count, color: "var(--sem-red, #ef4444)" }
+            ].map((c) => (
+              <div key={c.label} className={styles.sumCard}>
+                <div className={styles.sumLabel}>{c.label}</div>
+                <div className={styles.sumValue} style={{ color: c.color }}>{c.value}</div>
+              </div>
+            ))}
           </div>
+
+          <PreviewTable items={result.errors.length > 0 ? result.errors : result.preview} gridStyle={gridStyle} />
 
           <div className={styles.wizardFoot} style={{ marginTop: 16 }}>
-            <Button variant="primary" icon="scan-line" onClick={doPreview} disabled={!file || previewing}>{previewing ? "Memvalidasi…" : "Validasi File"}</Button>
+            <Button variant="ghost" onClick={reset}>Mulai Ulang</Button>
+            <Button variant="primary" icon="save" onClick={doCommit} disabled={!result.success || committing || committed}>
+              {committed ? "Tersimpan" : committing ? `Menyimpan… ${commitStatus}` : "Simpan ke Database"}
+            </Button>
           </div>
+          {committed && <div className={`${styles.banner} ${styles.bannerOk}`} style={{ marginTop: 12, marginBottom: 0 }}><Icon name="circle-check" size={16} /> Import tarif berhasil disimpan.</div>}
         </div>
-
-        {/* Step 2: hasil validasi */}
-        {result && s && (
-          <div className={styles.panel}>
-            <div className={styles.panelTitle}>2. Hasil validasi</div>
-            <div className={styles.panelSub}>Mode terdeteksi: <b>{s.tariff_mode}</b> · {result.import_session_id}</div>
-
-            <div className={`${styles.banner} ${result.success ? styles.bannerOk : styles.bannerErr}`}>
-              <Icon name={result.success ? "circle-check" : "circle-alert"} size={16} />
-              {result.message}
-            </div>
-
-            <div className={styles.summary}>
-              {[
-                { label: "Total Baris", value: s.total_rows, color: "var(--text)" },
-                { label: "Valid", value: s.valid_count, color: "var(--sem-green, #22c55e)" },
-                { label: "Insert", value: s.insert_count, color: "var(--sem-green, #22c55e)" },
-                { label: "Update", value: s.update_count, color: "var(--sem-amber, #f59e0b)" },
-                { label: "Skip", value: s.skip_count, color: "var(--text-muted)" },
-                { label: "Error", value: s.error_count, color: "var(--sem-red, #ef4444)" }
-              ].map((c) => (
-                <div key={c.label} className={styles.sumCard}>
-                  <div className={styles.sumLabel}>{c.label}</div>
-                  <div className={styles.sumValue} style={{ color: c.color }}>{c.value}</div>
-                </div>
-              ))}
-            </div>
-
-            <PreviewTable items={result.errors.length > 0 ? result.errors : result.preview} gridStyle={gridStyle} />
-
-            <div className={styles.wizardFoot} style={{ marginTop: 16 }}>
-              <Button variant="ghost" onClick={reset}>Mulai Ulang</Button>
-              <Button variant="primary" icon="save" onClick={doCommit} disabled={!result.success || committing || committed}>
-                {committed ? "Tersimpan" : committing ? `Menyimpan… ${commitStatus}` : "Simpan ke Database"}
-              </Button>
-            </div>
-            {committed && <div className={`${styles.banner} ${styles.bannerOk}`} style={{ marginTop: 12, marginBottom: 0 }}><Icon name="circle-check" size={16} /> Import tarif berhasil disimpan.</div>}
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 }
 
 function PreviewTable({ items, gridStyle }: { items: TariffPreviewItem[]; gridStyle: CSSProperties }) {
   return (
-    <div className={mstyles.tableCard} style={{ maxHeight: 420 }}>
+    <div className={mstyles.tableCard} style={{ maxHeight: 360 }}>
       <div className={mstyles.tableScroll}>
         <div className={mstyles.table} style={{ minWidth: 760 }}>
           <div className={mstyles.thead} style={gridStyle}>

@@ -27,7 +27,6 @@ import {
 import { JaringanPage } from "@/pages/master-data/JaringanPage";
 import { WimMonitoringPage } from "@/pages/wim/WimMonitoringPage";
 import { MatriksTarifPage } from "@/pages/tarif/MatriksTarifPage";
-import { UploadTarifPage } from "@/pages/tarif/UploadTarifPage";
 import { PresentationOverlay } from "@/components/presentation/PresentationOverlay";
 import { UsersPage } from "@/pages/users/UsersPage";
 import { AksesPage } from "@/pages/admin/akses/AksesPage";
@@ -121,7 +120,8 @@ export default function App() {
           element={<RequireModule module="insights"><PeralatanPage /></RequireModule>}
         />
         <Route path="/tarif/matriks" element={<RequireModule module="tariff"><MatriksTarifPage /></RequireModule>} />
-        <Route path="/tarif/upload" element={<RequireModule module="tariff"><UploadTarifPage /></RequireModule>} />
+        {/* Alias lama → upload kini tombol+modal di Matriks Tarif. */}
+        <Route path="/tarif/upload" element={<Navigate to="/tarif/matriks" replace />} />
         <Route path="/presentasi" element={<PresentasiPage />} />
         <Route
           path="/informasi-publik/analitik-aplikasi"

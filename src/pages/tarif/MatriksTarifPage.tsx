@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
-import { Button, EmptyState, Input, Pagination, Select, useToast } from "@/components/ui";
+import { Button, EmptyState, Input, Modal, Pagination, Select, useToast } from "@/components/ui";
 import type { SelectOption } from "@/components/ui";
+import { useModuleAccess } from "@/lib/useModuleAccess";
 import { GOLONGAN, GOLONGAN_LABEL, getTariffGrid, listTariffBranches, listTariffMatrix } from "@/lib/tariff";
 import type { TariffBranch, TariffGrid, TariffMeta, TariffRow } from "@/types/tariff";
+import { UploadTarifWizard } from "./UploadTarifWizard";
 import mstyles from "@/pages/modules.module.css";
 import styles from "./tarif.module.css";
 
@@ -24,6 +26,8 @@ const OPEN_OPTIONS: SelectOption[] = [
 
 export function MatriksTarifPage() {
   const toast = useToast();
+  const access = useModuleAccess("tariff");
+  const [uploadOpen, setUploadOpen] = useState(false);
   const [mode, setMode] = useState<"table" | "grid">("table");
   const [branches, setBranches] = useState<TariffBranch[]>([]);
   const [branchId, setBranchId] = useState("all");
@@ -120,6 +124,9 @@ export function MatriksTarifPage() {
           </form>
         )}
         <Button variant="secondary" icon="rotate-cw" onClick={() => (mode === "table" ? void loadTable() : void loadGrid())} disabled={loading}>Muat Ulang</Button>
+        {access.canWrite && (
+          <Button variant="primary" icon="upload" onClick={() => setUploadOpen(true)}>Upload Tarif</Button>
+        )}
       </div>
 
       {mode === "table" ? (
@@ -207,6 +214,15 @@ export function MatriksTarifPage() {
       {mode === "grid" && grid && grid.gates.length > 0 && (
         <span className={mstyles.muted} style={{ fontSize: "var(--fs-micro)", marginTop: -8 }}>Angka dalam ribuan Rupiah (mis. 15 = Rp 15.000). Sel abu = asal sama dengan tujuan.</span>
       )}
+
+      <Modal open={uploadOpen} onOpenChange={setUploadOpen} title="Upload Tarif" width={900}>
+        <UploadTarifWizard
+          onCommitted={() => {
+            if (mode === "table") void loadTable();
+            else void loadGrid();
+          }}
+        />
+      </Modal>
     </div>
   );
 }
