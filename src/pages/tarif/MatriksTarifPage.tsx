@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
-import { Button, EmptyState, Input, Modal, Pagination, Select, useToast } from "@/components/ui";
+import { Button, EmptyState, Input, Pagination, Select, useToast } from "@/components/ui";
 import type { SelectOption } from "@/components/ui";
 import { useModuleAccess } from "@/lib/useModuleAccess";
 import { GOLONGAN, GOLONGAN_LABEL, getTariffGrid, listTariffBranches, listTariffMatrix } from "@/lib/tariff";
 import type { TariffBranch, TariffGrid, TariffMeta, TariffRow } from "@/types/tariff";
-import { UploadTarifWizard } from "./UploadTarifWizard";
+import { UploadTarifModal } from "./UploadTarifModal";
 import mstyles from "@/pages/modules.module.css";
 import styles from "./tarif.module.css";
 
@@ -215,14 +215,14 @@ export function MatriksTarifPage() {
         <span className={mstyles.muted} style={{ fontSize: "var(--fs-micro)", marginTop: -8 }}>Angka dalam ribuan Rupiah (mis. 15 = Rp 15.000). Sel abu = asal sama dengan tujuan.</span>
       )}
 
-      <Modal open={uploadOpen} onOpenChange={setUploadOpen} title="Upload Tarif" width={900}>
-        <UploadTarifWizard
-          onCommitted={() => {
-            if (mode === "table") void loadTable();
-            else void loadGrid();
-          }}
-        />
-      </Modal>
+      <UploadTarifModal
+        open={uploadOpen}
+        onClose={() => setUploadOpen(false)}
+        onCommitted={() => {
+          if (mode === "table") void loadTable();
+          else void loadGrid();
+        }}
+      />
     </div>
   );
 }
