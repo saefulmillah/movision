@@ -1,8 +1,9 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CSSProperties, DragEvent } from "react";
 import { Button, Icon, Select, Switch, useToast } from "@/components/ui";
-import { GOLONGAN_LABEL, commitTariffImport, getImportSession, previewTariffImport } from "@/lib/tariff";
-import type { TariffImportAction, TariffPreviewItem, TariffPreviewResult } from "@/types/tariff";
+import type { SelectOption } from "@/components/ui";
+import { GOLONGAN_LABEL, commitTariffImport, downloadTariffTemplate, getImportSession, listTariffBranches, previewTariffImport } from "@/lib/tariff";
+import type { TariffBranch, TariffImportAction, TariffPreviewItem, TariffPreviewResult } from "@/types/tariff";
 import mstyles from "@/pages/modules.module.css";
 import styles from "./tarif.module.css";
 
@@ -26,6 +27,30 @@ export function UploadTarifWizard({ onCommitted }: { onCommitted?: () => void })
   const [tariffMode, setTariffMode] = useState("");
   const [genReverse, setGenReverse] = useState(true);
   const [allowSameOD, setAllowSameOD] = useState(true);
+
+  const [branches, setBranches] = useState<TariffBranch[]>([]);
+  const [tplBranch, setTplBranch] = useState("");
+  const [downloading, setDownloading] = useState(false);
+
+  useEffect(() => {
+    listTariffBranches().then((b) => {
+      setBranches(b);
+      if (b.length > 0) setTplBranch(String(b[0].id));
+    }).catch(() => setBranches([]));
+  }, []);
+
+  async function downloadTemplate() {
+    if (!tplBranch) return;
+    setDownloading(true);
+    try {
+      await downloadTariffTemplate(Number(tplBranch), Number(isOpen));
+      toast.success("Template diunduh", "Template berisi data tarif existing ruas tersebut.");
+    } catch (e) {
+      toast.error("Gagal mengunduh template", e instanceof Error ? e.message : undefined);
+    } finally {
+      setDownloading(false);
+    }
+  }
 
   const [previewing, setPreviewing] = useState(false);
   const [result, setResult] = useState<TariffPreviewResult | null>(null);
@@ -124,8 +149,27 @@ export function UploadTarifWizard({ onCommitted }: { onCommitted?: () => void })
   const s = result?.summary;
   const gridStyle = { gridTemplateColumns: PREVIEW_COLS } as CSSProperties;
 
+  const branchTplOptions: SelectOption[] = branches.map((b) => ({ value: String(b.id), label: b.branch_name || b.branch_code || `#${b.id}` }));
+
   return (
     <div className={styles.wizard}>
+      {/* Template per ruas */}
+      <div className={styles.panel}>
+        <div className={styles.panelTitle}>Template per ruas</div>
+        <div className={styles.panelSub}>Unduh template .xlsx yang sudah terisi tarif existing ruas terpilih — untuk diperbarui lalu diunggah kembali.</div>
+        <div className={styles.optRow} style={{ marginTop: 0, alignItems: "flex-end" }}>
+          <div className={styles.opt} style={{ minWidth: 220 }}>
+            <span className={styles.optLabel}>Ruas</span>
+            <Select value={tplBranch} onValueChange={setTplBranch} options={branchTplOptions} placeholder="Pilih ruas" ariaLabel="Ruas template" />
+          </div>
+          <div className={styles.opt} style={{ minWidth: 150 }}>
+            <span className={styles.optLabel}>Tipe sistem</span>
+            <Select value={isOpen} onValueChange={setIsOpen} options={[{ value: "1", label: "Terbuka" }, { value: "0", label: "Tertutup" }]} ariaLabel="Tipe template" />
+          </div>
+          <Button variant="secondary" icon="download" onClick={downloadTemplate} disabled={!tplBranch || downloading}>{downloading ? "Mengunduh…" : "Unduh Template"}</Button>
+        </div>
+      </div>
+
       {/* Step 1: file + opsi */}
       <div className={styles.panel}>
         <div className={styles.panelTitle}>1. Pilih file & opsi</div>
