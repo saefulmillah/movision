@@ -42,19 +42,38 @@ export interface LabeledIcon {
   anchor: [number, number];
 }
 
-/** Marker badge + label teks ber-outline di bawahnya (mis. nama gerbang). */
-export function labeledMarkerDataUri(glyph: string, color: string, label: string): LabeledIcon {
+/** Status kepadatan opsional di marker gerbang. `text` opsional: bila kosong,
+ *  hanya cincin penekanan berwarna level yang digambar (teks pindah ke tooltip). */
+export interface MarkerStatus {
+  color: string;
+  text?: string;
+}
+
+/** Marker badge + label teks ber-outline di bawahnya (mis. nama gerbang).
+ *  Bila `status` diisi: cincin penekanan berwarna level; baris status di bawah
+ *  nama hanya bila `status.text` terisi (default status kini lewat tooltip). */
+export function labeledMarkerDataUri(glyph: string, color: string, label: string, status?: MarkerStatus): LabeledIcon {
   const inner = GLYPHS[glyph] ?? "";
   const text = escapeXml(label);
-  const w = Math.max(48, Math.ceil(text.length * 6.6) + 16);
-  const h = 50;
+  const statusText = status?.text ? escapeXml(status.text) : "";
+  const w = Math.max(48, Math.ceil(Math.max(text.length, statusText.length) * 6.6) + 18);
+  const h = statusText ? 62 : 50;
   const cx = w / 2;
+  const ring = status
+    ? `<circle cx="${cx}" cy="16" r="15.5" fill="none" stroke="${status.color}" stroke-width="2.6" opacity="0.95"/>`
+    : "";
+  const line2 = status && statusText
+    ? `<text x="${cx}" y="55" text-anchor="middle" font-family="'IBM Plex Sans',system-ui,sans-serif" font-size="10" font-weight="700" ` +
+      `fill="${status.color}" stroke="#10233f" stroke-width="3" paint-order="stroke" style="paint-order:stroke">${statusText}</text>`
+    : "";
   const svg =
     `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">` +
+    ring +
     `<circle cx="${cx}" cy="16" r="13" fill="${color}" stroke="#ffffff" stroke-width="2.2"/>` +
     `<g transform="translate(${cx - 9},7) scale(0.75)" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${inner}</g>` +
     `<text x="${cx}" y="41" text-anchor="middle" font-family="'IBM Plex Sans',system-ui,sans-serif" font-size="11" font-weight="700" ` +
     `fill="#ffffff" stroke="#10233f" stroke-width="3.2" paint-order="stroke" style="paint-order:stroke">${text}</text>` +
+    line2 +
     `</svg>`;
   return { url: `data:image/svg+xml,${encodeURIComponent(svg)}`, size: [w, h], anchor: [cx, 16] };
 }

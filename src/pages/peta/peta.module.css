@@ -1,4 +1,6 @@
 .page {
+  /* Panel kanan diperlebar (muat streaming CCTV gerbang + detail). */
+  --w-panel-right: 380px;
   display: grid;
   grid-template-columns: var(--w-panel-left) 1fr var(--w-panel-right);
   height: 100%;
@@ -107,6 +109,53 @@
   font-size: 10px;
   font-weight: 600;
   flex: none;
+}
+
+/* Label grup di dalam daftar layer (mis. "Jaringan Jalan Tol") */
+.layerGroupLabel {
+  padding: 12px 10px 4px;
+  margin-top: 4px;
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-micro);
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Legenda warna tooltip kepadatan (lancar → kritis) */
+.densityLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  padding: 2px 12px 6px;
+}
+.densityLegendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--fs-micro);
+  color: var(--text-muted);
+}
+.densityLegendDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: none;
+}
+
+/* Legenda garis ruas: solid beragam (operasional) / merah putus-putus (fungsional) */
+.routeLegend {
+  width: 22px;
+  height: 3px;
+  border-radius: 2px;
+  /* Operasional → warna beragam */
+  background: linear-gradient(90deg, #38bdf8, #34d399, #fbbf24, #a78bfa);
+}
+.routeLegend[data-dashed="true"] {
+  height: 0;
+  border-radius: 0;
+  background: none;
+  border-top: 3px dashed currentColor;
 }
 
 /* Toggle switch */
@@ -399,6 +448,58 @@
   color: var(--on-scrim-dim);
   font-size: var(--fs-sm);
   border: 1px solid var(--line);
+}
+
+/* ============ Streaming CCTV gerbang (detail) ============ */
+.gateCctv {
+  margin-top: 16px;
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+.gateCctvHead {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+.gateCamName {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+.gateCamList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+  max-height: 220px;
+  overflow: auto;
+}
+.gateCamBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: var(--fs-xs);
+}
+.gateCamBtn[data-active] {
+  border-color: var(--st-blue, #3b82f6);
+  background: var(--st-blue-weak, rgba(59, 130, 246, 0.14));
+}
+.gateCamBtnText {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ============ Mode layar penuh ============ */

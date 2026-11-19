@@ -1,0 +1,321 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  padding: 16px 0;
+  font-size: var(--fs-sm, 13px);
+}
+
+/* ---------- Ringkasan ---------- */
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg, 12px);
+  padding: 14px;
+}
+.summaryTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.siteName {
+  font-size: var(--fs-md, 15px);
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.siteMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: var(--fs-xs, 12px);
+  min-width: 0;
+}
+.code {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  background: var(--surface-3);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 1px 6px;
+  font-size: 11px;
+}
+.metaSep {
+  opacity: 0.6;
+}
+
+.healthRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.healthBar {
+  flex: 1 1 auto;
+  display: flex;
+  height: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--surface-3);
+}
+.healthBar i {
+  display: block;
+  height: 100%;
+}
+.hbOn { background: var(--sem-green); }
+.hbWarn { background: var(--sem-amber); }
+.hbOff { background: var(--sem-red); }
+.healthText {
+  flex: none;
+  font-size: var(--fs-xs, 12px);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.healthText b {
+  color: var(--text);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.chipOk {
+  color: var(--sem-green);
+  background: color-mix(in srgb, var(--sem-green) 14%, transparent);
+}
+.chipWarn {
+  color: var(--sem-amber);
+  background: color-mix(in srgb, var(--sem-amber) 16%, transparent);
+}
+.chipOff {
+  color: var(--sem-red);
+  background: color-mix(in srgb, var(--sem-red) 14%, transparent);
+}
+.chipMuted {
+  color: var(--text-muted);
+  background: var(--surface-3);
+}
+
+/* ---------- Waktu pengecekan ---------- */
+.checks {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg, 12px);
+  padding: 10px 12px;
+  min-width: 0;
+}
+.checkIcon {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: var(--surface-3);
+  color: var(--text-muted);
+}
+.checkBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.checkLabel {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-muted);
+}
+.checkValue {
+  font-size: var(--fs-xs, 12px);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Error ---------- */
+.errBox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--r-lg, 12px);
+  border: 1px solid color-mix(in srgb, var(--sem-red) 35%, transparent);
+  background: color-mix(in srgb, var(--sem-red) 10%, transparent);
+  color: var(--sem-red);
+}
+.errTitle {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.errText {
+  font-size: var(--fs-xs, 12px);
+  word-break: break-word;
+  margin-top: 2px;
+}
+.inlineErr {
+  color: var(--sem-red);
+  font-size: var(--fs-xs, 12px);
+}
+
+/* ---------- Seksi ---------- */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sectionHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 6px;
+}
+.sectionTitle {
+  font-size: var(--fs-xs, 12px);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-muted);
+}
+.countBadge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--surface-3);
+  border-radius: 999px;
+  padding: 1px 7px;
+  font-variant-numeric: tabular-nums;
+}
+.muted {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: var(--fs-sm, 13px);
+}
+
+/* ---------- Perangkat (tag per device, warna = status) ---------- */
+.devTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+.devTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-xs, 12px);
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: default;
+}
+.devTagDot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ---------- Log ---------- */
+.logList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.logItem {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 6px 2px;
+  font-size: var(--fs-xs, 12px);
+}
+.logItem + .logItem {
+  border-top: 1px solid var(--line);
+}
+.logIconOk,
+.logIconFail {
+  flex: none;
+  display: inline-flex;
+}
+.logIconOk { color: var(--sem-green); }
+.logIconFail { color: var(--sem-red); }
+.logType {
+  color: var(--text);
+  font-weight: 600;
+}
+.logHttp {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 10px;
+  color: var(--text-muted);
+  background: var(--surface-3);
+  border-radius: 6px;
+  padding: 1px 6px;
+}
+.logTime {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.logErr {
+  flex: 1 1 100%;
+  color: var(--sem-red);
+  word-break: break-word;
+  padding-left: 22px;
+}

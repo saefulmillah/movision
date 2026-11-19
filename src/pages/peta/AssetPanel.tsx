@@ -1,8 +1,11 @@
+import { useEffect, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { HlsVideo } from "@/components/ui/HlsVideo";
 import { StatusPill, toneForStatus } from "@/components/ui/StatusPill";
 import type { MapAsset } from "@/types/monitoring";
+import { trafficFlow } from "@/lib/trafficFlow";
+import type { Cctv } from "@/lib/trafficFlow";
 import { LAYERS } from "./layers";
 import type { LayerKey, ListItem } from "./layers";
 import styles from "./peta.module.css";
@@ -19,6 +22,8 @@ interface AssetPanelProps {
   onSelectItem: (item: ListItem) => void;
   onBack: () => void;
   onClose: () => void;
+  /** Nama gerbang (ter-normalisasi, gb_tujuan) utk ambil streaming CCTV gerbang. */
+  gateStreamGb: string | null;
 }
 
 function layerName(key: LayerKey | null): string {
@@ -80,7 +85,8 @@ export function AssetPanel({
   selection,
   onSelectItem,
   onBack,
-  onClose
+  onClose,
+  gateStreamGb
 }: AssetPanelProps) {
   if (mode === "empty") {
     return (
@@ -129,6 +135,7 @@ export function AssetPanel({
                 </div>
               );
             })()}
+          {layerKey === "gate" && <GateCctv gb={gateStreamGb} />}
         </div>
       </aside>
     );
@@ -184,6 +191,80 @@ function renderItem(item: ListItem, selection: ListItem | null, onSelectItem: (i
       <span className={styles.assetRight}>
         <StatusPill label={item.status} tone={toneForStatus(item.status)} dot />
       </span>
+    </div>
+  );
+}
+
+/** Streaming CCTV gerbang terpilih (klik marker gerbang). Ambil kamera via
+ *  traffic-flow/cctv memakai nama gerbang ternormalisasi (gb_tujuan). */
+function GateCctv({ gb }: { gb: string | null }) {
+  const [cams, setCams] = useState<Cctv[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    if (!gb) {
+      setCams([]);
+      return;
+    }
+    let alive = true;
+    setLoading(true);
+    setActive(0);
+    trafficFlow
+      .cctv({ gb_tujuan: gb })
+      .then((r) => {
+        if (alive) setCams(r.items.flatMap((g) => g.cctv));
+      })
+      .catch(() => {
+        if (alive) setCams([]);
+      })
+      .finally(() => {
+        if (alive) setLoading(false);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [gb]);
+
+  const cam = cams[active];
+  return (
+    <div className={styles.gateCctv}>
+      <div className={styles.gateCctvHead}>
+        <Icon name="cctv" size={15} /> Kamera Gerbang{cams.length > 0 ? ` (${cams.length})` : ""}
+      </div>
+      {loading ? (
+        <EmptyState icon="cctv" title="Memuat kamera…" />
+      ) : cams.length === 0 ? (
+        <EmptyState
+          icon="video-off"
+          title="Tak ada kamera terpetakan"
+          description={gb ? "Petakan kamera gerbang ini lewat data CCTV / Arus Lalin." : "Gerbang ini belum terhubung ke modul arus lalin."}
+        />
+      ) : (
+        <>
+          <HlsVideo url={cam?.stream_url ?? null} active />
+          <div className={styles.gateCamName}>
+            {cam?.name}
+            {cam?.is_gate ? " · kamera gerbang" : ""}
+          </div>
+          {cams.length > 1 && (
+            <div className={styles.gateCamList}>
+              {cams.map((c, i) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  className={styles.gateCamBtn}
+                  data-active={i === active || undefined}
+                  onClick={() => setActive(i)}
+                >
+                  {c.is_gate && <Icon name="door-open" size={13} />}
+                  <span className={styles.gateCamBtnText}>{c.name}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

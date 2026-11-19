@@ -1,0 +1,346 @@
+/* Dashboard Manajemen — mengikuti token tema aplikasi (dark-mode aware). */
+
+/* ---- Selektor periode ---- */
+.periodBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.presetGroup {
+  display: inline-flex;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+}
+.presetBtn {
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.presetBtn:hover {
+  color: var(--text);
+}
+.presetActive {
+  background: var(--st-blue);
+  color: #fff;
+}
+.customDates {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.dateField {
+  width: 150px;
+}
+.rangeChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 11px;
+  white-space: nowrap;
+}
+
+/* ---- Heading seksi ---- */
+.sectionHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+.sectionIcon {
+  color: var(--st-blue);
+  flex: none;
+}
+.sectionTitle {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.sectionSub {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ---- Badge delta ---- */
+.deltaGood,
+.deltaBad,
+.deltaFlat {
+  font-weight: 700;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.deltaGood { color: var(--sem-green); }
+.deltaBad { color: var(--sem-red); }
+.deltaFlat { color: var(--text-muted); }
+
+.subDelta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.subDeltaTop {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.kpiMetaMuted {
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 11.5px;
+}
+.kpiMetaRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+/* ---- KPI Insiden SOS mini stats ---- */
+.sosMiniStats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line);
+}
+.sosMiniStats span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* ---- Kartu aset ---- */
+.asetCard {
+  border-left-color: var(--st-purple, #7c5cff);
+}
+.asetGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 6px;
+}
+.asetRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13px;
+}
+.asetLabel {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.asetVal {
+  color: var(--text);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.asetVal b { color: var(--text); }
+.asetOff { color: var(--sem-red); font-weight: 700; }
+.asetOffMuted { color: var(--text-muted); font-weight: 500; }
+
+/* ---- Kartu degradasi ---- */
+.kpiDegraded {
+  border-left-color: var(--text-muted) !important;
+  opacity: 0.85;
+}
+.degradedValue {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+.degradedBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 120px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ---- Status Saat Ini: grid chip ---- */
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+}
+.statChip {
+  background: var(--surface-2, var(--surface-1));
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.chip_good { border-left: 3px solid var(--sem-green); }
+.chip_warning { border-left: 3px solid var(--sem-amber); }
+.chip_critical { border-left: 3px solid var(--sem-red); }
+.statValue {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.statLabel {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-weight: 700;
+  margin-top: 3px;
+}
+.statSub {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-top: 1px;
+}
+
+/* ---- Butuh Perhatian ---- */
+.perhatianList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.perhatianRow {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.row_tinggi { background: color-mix(in srgb, var(--sem-red) 8%, var(--surface-1)); }
+.row_sedang { background: color-mix(in srgb, var(--sem-amber) 10%, var(--surface-1)); }
+.row_rendah { background: var(--surface-1); }
+.perhatianLink {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  text-decoration: none;
+  color: inherit;
+}
+a.perhatianLink:hover {
+  background: color-mix(in srgb, var(--st-blue) 6%, transparent);
+}
+.sevDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  flex: none;
+}
+.sev_tinggi { background: var(--sem-red); }
+.sev_sedang { background: var(--sem-amber); }
+.sev_rendah { background: var(--text-muted); }
+.perhatianIcon { color: var(--text-muted); flex: none; }
+.perhatianText { flex: 1 1 auto; min-width: 0; }
+.perhatianTitle {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text);
+}
+.perhatianDetail {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-top: 1px;
+}
+.perhatianNilai {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.perhatianChevron { color: var(--text-muted); flex: none; }
+
+.allNormal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 90px;
+  color: var(--sem-green);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ---- Link panel ---- */
+.panelLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--st-blue);
+  text-decoration: none;
+}
+.panelLink:hover { text-decoration: underline; }
+
+/* ---- Top ruas ---- */
+.ruasName { font-weight: 600; color: var(--text); }
+.ruasSub { font-size: 11px; color: var(--text-muted); }
+
+/* ---- Ringkasan SOS ---- */
+.sosStatRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.sosChart {
+  width: 100%;
+  height: 200px;
+  margin-top: 12px;
+}
+
+/* ---- Skeleton ---- */
+.skeletonWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.skel {
+  background: linear-gradient(90deg, var(--surface-1) 25%, var(--line) 37%, var(--surface-1) 63%);
+  background-size: 400% 100%;
+  animation: dmShimmer 1.3s ease infinite;
+  border-radius: 12px;
+}
+.skelBar { height: 40px; width: 320px; max-width: 100%; }
+.skelKpi { height: 104px; }
+.skelPanel { height: 280px; }
+@keyframes dmShimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+@media (max-width: 720px) {
+  .sosStatRow { grid-template-columns: 1fr; }
+}

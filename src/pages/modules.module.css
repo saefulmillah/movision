@@ -30,6 +30,17 @@
   display: flex;
   gap: var(--sp-5);
 }
+/* Varian halaman "mengalir": kartu tumbuh setinggi isinya tanpa scrollbar
+   internal; yang menggulir adalah halaman (dipakai WIM Monitoring). */
+.pageFlow {
+  overflow-y: auto;
+}
+.pageFlow .body {
+  flex: none;
+}
+.pageFlow .tableScroll {
+  overflow-y: visible;
+}
 .tableCard {
   flex: 1 1 auto;
   min-width: 0;

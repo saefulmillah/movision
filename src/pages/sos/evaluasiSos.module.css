@@ -1,0 +1,69 @@
+/* Gaya khusus halaman Evaluasi SOS. Layout utama memakai insights.module.css. */
+
+.filterBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.filterLabel {
+  font-size: var(--fs-xs, 12px);
+  color: var(--text-muted);
+  margin-right: 2px;
+}
+.dateField {
+  width: 158px;
+}
+.slaField {
+  width: 86px;
+}
+
+/* ---- Baris filter riwayat ---- */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.searchField {
+  width: 220px;
+  max-width: 100%;
+}
+
+/* ---- Bar proporsi pada tabel breakdown ---- */
+.breakdownName {
+  font-weight: 600;
+  color: var(--text);
+}
+.breakdownSub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ---- Baris tabel riwayat yang bisa diklik ---- */
+.rowClickable {
+  cursor: pointer;
+  transition: background var(--t-fast, 0.12s);
+}
+.rowClickable:hover {
+  background: var(--surface-2, #f6f8fb);
+}
+.chevron {
+  color: var(--text-muted);
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+/* ---- Catatan kecil di bawah panel ---- */
+.foot {
+  font-size: var(--fs-micro, 11px);
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+
+/* ---- Isi modal drill-down ---- */
+.drillBody {
+  min-width: 0;
+}

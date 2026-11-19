@@ -1,0 +1,27 @@
+[
+  { "elementType": "geometry", "stylers": [{ "color": "#081a33" }] },
+  { "elementType": "labels.text.fill", "stylers": [{ "color": "#5a86c2" }] },
+  { "elementType": "labels.text.stroke", "stylers": [{ "color": "#030a17" }, { "weight": 2 }] },
+  { "elementType": "labels.icon", "stylers": [{ "visibility": "off" }] },
+
+  { "featureType": "landscape", "elementType": "geometry", "stylers": [{ "color": "#0a1e3d" }] },
+  { "featureType": "landscape.natural", "elementType": "geometry", "stylers": [{ "color": "#0b2347" }] },
+
+  { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#03101f" }] },
+  { "featureType": "water", "elementType": "labels.text.fill", "stylers": [{ "color": "#2e5c8f" }] },
+
+  { "featureType": "administrative", "elementType": "geometry.stroke", "stylers": [{ "color": "#1d4c88" }, { "weight": 1 }] },
+  { "featureType": "administrative.country", "elementType": "geometry.stroke", "stylers": [{ "color": "#2f74c0" }] },
+  { "featureType": "administrative.province", "elementType": "geometry.stroke", "stylers": [{ "color": "#215aa0" }] },
+  { "featureType": "administrative.country", "elementType": "labels.text.fill", "stylers": [{ "color": "#7fb0e6" }] },
+  { "featureType": "administrative.province", "elementType": "labels.text.fill", "stylers": [{ "color": "#6c9ad6" }] },
+
+  { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#10305a" }] },
+  { "featureType": "road.highway", "elementType": "geometry", "stylers": [{ "color": "#143a6a" }] },
+
+  { "featureType": "poi", "stylers": [{ "visibility": "off" }] },
+  { "featureType": "transit", "stylers": [{ "visibility": "off" }] },
+  { "featureType": "road", "elementType": "labels", "stylers": [{ "visibility": "off" }] },
+  { "featureType": "administrative.neighborhood", "stylers": [{ "visibility": "off" }] },
+  { "featureType": "administrative.land_parcel", "stylers": [{ "visibility": "off" }] }
+]

@@ -3,9 +3,16 @@ import { AppShell } from "@/components/shell/AppShell";
 import { RequireAuth, RequireModule, RequirePermission, RequireRole } from "@/components/RouteGuards";
 import { LoginPage } from "@/pages/LoginPage";
 import { DashboardPage } from "@/pages/DashboardPage";
+import { DashboardManajemenPage } from "@/pages/dashboard/DashboardManajemenPage";
 import { PetaPage } from "@/pages/peta/PetaPage";
 import { CctvPage } from "@/pages/cctv/CctvPage";
+import { ArusWallPage } from "@/pages/arus/ArusWallPage";
+import { KepadatanPage } from "@/pages/arus/KepadatanPage";
+import { TrenPage } from "@/pages/arus/TrenPage";
+import { PeringatanPage } from "@/pages/arus/PeringatanPage";
+import { SetelanArusPage } from "@/pages/arus/SetelanArusPage";
 import { SosPage } from "@/pages/sos/SosPage";
+import { EvaluasiSosPage } from "@/pages/sos/EvaluasiSosPage";
 import { NewsPage } from "@/pages/news/NewsPage";
 import { IncidentPage } from "@/pages/incident/IncidentPage";
 import { FeedbackPage } from "@/pages/feedback/FeedbackPage";
@@ -27,6 +34,7 @@ import {
 import { JaringanPage } from "@/pages/master-data/JaringanPage";
 import { WimMonitoringPage } from "@/pages/wim/WimMonitoringPage";
 import { MatriksTarifPage } from "@/pages/tarif/MatriksTarifPage";
+import { LhrTertimbangPage } from "@/pages/lhr/LhrTertimbangPage";
 import { PresentationOverlay } from "@/components/presentation/PresentationOverlay";
 import { UsersPage } from "@/pages/users/UsersPage";
 import { MenuManagerPage } from "@/pages/menu-manager/MenuManagerPage";
@@ -56,9 +64,23 @@ export default function App() {
         }
       >
         <Route path="/" element={<DashboardPage />} />
+        <Route
+          path="/dashboard/manajemen"
+          element={<RequireModule module="dashboard"><DashboardManajemenPage /></RequireModule>}
+        />
         <Route path="/peta" element={<PetaPage />} />
         <Route path="/cctv" element={<CctvPage />} />
+        {/* ============ Arus Lalin (traffic_flow) ============ */}
+        <Route path="/arus" element={<RequireModule module="traffic_flow"><ArusWallPage /></RequireModule>} />
+        <Route path="/arus/kepadatan" element={<RequireModule module="traffic_flow"><KepadatanPage /></RequireModule>} />
+        <Route path="/arus/tren" element={<RequireModule module="traffic_flow"><TrenPage /></RequireModule>} />
+        <Route path="/arus/peringatan" element={<RequireModule module="traffic_flow"><PeringatanPage /></RequireModule>} />
+        <Route path="/arus/setelan" element={<RequireModule module="traffic_flow"><SetelanArusPage /></RequireModule>} />
         <Route path="/sos" element={<SosPage />} />
+        <Route
+          path="/sos/evaluasi"
+          element={<RequirePermission permission="sos.ticket.view"><EvaluasiSosPage /></RequirePermission>}
+        />
         <Route path="/berita" element={<NewsPage />} />
         <Route path="/incident" element={<IncidentPage />} />
         <Route path="/feedback" element={<FeedbackPage />} />
@@ -119,6 +141,10 @@ export default function App() {
         <Route
           path="/operasional/peralatan"
           element={<RequireModule module="insights"><PeralatanPage /></RequireModule>}
+        />
+        <Route
+          path="/operasional/lhr-tertimbang"
+          element={<RequireModule module="monitoring_rekonsiliasi"><LhrTertimbangPage /></RequireModule>}
         />
         <Route path="/tarif/matriks" element={<RequireModule module="tariff"><MatriksTarifPage /></RequireModule>} />
         {/* Alias lama → upload kini tombol+modal di Matriks Tarif. */}

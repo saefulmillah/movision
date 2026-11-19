@@ -5,6 +5,7 @@ import { backendAsset } from "@/lib/api";
 import { MARKER_COLORS, labeledMarkerDataUri, markerDataUri } from "@/lib/markerIcon";
 import type { GateAlert, MapAsset, SosTicket } from "@/types/monitoring";
 import type { LiveVehicle, NetworkArc, NetworkNode, WeatherPoint } from "@/types/map";
+import { normGate } from "./arusResolver";
 
 export type LayerKey = "cctv" | "vms" | "fo" | "gps" | "gate" | "weather" | "sos";
 
@@ -45,6 +46,8 @@ export interface MapPoint {
   /** Untuk popup info: nama perangkat + label tipe. */
   name?: string;
   typeLabel?: string;
+  /** Khusus GPS: jenis kendaraan (untuk segmentasi donut cluster multi-kategori). */
+  vehicleType?: string;
 }
 
 const LAYER_TYPE_LABEL: Record<LayerKey, string> = {
@@ -105,12 +108,23 @@ export function assetToItem(a: MapAsset): ListItem {
 }
 
 /* ---- Gerbang ---- */
-export function gateToPoint(g: GateAlert): MapPoint | null {
+/** Status kepadatan gerbang "jadi perhatian" (dari ranking traffic-flow). */
+export interface GateConcern {
+  label: string;
+  color: string;
+  pct: string;
+}
+
+export function gateToPoint(g: GateAlert, concern?: Map<string, GateConcern>): MapPoint | null {
   if (!g.lat || !g.lng) return null;
   const critical = isCritical(g.status);
   const color = critical ? MARKER_COLORS.gray : MARKER_COLORS.gate;
-  // Marker gerbang menyertakan label nama (teks ber-outline).
-  const labeled = labeledMarkerDataUri("building-2", color, g.gate_name);
+  // Status kepadatan bila gerbang ini sedang jadi perhatian: hanya cincin warna
+  // level pada marker — teks kepadatan ditampilkan lewat tooltip persisten.
+  const dens = concern?.get(normGate(g.gate_name));
+  const status = dens ? { color: dens.color } : undefined;
+  // Marker gerbang menyertakan label nama (teks ber-outline) + cincin level.
+  const labeled = labeledMarkerDataUri("building-2", color, g.gate_name, status);
   return {
     id: `gate-${g.gate_id}`,
     lat: g.lat,
@@ -122,7 +136,7 @@ export function gateToPoint(g: GateAlert): MapPoint | null {
     iconSize: labeled.size,
     iconAnchor: labeled.anchor,
     name: g.gate_name,
-    typeLabel: LAYER_TYPE_LABEL.gate
+    typeLabel: dens ? `${LAYER_TYPE_LABEL.gate} · ${dens.label}` : LAYER_TYPE_LABEL.gate
   };
 }
 export function gateToItem(g: GateAlert): ListItem {
@@ -142,6 +156,8 @@ export function gateToItem(g: GateAlert): ListItem {
 /* ---- GPS Kendaraan ---- */
 export function vehicleToPoint(v: LiveVehicle): MapPoint | null {
   if (!v.latitude || !v.longitude) return null;
+  // Nama jenis kendaraan: utamakan referensi master (type_name), lalu string mentah.
+  const vtype = v.vehicle_type_ref?.type_name || v.vehicle_type || "Tidak diketahui";
   return {
     id: `gps-${v.vehicle_id}`,
     lat: v.latitude,
@@ -152,7 +168,8 @@ export function vehicleToPoint(v: LiveVehicle): MapPoint | null {
     // Ikon marker dari payload (vehicle_type_ref.icon_path) + prefix URL backend.
     iconUrl: backendAsset(v.vehicle_type_ref?.icon_path),
     name: v.label || v.node,
-    typeLabel: v.vehicle_type || LAYER_TYPE_LABEL.gps
+    typeLabel: vtype,
+    vehicleType: vtype
   };
 }
 export function vehicleToItem(v: LiveVehicle): ListItem {

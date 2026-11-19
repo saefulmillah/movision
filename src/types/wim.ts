@@ -19,6 +19,49 @@ export interface WimSummary {
 
 export type WimDeviceStatus = "online" | "warning" | "offline" | "unknown";
 
+/* Heatmap Kesehatan Site × Hari (/api/admin/wim-monitor/heatmap). */
+export type WimHeatmapStatus = "ok" | "warning" | "critical" | "kosong";
+
+export interface WimHeatmapDay {
+  date: string;
+  status: WimHeatmapStatus;
+  device_status: WimDeviceStatus | null;
+  device_total: number;
+  device_online: number;
+  device_offline: number;
+  device_warning: number;
+  has_daily_data: boolean;
+  daily_data_count: number;
+  last_error_message: string | null;
+}
+
+export interface WimHeatmapRow {
+  site_code: string;
+  site_name: string;
+  branch_id: number | null;
+  branch_name: string | null;
+  availability_pct: number;
+  days: WimHeatmapDay[];
+}
+
+export interface WimDeviceItem {
+  id: string;
+  name: string;
+  type: string | null;
+  status: string;
+}
+
+export interface WimMonitorLog {
+  check_type: string;
+  request_url: string | null;
+  http_status: number | null;
+  is_success: boolean;
+  error_message: string | null;
+  started_at: string | null;
+  finished_at: string | null;
+  created_at: string | null;
+}
+
 export interface WimSiteStatus {
   id: number;
   site_code: string;
@@ -40,4 +83,10 @@ export interface WimSiteStatus {
   last_success_at: string | null;
   last_error_message: string | null;
   [key: string]: unknown;
+}
+
+/** Detail satu site (GET /sites/:code) — WimSiteStatus + perangkat & log. */
+export interface WimSiteDetail extends WimSiteStatus {
+  devices?: WimDeviceItem[];
+  logs?: WimMonitorLog[];
 }

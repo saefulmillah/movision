@@ -5,8 +5,10 @@ import type { PillTone, SelectOption } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
 import { useBranch } from "@/context/BranchContext";
 import { formatDateTime } from "@/lib/format";
-import { fetchWimSites, fetchWimSummary, refreshWim } from "@/lib/wim";
-import type { WimDeviceStatus, WimSiteStatus, WimSummary } from "@/types/wim";
+import { fetchWimHeatmap, fetchWimSite, fetchWimSites, fetchWimSummary, refreshWim } from "@/lib/wim";
+import type { WimDeviceStatus, WimHeatmapRow, WimSiteDetail, WimSiteStatus, WimSummary } from "@/types/wim";
+import { WimHeatmap } from "./WimHeatmap";
+import { WimSiteDetailModal } from "./WimSiteDetailModal";
 import styles from "@/pages/modules.module.css";
 
 const GRID = "1.6fr 1.2fr 0.9fr 0.8fr 1.1fr" as const;
@@ -71,6 +73,19 @@ export function WimMonitoringPage() {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  // Heatmap Kesehatan Site × Hari
+  const [heatmapDays, setHeatmapDays] = useState(14);
+  const [heatmapRows, setHeatmapRows] = useState<WimHeatmapRow[]>([]);
+  const [heatmapLoading, setHeatmapLoading] = useState(false);
+  const [heatmapError, setHeatmapError] = useState("");
+
+  // Detail site (modal saat baris diklik)
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [activeSite, setActiveSite] = useState<WimSiteStatus | null>(null);
+  const [detail, setDetail] = useState<WimSiteDetail | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailError, setDetailError] = useState("");
+
   const branchId = branchFilter === "all" ? null : Number(branchFilter);
 
   const load = useCallback(async () => {
@@ -97,16 +112,48 @@ export function WimMonitoringPage() {
 
   useEffect(() => { void load(); }, [load]);
 
+  const loadHeatmap = useCallback(async () => {
+    setHeatmapLoading(true);
+    setHeatmapError("");
+    try {
+      const result = await fetchWimHeatmap(branchId, heatmapDays);
+      setHeatmapRows(Array.isArray(result) ? result : []);
+    } catch (e) {
+      setHeatmapError(e instanceof Error ? e.message : "Gagal memuat heatmap.");
+      setHeatmapRows([]);
+    } finally {
+      setHeatmapLoading(false);
+    }
+  }, [branchId, heatmapDays]);
+
+  useEffect(() => { void loadHeatmap(); }, [loadHeatmap]);
+
   async function doRefresh() {
     setRefreshing(true);
     try {
       await refreshWim();
       toast.success("Refresh WIM selesai");
-      await load();
+      await Promise.all([load(), loadHeatmap()]);
     } catch (e) {
       toast.error("Gagal refresh", e instanceof Error ? e.message : undefined);
     } finally {
       setRefreshing(false);
+    }
+  }
+
+  async function openDetail(row: WimSiteStatus) {
+    setActiveSite(row);
+    setDetail(null);
+    setDetailError("");
+    setDetailOpen(true);
+    setDetailLoading(true);
+    try {
+      const result = await fetchWimSite(row.site_code);
+      setDetail(result ?? null);
+    } catch (e) {
+      setDetailError(e instanceof Error ? e.message : "Gagal memuat detail site.");
+    } finally {
+      setDetailLoading(false);
     }
   }
 
@@ -125,7 +172,7 @@ export function WimMonitoringPage() {
   }
 
   return (
-    <div className={styles.page}>
+    <div className={`${styles.page} ${styles.pageFlow}`}>
       <div className={styles.header}>
         <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <strong style={{ fontSize: "var(--fs-md)" }}>Monitoring WIM</strong>
@@ -144,7 +191,7 @@ export function WimMonitoringPage() {
 
       {/* KPI */}
       {kpis.length > 0 && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: "var(--sp-4)", flex: "none" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: "var(--sp-4)", flex: "none" }}>
           {kpis.map((k) => (
             <div key={String(k.key)} style={{ background: "var(--surface-2)", border: "1px solid var(--line)", borderRadius: "var(--r-2xl)", padding: "14px 16px" }}>
               <div className={styles.muted} style={{ fontSize: "var(--fs-xs)", textTransform: "uppercase", letterSpacing: "0.5px" }}>{k.label}</div>
@@ -155,6 +202,16 @@ export function WimMonitoringPage() {
           ))}
         </div>
       )}
+
+      {/* Heatmap Kesehatan Site × Hari (bertumpuk di atas tabel) */}
+      <WimHeatmap
+        rows={heatmapRows}
+        days={heatmapDays}
+        onDaysChange={setHeatmapDays}
+        loading={heatmapLoading}
+        error={heatmapError}
+        onRetry={loadHeatmap}
+      />
 
       {/* Tabel site */}
       <div className={styles.body}>
@@ -174,7 +231,15 @@ export function WimMonitoringPage() {
                 <EmptyState icon="scale" title="Tidak ada site" description="Belum ada data monitoring WIM. Coba ganti ruas, atau jalankan Refresh bila Anda admin." />
               ) : (
                 sites.map((s) => (
-                  <div key={s.id} className={styles.trow} style={gridStyle}>
+                  <div
+                    key={s.id}
+                    className={styles.trow}
+                    style={{ ...gridStyle, cursor: "pointer" }}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => void openDetail(s)}
+                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); void openDetail(s); } }}
+                  >
                     <span style={{ minWidth: 0 }}>
                       <span className={styles.cellTitle}>{s.site_name || s.site_code}</span>
                       <span className={styles.cellSub}>{s.site_code}</span>
@@ -190,6 +255,15 @@ export function WimMonitoringPage() {
           </div>
         </div>
       </div>
+
+      <WimSiteDetailModal
+        open={detailOpen}
+        onClose={() => setDetailOpen(false)}
+        site={activeSite}
+        detail={detail}
+        loading={detailLoading}
+        error={detailError}
+      />
     </div>
   );
 }

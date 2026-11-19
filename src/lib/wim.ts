@@ -1,6 +1,6 @@
 import { api } from "@/lib/api";
 import { buildQuery } from "@/lib/news";
-import type { WimSiteStatus, WimSummary } from "@/types/wim";
+import type { WimHeatmapRow, WimSiteDetail, WimSiteStatus, WimSummary } from "@/types/wim";
 
 /* WIM Monitoring — read-only + refresh manual. `branch_id` opsional (kosong = semua ruas). */
 
@@ -12,8 +12,8 @@ export function fetchWimSummaryTrend(branchId?: number | null, days = 30): Promi
   return api.get<unknown>(`/admin/wim-monitor/summary-trend${buildQuery({ branch_id: branchId ?? undefined, days })}`);
 }
 
-export function fetchWimHeatmap(branchId?: number | null, days = 30): Promise<unknown> {
-  return api.get<unknown>(`/admin/wim-monitor/heatmap${buildQuery({ branch_id: branchId ?? undefined, days })}`);
+export function fetchWimHeatmap(branchId?: number | null, days = 14): Promise<WimHeatmapRow[]> {
+  return api.get<WimHeatmapRow[]>(`/admin/wim-monitor/heatmap${buildQuery({ branch_id: branchId ?? undefined, days })}`);
 }
 
 export interface WimSitesParams {
@@ -27,8 +27,8 @@ export function fetchWimSites(params: WimSitesParams = {}): Promise<WimSiteStatu
   return api.get<WimSiteStatus[]>(`/admin/wim-monitor/sites${buildQuery({ ...params, branch_id: params.branch_id ?? undefined })}`);
 }
 
-export function fetchWimSite(siteCode: string): Promise<WimSiteStatus> {
-  return api.get<WimSiteStatus>(`/admin/wim-monitor/sites/${encodeURIComponent(siteCode)}`);
+export function fetchWimSite(siteCode: string): Promise<WimSiteDetail> {
+  return api.get<WimSiteDetail>(`/admin/wim-monitor/sites/${encodeURIComponent(siteCode)}`);
 }
 
 export function fetchWimSiteTrend(siteCode: string, days = 30): Promise<unknown> {

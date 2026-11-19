@@ -10,6 +10,8 @@ import { LayerPanel } from "./LayerPanel";
 import { AssetPanel } from "./AssetPanel";
 import type { PanelMode } from "./AssetPanel";
 import { MapView } from "./MapView";
+import type { FitRequest, LatLng } from "./MapView";
+import type { DensityTip } from "./useMapOverlays";
 import {
   LAYERS,
   arcNodesToPoints,
@@ -25,6 +27,13 @@ import {
   weatherToPoint
 } from "./layers";
 import type { LayerKey, ListItem, MapPoint } from "./layers";
+import { ROUTE_LAYERS } from "./routeLayers";
+import type { RouteKey } from "./routeLayers";
+import { trafficFlow, levelMeta } from "@/lib/trafficFlow";
+import { buildArahIndex, buildBranchArah, normGate, resolveClickToArah } from "./arusResolver";
+import type { GateConcern } from "./layers";
+import { ArusLalinPanel } from "./ArusLalinPanel";
+import type { TrafficSel } from "./ArusLalinPanel";
 import styles from "./peta.module.css";
 
 const AUTO_HIDE_MS = 2600;
@@ -32,6 +41,12 @@ const AUTO_HIDE_MS = 2600;
 function initVisibility(): Record<LayerKey, boolean> {
   const out = {} as Record<LayerKey, boolean>;
   for (const l of LAYERS) out[l.key] = l.defaultOn;
+  return out;
+}
+
+function initRouteVisibility(): Record<RouteKey, boolean> {
+  const out = {} as Record<RouteKey, boolean>;
+  for (const l of ROUTE_LAYERS) out[l.key] = l.defaultOn;
   return out;
 }
 
@@ -46,17 +61,45 @@ export function PetaPage() {
   const arcsQ = usePolling(fetchNetworkArcs, 60000);
   const vehQ = usePolling(fetchLiveVehicles, 15000);
   const wxQ = usePolling(fetchWeatherPoints, 120000);
+  // Pemetaan gerbang→arah (konfigurasi, ambil sekali) untuk resolver klik vektor.
+  const arahMapQ = usePolling(() => trafficFlow.arahMap(), 0);
+  // Gerbang "jadi perhatian" (ramai/padat/kritis) untuk status kepadatan di peta.
+  const rankQ = usePolling(() => trafficFlow.ranking({ min_level: "ramai", limit: 80 }), 60000);
 
   const [visible, setVisible] = useState<Record<LayerKey, boolean>>(initVisibility);
+  const [routeVisible, setRouteVisible] = useState<Record<RouteKey, boolean>>(initRouteVisibility);
+  // Toggle "Status Kepadatan": marker gerbang padat + tooltip persisten,
+  // independen dari toggle "Gerbang Tol".
+  const [densityOn, setDensityOn] = useState(true);
   const [panelMode, setPanelMode] = useState<PanelMode>("empty");
   const [listKey, setListKey] = useState<LayerKey | null>(null);
   const [search, setSearch] = useState("");
   const [selection, setSelection] = useState<ListItem | null>(null);
   const [focus, setFocus] = useState<{ lat: number; lng: number } | null>(null);
+  const [fitRequest, setFitRequest] = useState<FitRequest | null>(null);
+  const [trafficSel, setTrafficSel] = useState<TrafficSel | null>(null);
 
   const [full, setFull] = useState(false);
   const [layersOpen, setLayersOpen] = useState(false);
   const [uiVisible, setUiVisible] = useState(true);
+  const [mapTheme, setMapTheme] = useState<"dark" | "light">(() => {
+    try {
+      return localStorage.getItem("peta-map-theme") === "light" ? "light" : "dark";
+    } catch {
+      return "dark";
+    }
+  });
+  const toggleMapTheme = useCallback(() => {
+    setMapTheme((t) => {
+      const next = t === "dark" ? "light" : "dark";
+      try {
+        localStorage.setItem("peta-map-theme", next);
+      } catch {
+        /* storage tak tersedia — abaikan */
+      }
+      return next;
+    });
+  }, []);
 
   const branchName = activeBranch?.branch_name ?? "Semua Ruas";
 
@@ -117,6 +160,20 @@ export function PetaPage() {
     [groups]
   );
 
+  // Peta nama-gerbang(ternormalisasi) → status kepadatan, untuk marker gerbang.
+  const gateConcern = useMemo(() => {
+    const m = new Map<string, GateConcern>();
+    for (const it of rankQ.data?.items ?? []) {
+      const meta = levelMeta(it.level);
+      m.set(normGate(it.gb_tujuan), {
+        label: meta.label,
+        color: meta.color,
+        pct: `${Math.round((it.rho ?? 0) * 100)}%`
+      });
+    }
+    return m;
+  }, [rankQ.data]);
+
   const points = useMemo<MapPoint[]>(() => {
     const pts: MapPoint[] = [];
     const add = (arr: (MapPoint | null)[]) => {
@@ -125,15 +182,92 @@ export function PetaPage() {
     if (visible.cctv) add(groups.cctv.map((a) => assetToPoint(a, "cctv")));
     if (visible.vms) add(groups.vms.map((a) => assetToPoint(a, "vms")));
     if (visible.gps) add(groups.veh.map(vehicleToPoint));
-    if (visible.gate) add(groups.gates.map(gateToPoint));
+    // Gerbang: layer penuh menampilkan semua gerbang; cincin level hanya saat
+    // "Status Kepadatan" aktif. Bila layer Gerbang Tol mati tapi Status Kepadatan
+    // aktif → tetap tampilkan gerbang yang padat (beserta tooltip-nya).
+    if (visible.gate) {
+      add(groups.gates.map((g) => gateToPoint(g, densityOn ? gateConcern : undefined)));
+    } else if (densityOn) {
+      add(groups.gates.filter((g) => gateConcern.has(normGate(g.gate_name))).map((g) => gateToPoint(g, gateConcern)));
+    }
     if (visible.weather) add(groups.wx.map(weatherToPoint));
     if (visible.sos) add(groups.sos.map(sosToPoint));
     if (visible.fo) pts.push(...arcNodesToPoints(groups.fo));
     return pts;
-  }, [visible, groups]);
+  }, [visible, groups, gateConcern, densityOn]);
+
+  // Tooltip kepadatan persisten: satu per gerbang yang sedang jadi perhatian.
+  const densityTips = useMemo<DensityTip[]>(() => {
+    if (!densityOn) return [];
+    const out: DensityTip[] = [];
+    for (const g of groups.gates) {
+      if (g.lat == null || g.lng == null) continue;
+      const dens = gateConcern.get(normGate(g.gate_name));
+      if (!dens) continue;
+      out.push({ id: `dens-${g.gate_id}`, lat: g.lat, lng: g.lng, label: dens.label, color: dens.color, pct: `terisi ${dens.pct}` });
+    }
+    return out;
+  }, [densityOn, groups.gates, gateConcern]);
+
+  // --- Auto zoom & center ke ruas yang dipilih ---
+  // Kumpulan semua koordinat milik ruas aktif (lepas dari visibilitas layer),
+  // dipakai menghitung bounds fitBounds.
+  const branchCoords = useMemo<LatLng[]>(() => {
+    const c: LatLng[] = [];
+    // Hanya terima koordinat di dalam kotak wajar Indonesia; buang outlier
+    // (data koordinat rusak/0/terbalik) agar bounds tidak meledak.
+    const sane = (lat: number, lng: number) => lat >= -11 && lat <= 7 && lng >= 94 && lng <= 142;
+    const push = (lat?: number | null, lng?: number | null) => {
+      if (lat != null && lng != null && sane(lat, lng)) c.push({ lat, lng });
+    };
+    // Pakai infrastruktur statis MILIK ruas (gerbang, CCTV, VMS, cuaca).
+    // - Kendaraan GPS & SOS dilewati: berpindah → bounds tak stabil.
+    // - Node FO dilewati: arc backbone bisa menyambung ke kota lain (mis.
+    //   Palembang↔Jakarta) sehingga bounds meledak jauh dari ruas.
+    groups.gates.forEach((g) => push(g.lat, g.lng));
+    groups.cctv.forEach((a) => push(a.lat, a.lng));
+    groups.vms.forEach((a) => push(a.lat, a.lng));
+    groups.wx.forEach((w) => push(w.lat, w.lng));
+    return c;
+  }, [groups]);
+
+  // Tandai perlu fit hanya saat ruas BENAR-BENAR berganti (bukan tiap polling).
+  const prevBranchRef = useRef<number | null>(activeBranchId);
+  const pendingFitRef = useRef(true); // fit awal sesuai ruas tersimpan
+  const fitSeqRef = useRef(0);
+
+  useEffect(() => {
+    if (prevBranchRef.current !== activeBranchId) {
+      prevBranchRef.current = activeBranchId;
+      pendingFitRef.current = true;
+    }
+  }, [activeBranchId]);
+
+  // Data titik ruas dianggap siap bila muatan awal gerbang & aset selesai
+  // (switch ruas memakai data cache → langsung siap; hanya load awal menunggu).
+  const fitDataReady = !assetsQ.loading && !gatesQ.loading;
+
+  useEffect(() => {
+    if (!pendingFitRef.current) return;
+    if (activeBranchId == null) {
+      pendingFitRef.current = false;
+      fitSeqRef.current += 1;
+      setFitRequest({ token: fitSeqRef.current, kind: "overview" });
+      return;
+    }
+    // Tunggu data awal termuat agar bounds dihitung dari seluruh titik ruas,
+    // bukan sebagian (menghindari fit prematur yang salah zoom).
+    if (!fitDataReady) return;
+    const center = activeBranch ? { lat: activeBranch.center_lat, lng: activeBranch.center_lng } : null;
+    if (branchCoords.length === 0 && !center) return;
+    pendingFitRef.current = false;
+    fitSeqRef.current += 1;
+    setFitRequest({ token: fitSeqRef.current, kind: "branch", coords: branchCoords, center });
+  }, [activeBranchId, activeBranch, branchCoords, fitDataReady]);
 
   // --- Interaksi panel ---
   const openList = useCallback((key: LayerKey) => {
+    setTrafficSel(null);
     setListKey(key);
     setPanelMode("list");
     setSearch("");
@@ -145,7 +279,51 @@ export function PetaPage() {
     setVisible((v) => ({ ...v, [key]: !v[key] }));
   }, []);
 
+  const toggleRoute = useCallback((key: RouteKey) => {
+    setRouteVisible((v) => ({ ...v, [key]: !v[key] }));
+  }, []);
+
+  const toggleDensity = useCallback(() => setDensityOn((v) => !v), []);
+
+  // --- Klik vektor ruas → kartu arus lalin ---
+  const arahIndex = useMemo(() => buildArahIndex(arahMapQ.data?.items), [arahMapQ.data]);
+  const branchArah = useMemo(() => buildBranchArah(gatesQ.data ?? [], arahIndex), [gatesQ.data, arahIndex]);
+
+  // normName gerbang → gb_tujuan kanonik (untuk ambil streaming CCTV gerbang).
+  const gateGbByNorm = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const it of arahMapQ.data?.items ?? []) {
+      const k = normGate(it.gb_tujuan);
+      if (k && !m.has(k)) m.set(k, it.gb_tujuan);
+    }
+    return m;
+  }, [arahMapQ.data]);
+
+  // gb_tujuan gerbang yang sedang dibuka detailnya (null bila bukan gerbang).
+  const gateStreamGb = useMemo(() => {
+    if (panelMode !== "detail" || listKey !== "gate" || !selection) return null;
+    const name = (selection.raw as { gate_name?: string } | null)?.gate_name ?? selection.title;
+    return gateGbByNorm.get(normGate(name)) ?? null;
+  }, [panelMode, listKey, selection, gateGbByNorm]);
+
+  const onRouteClick = useCallback(
+    (lat: number, lng: number, info: { functional: boolean; name: string }) => {
+      if (info.functional) {
+        setTrafficSel({ kind: "functional", roadName: info.name });
+        return;
+      }
+      const r = resolveClickToArah(lat, lng, gatesQ.data ?? [], arahIndex, branchArah);
+      setTrafficSel(
+        r
+          ? { kind: "arah", arah: r.arah, roadName: info.name, gateName: r.gateName }
+          : { kind: "untracked", roadName: info.name }
+      );
+    },
+    [gatesQ.data, arahIndex, branchArah]
+  );
+
   const selectItem = useCallback((item: ListItem) => {
+    setTrafficSel(null);
     setSelection(item);
     setPanelMode("detail");
     if (item.lat && item.lng) setFocus({ lat: item.lat, lng: item.lng });
@@ -160,6 +338,7 @@ export function PetaPage() {
       if (!layerItems) return;
       const found = layerItems.find((i) => `${key}-${i.id}` === pointId);
       if (found) {
+        setTrafficSel(null);
         setListKey(key);
         setSelection(found);
         setPanelMode("detail");
@@ -230,6 +409,11 @@ export function PetaPage() {
           activeListKey={panelMode !== "empty" ? listKey : null}
           onOpenList={openList}
           onToggle={toggleLayer}
+          routeVisible={routeVisible}
+          onToggleRoute={toggleRoute}
+          densityOn={densityOn}
+          densityCount={densityTips.length}
+          onToggleDensity={toggleDensity}
         />
       ) : (
         <>
@@ -252,6 +436,11 @@ export function PetaPage() {
                 openList(k);
               }}
               onToggle={toggleLayer}
+              routeVisible={routeVisible}
+              onToggleRoute={toggleRoute}
+              densityOn={densityOn}
+              densityCount={densityTips.length}
+              onToggleDensity={toggleDensity}
             />
           </div>
         </>
@@ -265,7 +454,7 @@ export function PetaPage() {
             {branchName}
           </div>
         )}
-        <MapView points={points} arcs={groups.fo} foVisible={visible.fo} focus={focus} onSelect={selectByPointId} onToggleFull={toggleFull} isFull={full} />
+        <MapView points={points} arcs={groups.fo} foVisible={visible.fo} routeVisible={routeVisible} densityTips={densityTips} densityOn={densityOn} focus={focus} fitRequest={fitRequest} onSelect={selectByPointId} onRouteClick={onRouteClick} onToggleFull={toggleFull} isFull={full} mapTheme={mapTheme} onToggleTheme={toggleMapTheme} />
 
         {/* Floating toolbar (mode layar penuh) */}
         {full && (
@@ -284,8 +473,10 @@ export function PetaPage() {
         )}
       </div>
 
-      {/* Panel kanan */}
-      {(!full || showRightPanel) && (
+      {/* Panel kanan — kartu arus lalin (klik vektor) diprioritaskan */}
+      {trafficSel ? (
+        <ArusLalinPanel sel={trafficSel} onClose={() => setTrafficSel(null)} />
+      ) : (!full || showRightPanel) ? (
         <AssetPanel
           key={`${panelMode}-${selection?.id ?? "none"}`}
           mode={panelMode}
@@ -297,8 +488,9 @@ export function PetaPage() {
           onSelectItem={selectItem}
           onBack={backToList}
           onClose={closePanel}
+          gateStreamGb={gateStreamGb}
         />
-      )}
+      ) : null}
     </div>
   );
 }

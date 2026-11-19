@@ -1,0 +1,242 @@
+/* Gaya khusus halaman LHR Tertimbang. Layout utama memakai insights.module.css. */
+
+.filterBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.dateField {
+  width: 168px;
+}
+.filterLabel {
+  font-size: var(--fs-xs, 12px);
+  color: var(--text-muted);
+  margin-right: 2px;
+}
+
+/* ---- Footer rata-rata pada tabel rincian harian ---- */
+.foot td {
+  font-weight: 700;
+  border-top: 2px solid var(--border, #cbd3dd);
+  background: var(--surface-2, #f6f8fb);
+  color: var(--text);
+  padding: 8px 10px;
+}
+.foot td:first-child {
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+}
+
+/* ---- Penanda sumber data (auto / manual) di baris tabel ---- */
+.srcTags {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+.srcTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--fs-micro, 11px);
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 999px;
+  line-height: 1.6;
+}
+.srcAuto {
+  color: #1f9d6b;
+  background: color-mix(in srgb, #1f9d6b 14%, transparent);
+}
+.srcManual {
+  color: #3c63b4;
+  background: color-mix(in srgb, #3c63b4 14%, transparent);
+}
+.srcNone {
+  color: var(--text-muted);
+  background: color-mix(in srgb, var(--text-muted) 12%, transparent);
+}
+.tagWarn {
+  color: #d1495b;
+  background: color-mix(in srgb, #d1495b 14%, transparent);
+}
+
+/* ---- Matriks kelengkapan (tanggal × gerbang) ---- */
+.matrixWrap {
+  overflow: auto;
+  border: 1px solid var(--border, #e4e9ef);
+  border-radius: 10px;
+}
+.matrix {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: max-content;
+  min-width: 100%;
+  font-size: var(--fs-xs, 12px);
+}
+.matrix th,
+.matrix td {
+  padding: 6px 8px;
+  text-align: center;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border, #e4e9ef);
+}
+.matrix thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-2, #f6f8fb);
+  color: var(--text-muted);
+  font-weight: 600;
+  z-index: 1;
+}
+.matrix .dateCol {
+  position: sticky;
+  left: 0;
+  background: var(--surface, #fff);
+  text-align: left;
+  font-weight: 600;
+  color: var(--text);
+  z-index: 2;
+}
+.matrix thead .dateCol {
+  z-index: 3;
+}
+/* Kolom gerbang yang bisa diklik untuk expand rincian shift. */
+.gerbangCell {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+.gerbangCell:hover {
+  color: #3c63b4;
+}
+.matrix tbody tr.rowSel td {
+  background: color-mix(in srgb, #3c63b4 10%, transparent);
+}
+.matrix tbody tr.rowSel .dateCol {
+  background: color-mix(in srgb, #3c63b4 16%, var(--surface, #fff));
+  color: #3c63b4;
+}
+
+/* Sub-baris rincian per shift (inline expand di dalam matriks) */
+.shiftSubRow td {
+  background: color-mix(in srgb, #3c63b4 4%, var(--surface, #fff));
+}
+.shiftSubRow .shiftLabel {
+  padding-left: 24px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: color-mix(in srgb, #3c63b4 8%, var(--surface, #fff));
+}
+.cell {
+  min-width: 24px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+.cAuto { background: #1f9d6b; }
+.cManual { background: #3c63b4; }
+.cPartial { background: #d9a520; }
+.cKosong { background: #d1495b; }
+/* Versi pastel (saturasi rendah) untuk sel rincian shift — dibedakan dari baris utama. */
+.cAutoSoft { background: #c3e6d5; color: #15603f; }
+.cManualSoft { background: #cdd9f2; color: #2a4578; }
+.cKosongSoft { background: #f3cdd2; color: #8f2c39; }
+.cNa {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px dashed var(--border, #cfd6de);
+}
+
+/* ---- Legenda ---- */
+.legend {
+  display: inline-flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+  font-size: var(--fs-xs, 12px);
+  color: var(--text-muted);
+}
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+/* ---- Badge persentase lengkap ---- */
+.pctBadge {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-weight: 800;
+  font-size: var(--fs-lg, 18px);
+}
+.pctGood { color: #1f9d6b; }
+.pctWarn { color: #c08a1e; }
+.pctBad { color: #d1495b; }
+
+/* ---- Cara melengkapi ---- */
+.howGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  margin-top: 4px;
+}
+.howCard {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--border, #e4e9ef);
+  border-radius: 10px;
+  background: var(--surface, #fff);
+}
+.howIcon {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, #3c63b4 12%, transparent);
+  color: #3c63b4;
+}
+.howText {
+  font-size: var(--fs-sm, 13px);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* ---- Daftar sel kosong ---- */
+.kosongList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 260px;
+  overflow: auto;
+}
+.kosongRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 5px 2px;
+  border-bottom: 1px solid var(--border, #eef1f5);
+  font-size: var(--fs-xs, 12px);
+}
+.kosongRow span:first-child { color: var(--text); font-weight: 600; }
+.kosongRow span:last-child { color: var(--text-muted); }
