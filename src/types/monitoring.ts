@@ -39,6 +39,15 @@ export interface GateAlert {
   last_event_at?: string | null;
 }
 
+/** Lokasi gerbang (master) tanpa data perangkat — layer "Lokasi Gerbang". */
+export interface GateLocation {
+  gate_code: string;
+  gate_name: string;
+  branch_id: number | null;
+  lat: number;
+  lng: number;
+}
+
 export interface MapAsset {
   id: number;
   asset_type: "cctv" | "vms" | string;

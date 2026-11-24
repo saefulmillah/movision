@@ -153,6 +153,16 @@
 .tbSpacer {
   flex: 1 1 auto;
 }
+.offToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
 
 /* Pager mode layar penuh (di floating toolbar) */
 .pager {

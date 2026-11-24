@@ -1,4 +1,4 @@
-import { Button, Tabs } from "@/components/ui";
+import { Button, Switch, Tabs } from "@/components/ui";
 import type { TabItem } from "@/components/ui";
 import styles from "./cctv.module.css";
 
@@ -15,9 +15,11 @@ interface CctvToolbarProps {
   cols: number;
   onCols: (cols: number) => void;
   onFull: () => void;
+  showOffline: boolean;
+  onToggleOffline: () => void;
 }
 
-export function CctvToolbar({ branchName, online, offline, cols, onCols, onFull }: CctvToolbarProps) {
+export function CctvToolbar({ branchName, online, offline, cols, onCols, onFull, showOffline, onToggleOffline }: CctvToolbarProps) {
   return (
     <div className={styles.toolbar}>
       <span className={styles.tbBranch}>{branchName}</span>
@@ -28,6 +30,15 @@ export function CctvToolbar({ branchName, online, offline, cols, onCols, onFull 
         <span className={styles.off}>{offline} offline</span>
       </span>
       <span className={styles.tbSpacer} />
+      {/* Toggle tampilkan/sembunyikan CCTV offline — di sebelah pengaturan matrix layout. */}
+      <label className={styles.offToggle} title={`${showOffline ? "Sembunyikan" : "Tampilkan"} CCTV offline`}>
+        <Switch
+          checked={showOffline}
+          onCheckedChange={onToggleOffline}
+          ariaLabel="Tampilkan CCTV offline"
+        />
+        <span>Tampilkan offline</span>
+      </label>
       <Tabs value={String(cols)} onValueChange={(v) => onCols(Number(v))} items={GRID_TABS} />
       <Button variant="secondary" size="sm" icon="maximize" iconOnly onClick={onFull} title="Layar penuh" />
     </div>

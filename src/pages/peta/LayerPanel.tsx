@@ -28,6 +28,7 @@ interface LayerPanelProps {
   densityOn: boolean;
   densityCount: number;
   onToggleDensity: () => void;
+  onOpenArusAll: () => void;
 }
 
 export function LayerPanel({
@@ -42,7 +43,8 @@ export function LayerPanel({
   onToggleRoute,
   densityOn,
   densityCount,
-  onToggleDensity
+  onToggleDensity,
+  onOpenArusAll
 }: LayerPanelProps) {
   return (
     <aside className={styles.layerPanel}>
@@ -94,6 +96,27 @@ export function LayerPanel({
 
         {/* ---- Status kepadatan gerbang (toggle independen) ---- */}
         <div className={styles.layerGroupLabel}>Arus Lalu Lintas</div>
+
+        {/* Ringkasan agregat semua koridor (buka panel Arus Lalin). */}
+        <div className={styles.layerRow}>
+          <div
+            className={styles.layerZone}
+            onClick={onOpenArusAll}
+            style={{ cursor: "pointer" }}
+            role="button"
+            title="Lihat ringkasan arus lalin seluruh koridor"
+          >
+            <span className={styles.layerIcon} style={{ background: "color-mix(in srgb, var(--sem-blue, #3b82f6) 16%, transparent)", color: "var(--sem-blue, #3b82f6)" }}>
+              <Icon name="activity" size={16} />
+            </span>
+            <span className={styles.layerInfo}>
+              <span className={styles.layerName}>Ringkasan Arus Lalin</span>
+              <span className={styles.layerCount}>Semua ruas</span>
+            </span>
+            <Icon name="chevron-right" size={15} />
+          </div>
+        </div>
+
         <div className={styles.layerRow} data-active={densityOn || undefined}>
           <div className={styles.layerZone} style={{ cursor: "default" }} title="Tooltip kepadatan gerbang yang selalu tampil (marker gerbang padat ikut muncul walau layer Gerbang Tol dimatikan).">
             <span className={styles.layerIcon} style={{ background: "color-mix(in srgb, var(--sem-orange, #f97316) 16%, transparent)", color: "var(--sem-orange, #f97316)" }}>

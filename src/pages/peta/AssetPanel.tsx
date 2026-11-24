@@ -72,6 +72,16 @@ function attributes(key: LayerKey | null, raw: Record<string, unknown>): [string
       push("Jarak", raw.distance_km ? `${raw.distance_km} km` : "");
       push("Status", raw.status);
       break;
+    case "weather":
+      push("Kode", raw.point_code);
+      push("Kondisi", raw.weather_label);
+      push("Suhu", raw.temperature_c != null ? `${raw.temperature_c}°C` : "");
+      push("Kelembapan", raw.humidity_pct != null ? `${raw.humidity_pct}%` : "");
+      push("Angin", raw.wind_kph != null ? `${raw.wind_kph} km/j` : "");
+      push("Ruas", raw.branch_name ?? raw.branch_id);
+      push("Koordinat", raw.lat && raw.lng ? `${raw.lat}, ${raw.lng}` : "");
+      if (raw.is_stale) push("Catatan", "Data mungkin kedaluwarsa");
+      break;
   }
   return rows;
 }
@@ -163,6 +173,16 @@ export function AssetPanel({
             <div key={type}>
               <div className={styles.groupHeader}>
                 <span>{type}</span>
+                <span className={styles.groupCount}>{group.length}</span>
+              </div>
+              {group.map((item) => renderItem(item, selection, onSelectItem))}
+            </div>
+          ))
+        ) : layerKey === "weather" ? (
+          groupByBranch(items).map(([ruas, group]) => (
+            <div key={ruas}>
+              <div className={styles.groupHeader}>
+                <span>{ruas}</span>
                 <span className={styles.groupCount}>{group.length}</span>
               </div>
               {group.map((item) => renderItem(item, selection, onSelectItem))}
@@ -276,6 +296,18 @@ function groupByVehicleType(items: ListItem[]): [string, ListItem[]][] {
     const type = (item.raw as { vehicle_type?: string })?.vehicle_type || "Lainnya";
     if (!map.has(type)) map.set(type, []);
     map.get(type)!.push(item);
+  }
+  return [...map.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+}
+
+/** Kelompokkan item cuaca berdasarkan nama ruas (dari data mentah), urut alfabet. */
+function groupByBranch(items: ListItem[]): [string, ListItem[]][] {
+  const map = new Map<string, ListItem[]>();
+  for (const item of items) {
+    const raw = item.raw as { branch_name?: string; branch_id?: number } | null;
+    const ruas = raw?.branch_name || (raw?.branch_id != null ? `Ruas ${raw.branch_id}` : "Tanpa Ruas");
+    if (!map.has(ruas)) map.set(ruas, []);
+    map.get(ruas)!.push(item);
   }
   return [...map.entries()].sort((a, b) => a[0].localeCompare(b[0]));
 }

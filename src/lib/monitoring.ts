@@ -1,5 +1,5 @@
 import { api } from "@/lib/api";
-import type { Branch, GateAlert, MapAsset, MonitoringSummary, SosTicket } from "@/types/monitoring";
+import type { Branch, GateAlert, GateLocation, MapAsset, MonitoringSummary, SosTicket } from "@/types/monitoring";
 import type { LiveVehicle, NetworkArc, WeatherPoint } from "@/types/map";
 
 /** Ringkasan KPI Dashboard (agregasi backend). */
@@ -10,6 +10,11 @@ export function fetchMonitoringSummary(): Promise<MonitoringSummary> {
 /** Peringatan gerbang tol. Endpoint membungkus { data, meta }; klien mengembalikan data. */
 export function fetchGateAlerts(): Promise<GateAlert[]> {
   return api.get<GateAlert[]>("/map/gate-alerts");
+}
+
+/** Lokasi gerbang (master) yang belum ada di feed status — layer "Lokasi Gerbang". */
+export function fetchGateLocations(): Promise<GateLocation[]> {
+  return api.get<GateLocation[]>("/map/gate-locations");
 }
 
 /** Daftar ruas beserta koordinat pusat. */

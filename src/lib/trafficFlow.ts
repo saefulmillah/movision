@@ -84,6 +84,14 @@ export interface DensityItem {
   kapasitas_dinamis: number | null; rho_dinamis: number | null; tren_dinamis: number | null;
   level_dinamis?: Level;
   kapasitas_desain?: number | null; pct_desain?: number | null;
+  // Bukti antrian (A+C): jenuh bertahan / waktu tempuh naik → status "kritis = antri".
+  antri?: boolean;
+  antri_alasan?: string[];
+  sat_bins?: number;
+  avg_tt_now?: number | null;
+  avg_tt_base?: number | null;
+  tt_ratio?: number | null;
+  butuh_mobile_reader?: boolean;
   last_bin: string | null;
 }
 export interface DensityResp { arah: string; count: number; items: DensityItem[]; }
@@ -139,6 +147,26 @@ export interface ArahMapItem {
 }
 export interface ArahMapResp { arah_utama: Arah[]; count: number; items: ArahMapItem[]; }
 
+export type KondisiObservasi = "lancar" | "antri_ringan" | "antri_sedang" | "antri_parah";
+export const KONDISI_META: Record<KondisiObservasi, { label: string; color: string }> = {
+  lancar: { label: "Lancar", color: "#22c55e" },
+  antri_ringan: { label: "Antri ringan", color: "#eab308" },
+  antri_sedang: { label: "Antri sedang", color: "#f97316" },
+  antri_parah: { label: "Antri parah", color: "#ef4444" }
+};
+export interface ObservasiRow {
+  id: number; kode_bujt: string; gb_tujuan_norm: string; arah: string | null;
+  observed_at: string; kondisi: KondisiObservasi; gardu_antri: number; catatan: string | null;
+  snap_level: Level | null; snap_rho: number | string | null; snap_rate_now: number | null;
+  snap_kapasitas_jam: number | null; snap_tt_avg: number | string | null;
+  snap_antri: number | null; snap_last_bin: string | null; observer_name: string | null;
+}
+export interface ObservasiListResp { count: number; items: ObservasiRow[]; }
+export interface ObservasiCreateBody {
+  kode_bujt: string; gb_tujuan: string; arah?: string;
+  kondisi: KondisiObservasi; gardu_antri?: number; catatan?: string;
+}
+
 // ---- Pemanggil ----
 
 const B = "/traffic-flow";
@@ -157,7 +185,11 @@ export const trafficFlow = {
   prediksiVs: (arah?: string) => api.get<PrediksiVsResp>(`${B}/prediksi-vs${qs({ arah })}`),
   prediksiList: (tanggal?: string) => api.get<PrediksiListResp>(`${B}/prediksi${qs({ tanggal })}`),
   prediksiUpsert: (rows: Omit<PrediksiRow, "source" | "updated_at">[]) =>
-    api.post<{ upserted: number }>(`${B}/prediksi`, rows)
+    api.post<{ upserted: number }>(`${B}/prediksi`, rows),
+  observasiList: (p?: { kode_bujt?: string; gb_tujuan?: string; limit?: number }) =>
+    api.get<ObservasiListResp>(`${B}/observasi${qs(p)}`),
+  observasiCreate: (body: ObservasiCreateBody) =>
+    api.post<{ id: number }>(`${B}/observasi`, body)
 };
 
 function qs(p?: Record<string, string | number | undefined | null>): string {

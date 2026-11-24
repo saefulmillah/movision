@@ -5,7 +5,7 @@ import { useTickets } from "@/context/TicketsContext";
 import { useSse } from "@/context/SseContext";
 import { useClock } from "@/lib/useClock";
 import { usePolling } from "@/lib/usePolling";
-import { fetchGateAlerts, fetchLiveVehicles, fetchMapAssets, fetchNetworkArcs, fetchWeatherPoints } from "@/lib/monitoring";
+import { fetchGateAlerts, fetchGateLocations, fetchLiveVehicles, fetchMapAssets, fetchNetworkArcs, fetchWeatherPoints } from "@/lib/monitoring";
 import { LayerPanel } from "./LayerPanel";
 import { AssetPanel } from "./AssetPanel";
 import type { PanelMode } from "./AssetPanel";
@@ -18,12 +18,14 @@ import {
   arcToItem,
   assetToItem,
   assetToPoint,
+  gateLocToPoint,
   gateToItem,
   gateToPoint,
   sosToItem,
   sosToPoint,
   vehicleToItem,
   vehicleToPoint,
+  weatherToItem,
   weatherToPoint
 } from "./layers";
 import type { LayerKey, ListItem, MapPoint } from "./layers";
@@ -38,16 +40,47 @@ import styles from "./peta.module.css";
 
 const AUTO_HIDE_MS = 2600;
 
+// Kunci localStorage untuk setelan peta (bertahan antar sesi).
+const LS_VISIBLE = "peta-layer-visible";
+const LS_ROUTE = "peta-route-visible";
+const LS_DENSITY = "peta-density-on";
+
+/** Baca map boolean tersimpan lalu merge ke default (key baru tetap pakai default). */
+function loadToggles<K extends string>(storageKey: string, defaults: Record<K, boolean>): Record<K, boolean> {
+  try {
+    const raw = localStorage.getItem(storageKey);
+    if (raw) {
+      const saved = JSON.parse(raw) as Partial<Record<K, boolean>>;
+      for (const k of Object.keys(defaults) as K[]) {
+        if (typeof saved[k] === "boolean") defaults[k] = saved[k] as boolean;
+      }
+    }
+  } catch {
+    /* storage tak tersedia / rusak — pakai default */
+  }
+  return defaults;
+}
+
 function initVisibility(): Record<LayerKey, boolean> {
   const out = {} as Record<LayerKey, boolean>;
   for (const l of LAYERS) out[l.key] = l.defaultOn;
-  return out;
+  return loadToggles(LS_VISIBLE, out);
 }
 
 function initRouteVisibility(): Record<RouteKey, boolean> {
   const out = {} as Record<RouteKey, boolean>;
   for (const l of ROUTE_LAYERS) out[l.key] = l.defaultOn;
-  return out;
+  return loadToggles(LS_ROUTE, out);
+}
+
+function initDensity(): boolean {
+  try {
+    const raw = localStorage.getItem(LS_DENSITY);
+    if (raw != null) return raw === "1";
+  } catch {
+    /* abaikan */
+  }
+  return true;
 }
 
 export function PetaPage() {
@@ -61,6 +94,8 @@ export function PetaPage() {
   const arcsQ = usePolling(fetchNetworkArcs, 60000);
   const vehQ = usePolling(fetchLiveVehicles, 15000);
   const wxQ = usePolling(fetchWeatherPoints, 120000);
+  // Lokasi gerbang (master) yang belum ada di feed status — jarang berubah.
+  const gateLocQ = usePolling(fetchGateLocations, 300000);
   // Pemetaan gerbang→arah (konfigurasi, ambil sekali) untuk resolver klik vektor.
   const arahMapQ = usePolling(() => trafficFlow.arahMap(), 0);
   // Gerbang "jadi perhatian" (ramai/padat/kritis) untuk status kepadatan di peta.
@@ -70,7 +105,7 @@ export function PetaPage() {
   const [routeVisible, setRouteVisible] = useState<Record<RouteKey, boolean>>(initRouteVisibility);
   // Toggle "Status Kepadatan": marker gerbang padat + tooltip persisten,
   // independen dari toggle "Gerbang Tol".
-  const [densityOn, setDensityOn] = useState(true);
+  const [densityOn, setDensityOn] = useState(initDensity);
   const [panelMode, setPanelMode] = useState<PanelMode>("empty");
   const [listKey, setListKey] = useState<LayerKey | null>(null);
   const [search, setSearch] = useState("");
@@ -101,6 +136,29 @@ export function PetaPage() {
     });
   }, []);
 
+  // Simpan setelan toggle agar bertahan saat halaman dibuka ulang.
+  useEffect(() => {
+    try {
+      localStorage.setItem(LS_VISIBLE, JSON.stringify(visible));
+    } catch {
+      /* abaikan */
+    }
+  }, [visible]);
+  useEffect(() => {
+    try {
+      localStorage.setItem(LS_ROUTE, JSON.stringify(routeVisible));
+    } catch {
+      /* abaikan */
+    }
+  }, [routeVisible]);
+  useEffect(() => {
+    try {
+      localStorage.setItem(LS_DENSITY, densityOn ? "1" : "0");
+    } catch {
+      /* abaikan */
+    }
+  }, [densityOn]);
+
   const branchName = activeBranch?.branch_name ?? "Semua Ruas";
 
   // --- Filter per ruas aktif ---
@@ -118,8 +176,9 @@ export function PetaPage() {
     const wx = (wxQ.data ?? []).filter((w) => inBranch(w.branch_id));
     const sos = tickets.filter((t) => inBranch(t.sos?.branch_id));
     const fo = (arcsQ.data ?? []).filter((e) => inBranch(e.source?.branch_id) || inBranch(e.target?.branch_id));
-    return { cctv, vms, gates, veh, wx, sos, fo };
-  }, [assetsQ.data, gatesQ.data, vehQ.data, wxQ.data, arcsQ.data, tickets, inBranch]);
+    const gateloc = (gateLocQ.data ?? []).filter((g) => inBranch(g.branch_id));
+    return { cctv, vms, gates, veh, wx, sos, fo, gateloc };
+  }, [assetsQ.data, gatesQ.data, vehQ.data, wxQ.data, arcsQ.data, gateLocQ.data, tickets, inBranch]);
 
   const items = useMemo<Record<LayerKey, ListItem[]>>(
     () => ({
@@ -128,8 +187,9 @@ export function PetaPage() {
       fo: groups.fo.map(arcToItem),
       gps: groups.veh.map(vehicleToItem),
       gate: groups.gates.map(gateToItem),
-      weather: [],
-      sos: groups.sos.map(sosToItem)
+      weather: groups.wx.map(weatherToItem),
+      sos: groups.sos.map(sosToItem),
+      gateloc: []
     }),
     [groups]
   );
@@ -142,7 +202,8 @@ export function PetaPage() {
       gps: groups.veh.length,
       gate: groups.gates.length,
       weather: groups.wx.length,
-      sos: groups.sos.length
+      sos: groups.sos.length,
+      gateloc: groups.gateloc.length
     }),
     [groups]
   );
@@ -155,7 +216,8 @@ export function PetaPage() {
       gps: 0,
       gate: groups.gates.filter((g) => ["error", "offline"].includes(String(g.status).toLowerCase())).length,
       weather: 0,
-      sos: groups.sos.length
+      sos: groups.sos.length,
+      gateloc: 0
     }),
     [groups]
   );
@@ -165,10 +227,14 @@ export function PetaPage() {
     const m = new Map<string, GateConcern>();
     for (const it of rankQ.data?.items ?? []) {
       const meta = levelMeta(it.level);
+      const ttUp = it.tt_ratio != null && it.tt_ratio > 1 ? `tt +${Math.round((it.tt_ratio - 1) * 100)}%` : undefined;
       m.set(normGate(it.gb_tujuan), {
         label: meta.label,
         color: meta.color,
-        pct: `${Math.round((it.rho ?? 0) * 100)}%`
+        pct: `${Math.round((it.rho ?? 0) * 100)}%`,
+        antri: it.antri,
+        reader: it.butuh_mobile_reader,
+        note: ttUp
       });
     }
     return m;
@@ -191,6 +257,7 @@ export function PetaPage() {
       add(groups.gates.filter((g) => gateConcern.has(normGate(g.gate_name))).map((g) => gateToPoint(g, gateConcern)));
     }
     if (visible.weather) add(groups.wx.map(weatherToPoint));
+    if (visible.gateloc) add(groups.gateloc.map(gateLocToPoint));
     if (visible.sos) add(groups.sos.map(sosToPoint));
     if (visible.fo) pts.push(...arcNodesToPoints(groups.fo));
     return pts;
@@ -275,15 +342,35 @@ export function PetaPage() {
     setVisible((v) => (v[key] ? v : { ...v, [key]: true }));
   }, []);
 
-  const toggleLayer = useCallback((key: LayerKey) => {
-    setVisible((v) => ({ ...v, [key]: !v[key] }));
-  }, []);
+  const toggleLayer = useCallback(
+    (key: LayerKey) => {
+      const turningOn = !visible[key];
+      setVisible((v) => ({ ...v, [key]: !v[key] }));
+      // Cuaca: nyalakan → buka daftar detail cuaca di panel kanan; matikan →
+      // tutup bila daftar cuaca sedang terbuka.
+      if (key === "weather") {
+        if (turningOn) {
+          openList("weather");
+        } else if (listKey === "weather") {
+          setPanelMode("empty");
+          setSelection(null);
+          setListKey(null);
+        }
+      }
+    },
+    [visible, listKey, openList]
+  );
 
   const toggleRoute = useCallback((key: RouteKey) => {
     setRouteVisible((v) => ({ ...v, [key]: !v[key] }));
   }, []);
 
   const toggleDensity = useCallback(() => setDensityOn((v) => !v), []);
+
+  // Buka panel Arus Lalin agregat (semua koridor), lepas dari klik vektor ruas.
+  const openArusAll = useCallback(() => {
+    setTrafficSel({ kind: "all", roadName: "Semua Ruas" });
+  }, []);
 
   // --- Klik vektor ruas → kartu arus lalin ---
   const arahIndex = useMemo(() => buildArahIndex(arahMapQ.data?.items), [arahMapQ.data]);
@@ -414,6 +501,7 @@ export function PetaPage() {
           densityOn={densityOn}
           densityCount={densityTips.length}
           onToggleDensity={toggleDensity}
+          onOpenArusAll={openArusAll}
         />
       ) : (
         <>
@@ -441,6 +529,7 @@ export function PetaPage() {
               densityOn={densityOn}
               densityCount={densityTips.length}
               onToggleDensity={toggleDensity}
+              onOpenArusAll={openArusAll}
             />
           </div>
         </>

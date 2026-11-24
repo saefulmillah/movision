@@ -18,9 +18,17 @@ const MARKER_CSS =
   "@keyframes petaMkEnter{from{opacity:0;transform:translateY(10px) scale(.6)}to{opacity:1;transform:none}}" +
   ".peta-mk-enter{animation:petaMkEnter 440ms cubic-bezier(.22,1,.36,1) both;transform-origin:50% 50%}" +
   ".peta-mk-icon{display:block;position:relative;will-change:transform,opacity}" +
+  // Staggered entrance bubble cluster: fade + scale-in (0.2→1) dari Y+12px, tanpa
+  // bounce (ease-out mulus). Delay di-set inline per-marker → muncul bergantian.
+  "@keyframes petaClEnter{from{opacity:0;transform:translateY(12px) scale(.2)}to{opacity:1;transform:none}}" +
+  ".peta-cl-enter{display:block;animation:petaClEnter 480ms cubic-bezier(.16,1,.3,1) both;" +
+  "transform-origin:50% 50%;will-change:transform,opacity}" +
   ".peta-cluster{display:flex;align-items:center;justify-content:center;cursor:pointer;" +
   "color:#eaf2ff;font:700 12px/1 'IBM Plex Sans',system-ui,sans-serif;transition:transform .12s ease}" +
   ".peta-cluster:hover{transform:scale(1.06)}" +
+  // Hormati preferensi kurangi-gerak: cluster langsung tampil (hanya bubble cluster,
+  // tak mengubah animasi marker lain).
+  "@media (prefers-reduced-motion:reduce){.peta-cl-enter{animation:none}}" +
   // Badge jumlah pada marker bertumpuk (koordinat sama) → tanda bisa di-spiderfy.
   ".peta-mk-badge{position:absolute;top:-5px;right:-5px;min-width:16px;height:16px;padding:0 3px;" +
   "border-radius:8px;background:#0ea5e9;color:#fff;box-sizing:border-box;box-shadow:0 1px 4px rgba(0,0,0,.55);" +
@@ -58,6 +66,26 @@ function playEnter(el: HTMLElement): void {
   el.classList.add("peta-mk-enter");
 }
 
+/* Staggered entrance bubble cluster: tiap pass render (clusterer hanya render-ulang
+ * saat ZOOM berubah) semua cluster dibuat dalam satu batch sinkron. Indeks naik
+ * per-cluster → delay bertingkat (muncul bergantian), lalu di-reset lewat timer 0ms
+ * agar batch berikutnya mulai dari 0. Cap batas atas agar cluster terakhir tak telat. */
+const CL_STAGGER_MS = 90; // jeda antar-cluster (80–100ms)
+const CL_STAGGER_CAP = 540; // batas atas delay (≈6 langkah)
+let clEnterSeq = 0;
+let clEnterResetT = 0;
+function nextClusterEnterDelay(): number {
+  if (!clEnterResetT) {
+    clEnterResetT = window.setTimeout(() => {
+      clEnterSeq = 0;
+      clEnterResetT = 0;
+    }, 0);
+  }
+  const d = Math.min(clEnterSeq * CL_STAGGER_MS, CL_STAGGER_CAP);
+  clEnterSeq += 1;
+  return d;
+}
+
 function escapeHtml(s: string): string {
   return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c] as string));
 }
@@ -70,7 +98,8 @@ const CAT_COLORS: Record<string, string> = {
   gps: "#5A8DFF",
   gate: "#F43F5E",
   weather: "#38BDF8",
-  sos: "#FB7185"
+  sos: "#FB7185",
+  gateloc: "#94A3B8"
 };
 const CAT_LABEL: Record<string, string> = {
   cctv: "CCTV",
@@ -79,7 +108,8 @@ const CAT_LABEL: Record<string, string> = {
   gps: "GPS",
   gate: "Gerbang",
   weather: "Cuaca",
-  sos: "SOS"
+  sos: "SOS",
+  gateloc: "Lokasi Gerbang"
 };
 
 /* GPS sering tetap bertumpuk walau sudah zoom-in → cluster-nya dipecah per
@@ -413,9 +443,19 @@ function makeClusterRenderer(map: google.maps.Map, popup: PopupOverlay): Rendere
         popup.hide();
       });
 
+      // Wrapper entrance: animasi fade+scale-in staggered ditaruh di sini, bukan di
+      // `bubble`, agar tak bentrok dengan transform :hover bubble (.peta-cluster).
+      // Transform-only + opacity → ringan (compositor), tak menghalangi klik/pan.
+      const enter = document.createElement("div");
+      enter.className = "peta-cl-enter";
+      enter.style.animationDelay = `${nextClusterEnterDelay()}ms`;
+      enter.appendChild(bubble);
+      // Lepas class setelah selesai agar will-change tak menetap & siap main-ulang.
+      enter.addEventListener("animationend", () => enter.classList.remove("peta-cl-enter"));
+
       return new google.maps.marker.AdvancedMarkerElement({
         position: cluster.position,
-        content: anchoredContent(bubble, r * 2, r * 2, r, r).root,
+        content: anchoredContent(enter, r * 2, r * 2, r, r).root,
         zIndex: 900 + Math.min(count, 99),
         gmpClickable: true
       });
@@ -1059,8 +1099,16 @@ interface LayerBuilt {
   labels: google.maps.Marker[];
 }
 
-const LABEL_MIN_ZOOM = 8; // tampilkan nama ruas mulai zoom ini (hindari tumpang-tindih saat overview)
+const LABEL_MIN_ZOOM = 6; // tampilkan nama ruas mulai zoom ini (overview Sumatera penuh)
 const DASH_MIN_ZOOM = 10; // fungsional: putus-putus saat dekat; garis tipis solid saat zoom out
+
+/** Ukuran font label ruas menurut zoom: kecil saat overview (meredam
+ *  tumpang-tindih antar-ruas berdekatan), membesar saat mendekat. */
+function labelFontSize(zoom: number): string {
+  if (zoom >= 10) return "11px";
+  if (zoom >= 8) return "10px";
+  return "9px"; // zoom 6–7 (overview Sumatera): kecil agar minim tumpang-tindih
+}
 
 /** Setel gaya garis fungsional menurut zoom: solid tipis saat jauh (jaringan
  *  terlihat jelas), putus-putus saat dekat (tanda ruas fungsional). */
@@ -1088,9 +1136,18 @@ export function useRouteLayers(visible: Record<RouteKey, boolean>, onRouteClick?
     if (!map) return;
     const zoom = map.getZoom() ?? 0;
     const showLabels = zoom >= LABEL_MIN_ZOOM;
+    const fontSize = labelFontSize(zoom);
     for (const lb of builtRef.current.values()) {
       for (const r of lb.routes) if (r.dashed) styleFunctional(r.vis, r.color, zoom);
-      for (const m of lb.labels) m.setVisible(showLabels);
+      for (const m of lb.labels) {
+        m.setVisible(showLabels);
+        if (!showLabels) continue;
+        // Perbesar/perkecil font label mengikuti zoom (hanya saat berubah).
+        const lab = m.getLabel();
+        if (lab && typeof lab === "object" && lab.fontSize !== fontSize) {
+          m.setLabel({ ...(lab as google.maps.MarkerLabel), fontSize });
+        }
+      }
     }
   }, [map]);
 
@@ -1286,6 +1343,7 @@ export function useRouteLayers(visible: Record<RouteKey, boolean>, onRouteClick?
           }
 
           built.set(layer.key, { routes, labels });
+          applyZoom(); // selaraskan ukuran font label dengan zoom saat ini
         })
         .catch((err) => console.error("[peta] route layer:", err));
     }

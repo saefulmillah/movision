@@ -3,11 +3,11 @@
 
 import { backendAsset } from "@/lib/api";
 import { MARKER_COLORS, labeledMarkerDataUri, markerDataUri } from "@/lib/markerIcon";
-import type { GateAlert, MapAsset, SosTicket } from "@/types/monitoring";
+import type { GateAlert, GateLocation, MapAsset, SosTicket } from "@/types/monitoring";
 import type { LiveVehicle, NetworkArc, NetworkNode, WeatherPoint } from "@/types/map";
 import { normGate } from "./arusResolver";
 
-export type LayerKey = "cctv" | "vms" | "fo" | "gps" | "gate" | "weather" | "sos";
+export type LayerKey = "cctv" | "vms" | "fo" | "gps" | "gate" | "weather" | "sos" | "gateloc";
 
 export interface LayerMeta {
   key: LayerKey;
@@ -27,8 +27,11 @@ export const LAYERS: LayerMeta[] = [
   { key: "fo", name: "Jaringan FO", icon: "share-2", colorVar: "--sem-cyan", color: "#22D3EE", hasList: true, defaultOn: false },
   { key: "gps", name: "GPS Kendaraan", icon: "truck", colorVar: "--st-blue", color: "#5A8DFF", hasList: true, defaultOn: true },
   { key: "gate", name: "Gerbang Tol", icon: "building-2", colorVar: "--sem-red", color: "#F43F5E", hasList: true, defaultOn: true },
-  { key: "weather", name: "Cuaca", icon: "cloud", colorVar: "--sem-sky", color: "#38BDF8", hasList: false, defaultOn: false },
-  { key: "sos", name: "SOS", icon: "siren", colorVar: "--sem-rose", color: "#FB7185", hasList: true, defaultOn: true }
+  { key: "weather", name: "Cuaca", icon: "cloud", colorVar: "--sem-sky", color: "#38BDF8", hasList: true, defaultOn: false },
+  { key: "sos", name: "SOS", icon: "siren", colorVar: "--sem-rose", color: "#FB7185", hasList: true, defaultOn: true },
+  // Lokasi gerbang dari master (titik abu-abu, tanpa klaim status) — melengkapi
+  // layer "Gerbang Tol" untuk gerbang yang belum ada datanya di feed status.
+  { key: "gateloc", name: "Lokasi Gerbang", icon: "map-pin", colorVar: "--st-gray", color: "#94A3B8", hasList: false, defaultOn: false }
 ];
 
 export interface MapPoint {
@@ -57,7 +60,8 @@ const LAYER_TYPE_LABEL: Record<LayerKey, string> = {
   gps: "GPS Kendaraan",
   gate: "Gerbang Tol",
   weather: "Cuaca",
-  sos: "SOS"
+  sos: "SOS",
+  gateloc: "Lokasi Gerbang"
 };
 
 export interface ListItem {
@@ -113,6 +117,12 @@ export interface GateConcern {
   label: string;
   color: string;
   pct: string;
+  /** Antrian terdeteksi (jenuh bertahan / waktu tempuh naik). */
+  antri?: boolean;
+  /** Disarankan menurunkan mobile reader (jenuh bertahan). */
+  reader?: boolean;
+  /** Catatan ringkas untuk tooltip (mis. "tt +42%"). */
+  note?: string;
 }
 
 export function gateToPoint(g: GateAlert, concern?: Map<string, GateConcern>): MapPoint | null {
@@ -136,8 +146,16 @@ export function gateToPoint(g: GateAlert, concern?: Map<string, GateConcern>): M
     iconSize: labeled.size,
     iconAnchor: labeled.anchor,
     name: g.gate_name,
-    typeLabel: dens ? `${LAYER_TYPE_LABEL.gate} · ${dens.label}` : LAYER_TYPE_LABEL.gate
+    typeLabel: dens ? gateDensityLabel(dens) : LAYER_TYPE_LABEL.gate
   };
+}
+
+/** Label tooltip gerbang: level + penanda antrian & saran mobile reader. */
+function gateDensityLabel(d: GateConcern): string {
+  const parts = [LAYER_TYPE_LABEL.gate, d.label];
+  if (d.antri) parts.push(d.note ? `Antri (${d.note})` : "Antri");
+  if (d.reader) parts.push("⚑ Mobile reader");
+  return parts.join(" · ");
 }
 export function gateToItem(g: GateAlert): ListItem {
   const s = g.device_summary;
@@ -198,6 +216,45 @@ export function weatherToPoint(w: WeatherPoint): MapPoint | null {
     iconUrl: markerDataUri("cloud", MARKER_COLORS.weather),
     name: w.point_name,
     typeLabel: w.weather_label || LAYER_TYPE_LABEL.weather
+  };
+}
+
+export function weatherToItem(w: WeatherPoint): ListItem {
+  // Rincian inline: kondisi + suhu/kelembapan/angin (ringkas) langsung di daftar.
+  const bits = [
+    w.temperature_c != null ? `${Math.round(w.temperature_c)}°C` : "",
+    w.humidity_pct != null ? `${Math.round(w.humidity_pct)}% RH` : "",
+    w.wind_kph != null ? `${Math.round(w.wind_kph)} km/j` : ""
+  ].filter(Boolean);
+  return {
+    id: String(w.id),
+    title: w.point_name,
+    desc: [w.weather_label, bits.join(" · ")].filter(Boolean).join(" — "),
+    status: w.is_stale ? "stale" : w.weather_label || "normal",
+    lat: w.lat,
+    lng: w.lng,
+    raw: w
+  };
+}
+
+/* ---- Lokasi Gerbang (master, tanpa status) ---- */
+export function gateLocToPoint(g: GateLocation): MapPoint | null {
+  if (g.lat == null || g.lng == null) return null;
+  const color = MARKER_COLORS.gray;
+  // Marker berlabel nama gerbang, warna abu-abu netral, TANPA cincin status.
+  const labeled = labeledMarkerDataUri("building-2", color, g.gate_name);
+  return {
+    id: `gateloc-${g.gate_code}`,
+    lat: g.lat,
+    lng: g.lng,
+    layer: "gateloc",
+    color,
+    critical: false,
+    iconUrl: labeled.url,
+    iconSize: labeled.size,
+    iconAnchor: labeled.anchor,
+    name: g.gate_name,
+    typeLabel: "Lokasi gerbang (tanpa data perangkat)"
   };
 }
 

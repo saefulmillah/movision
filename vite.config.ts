@@ -6,7 +6,7 @@ import react from "@vitejs/plugin-react";
 // bearer token/SSE mengalir lewat origin yang sama.
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  const apiTarget = env.VITE_API_PROXY_TARGET || "http://localhost:3000";
+  const apiTarget = env.VITE_API_PROXY_TARGET || "http://localhost:3100";
 
   return {
     plugins: [react()],
@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => {
       }
     },
     server: {
-      port: 5173,
+      port: 5273,
       proxy: {
         "/api": {
           target: apiTarget,

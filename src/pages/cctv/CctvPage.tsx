@@ -12,11 +12,17 @@ import { CameraGrid } from "./CameraGrid";
 import styles from "./cctv.module.css";
 
 const AUTO_HIDE_MS = 2600;
+const OFFLINE_KEY = "cctv-show-offline";
 const GRID_TABS: TabItem[] = [
   { value: "2", label: "2×2" },
   { value: "3", label: "3×3" },
   { value: "4", label: "4×4" }
 ];
+
+/** Kamera dianggap online bila aktif & punya URL stream; selain itu → offline. */
+function isCameraOnline(c: { is_active: number; stream_play_url: string | null }): boolean {
+  return Number(c.is_active) === 1 && Boolean(c.stream_play_url);
+}
 
 export function CctvPage() {
   const { activeBranchId, activeBranch } = useBranch();
@@ -32,11 +38,32 @@ export function CctvPage() {
   const [listOpen, setListOpen] = useState(false);
   const [uiVisible, setUiVisible] = useState(true);
   const [page, setPage] = useState(1);
+  const [showOffline, setShowOffline] = useState(() => {
+    try {
+      return localStorage.getItem(OFFLINE_KEY) !== "0";
+    } catch {
+      return true;
+    }
+  });
+
+  const toggleOffline = useCallback(() => {
+    setShowOffline((v) => {
+      const next = !v;
+      try {
+        localStorage.setItem(OFFLINE_KEY, next ? "1" : "0");
+      } catch {
+        /* storage tak tersedia — abaikan */
+      }
+      return next;
+    });
+  }, []);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return q ? cameras.filter((c) => c.cctv_name.toLowerCase().includes(q)) : cameras;
-  }, [cameras, query]);
+    let list = showOffline ? cameras : cameras.filter(isCameraOnline);
+    if (q) list = list.filter((c) => c.cctv_name.toLowerCase().includes(q));
+    return list;
+  }, [cameras, query, showOffline]);
 
   // Paging hanya saat layar penuh (mode normal menggulir seluruh kamera).
   const perPage = cols * cols;
@@ -46,12 +73,12 @@ export function CctvPage() {
   // Reset/clamp halaman saat grid, ruas, filter, atau mode berubah.
   useEffect(() => {
     setPage(1);
-  }, [cols, activeBranchId, full, query]);
+  }, [cols, activeBranchId, full, query, showOffline]);
   useEffect(() => {
     if (page > pageCount) setPage(pageCount);
   }, [page, pageCount]);
 
-  const online = useMemo(() => cameras.filter((c) => Number(c.is_active) === 1 && c.stream_play_url).length, [cameras]);
+  const online = useMemo(() => cameras.filter(isCameraOnline).length, [cameras]);
   const offline = cameras.length - online;
 
   // Auto-hide UI mode layar penuh.
@@ -120,6 +147,8 @@ export function CctvPage() {
             cols={cols}
             onCols={setCols}
             onFull={toggleFull}
+            showOffline={showOffline}
+            onToggleOffline={toggleOffline}
           />
         )}
 

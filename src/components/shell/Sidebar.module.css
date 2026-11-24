@@ -18,6 +18,10 @@
   display: flex;
   align-items: center;
   gap: var(--sp-3);
+  /* flex: none — WAJIB: tanpa ini, saat nav overflow (scroll) flexbox menyusutkan
+     header di bawah --h-topbar sehingga isinya (logo/brand) ter-geser NAIK dan
+     tak sejajar dengan judul di topbar (topbar sendiri sudah pakai flex:none). */
+  flex: none;
   height: var(--h-topbar);
   padding: 0 14px 0 18px;
   border-bottom: 1px solid var(--line);

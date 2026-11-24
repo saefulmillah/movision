@@ -10,6 +10,7 @@ import { ArusWallPage } from "@/pages/arus/ArusWallPage";
 import { KepadatanPage } from "@/pages/arus/KepadatanPage";
 import { TrenPage } from "@/pages/arus/TrenPage";
 import { PeringatanPage } from "@/pages/arus/PeringatanPage";
+import { ObservasiPage } from "@/pages/arus/ObservasiPage";
 import { SetelanArusPage } from "@/pages/arus/SetelanArusPage";
 import { SosPage } from "@/pages/sos/SosPage";
 import { EvaluasiSosPage } from "@/pages/sos/EvaluasiSosPage";
@@ -75,6 +76,7 @@ export default function App() {
         <Route path="/arus/kepadatan" element={<RequireModule module="traffic_flow"><KepadatanPage /></RequireModule>} />
         <Route path="/arus/tren" element={<RequireModule module="traffic_flow"><TrenPage /></RequireModule>} />
         <Route path="/arus/peringatan" element={<RequireModule module="traffic_flow"><PeringatanPage /></RequireModule>} />
+        <Route path="/arus/observasi" element={<RequireModule module="traffic_flow"><ObservasiPage /></RequireModule>} />
         <Route path="/arus/setelan" element={<RequireModule module="traffic_flow"><SetelanArusPage /></RequireModule>} />
         <Route path="/sos" element={<SosPage />} />
         <Route
