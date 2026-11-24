@@ -306,7 +306,7 @@ function TopCard({ data }: { data: OdolPresentation }) {
           <table className={styles.table}>
             <thead><tr><th className={styles.rank}>#</th><th>Wilayah</th><th className={styles.num}>ODOL</th><th className={styles.num}>%</th></tr></thead>
             <tbody>
-              {data.top_plates.slice(0, 12).map((it, i) => (
+              {data.top_plates.slice(0, 10).map((it, i) => (
                 <tr key={it.key}><td className={styles.rank}>{i + 1}</td><td><b>{it.key}</b> · {it.label}</td><td className={styles.num}>{fmt(it.total_odol)}</td><td className={styles.num}>{pct(it.odol_percent)}</td></tr>
               ))}
             </tbody>
@@ -315,7 +315,7 @@ function TopCard({ data }: { data: OdolPresentation }) {
           <table className={styles.table}>
             <thead><tr><th className={styles.rank}>#</th><th>Perusahaan</th><th className={styles.num}>ODOL</th><th className={styles.num}>Pangsa</th></tr></thead>
             <tbody>
-              {data.top_companies.slice(0, 12).map((it) => (
+              {data.top_companies.slice(0, 10).map((it) => (
                 <tr key={it.rank}><td className={styles.rank}>{it.rank}</td><td title={it.company_name}>{it.company_name}</td><td className={styles.num}>{fmt(it.total_odol)}</td><td className={styles.num}>{pct(it.company_share_percent)}</td></tr>
               ))}
             </tbody>
